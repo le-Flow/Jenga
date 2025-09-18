@@ -1,37 +1,35 @@
+##  Jenga Projektübesicht 🚀
 
-Jira Klon: Projektübersicht 🚀
-Frontend 🎨
-PWA: Die Anwendung soll als Progressive Web App entwickelt werden.
+### Frontend
 
-Framework: SolidJS
+- **PWA:** Die Anwendung soll als Progressive Web App entwickelt werden.
+- **Framework:** **SolidJS**
 
-Backend ⚙️
-Frameworks: Spring Boot oder Quarkus (Voraussetzung: Unterstützung für OpenAPI).
+***
 
-Datenbank: PostgreSQL in Kombination mit JPA (Java Persistence API).
+### Backend 
 
-Features ✨
-Benutzerverwaltung: Rollen, Gruppen und projektbasierte Berechtigungen.
+- **Frameworks:** **Spring Boot** oder **Quarkus** (Voraussetzung: Unterstützung für OpenAPI).
+- **Datenbank:** **PostgreSQL** in Kombination mit **JPA** (Java Persistence API).
 
-Ticket-System: Flexibles Vorlagensystem für Jira-ähnliche Tickets.
+***
 
-KI-Anbindung:
+### Features 
 
-Automatische Ticketerstellung aus Texten.
+- **Benutzerverwaltung:** Rollen, Gruppen und projektbasierte Berechtigungen.
+- **Ticket-System:** Flexibles Vorlagensystem für Jira-ähnliche Tickets.
+- **KI-Anbindung:**
+    - Automatische Ticketerstellung aus Texten.
+    - Intelligente Zusammenfassungen von Kommentaren und Beschreibungen.
+- **Versionskontrolle:** Anbindung an **GitHub** zur Verknüpfung von Commits und Pull Requests mit Tickets.
 
-Intelligente Zusammenfassungen von Kommentaren und Beschreibungen.
+***
 
-Versionskontrolle: Anbindung an GitHub zur Verknüpfung von Commits und Pull Requests mit Tickets.
+### Architektur & DevOps
 
-Architektur & DevOps 🏗️
-Deployment: Die gesamte Anwendung wird über Docker containerisiert.
-
-Authentifizierung: Keycloak für die zentrale Benutzerregistrierung und -verwaltung.
-
-Sicherheit: Absicherung der Verbindung über Let's Encrypt SSL-Zertifikate.
-
-CI/CD:
-
-Automatisierung von Builds und Tests.
-
-Deployment-Pipeline via GitHub Actions.
+- **Deployment:** Die gesamte Anwendung wird über **Docker** containerisiert.
+- **Authentifizierung:** **Keycloak** für die zentrale Benutzerregistrierung und -verwaltung.
+- **Sicherheit:** Absicherung der Verbindung über **Let's Encrypt** SSL-Zertifikate.
+- **CI/CD:**
+    - Automatisierung von Builds und Tests.
+    - Deployment-Pipeline via **GitHub Actions**.
