@@ -1,35 +1,31 @@
-##  Jenga Projektübesicht 🚀
+## Jenga: Projektübersicht 
 
-### Frontend
+### \<span style="color:red;"\>Frontend\</span\> 
 
-- **PWA:** Die Anwendung soll als Progressive Web App entwickelt werden.
-- **Framework:** **SolidJS**
+  - \<span style="color:red;"\>PWA\</span\>
+  - \<span style="color:red;"\>Framework: \<u\>SolidJS\</u\>\</span\>
 
-***
+-----
 
-### Backend 
+### \<span style="color:blue;"\>Backend\</span\> 
 
-- **Frameworks:** **Spring Boot** oder **Quarkus** (Voraussetzung: Unterstützung für OpenAPI).
-- **Datenbank:** **PostgreSQL** in Kombination mit **JPA** (Java Persistence API).
+  - \<span style="color:blue;"\>Framework: Springboot, \<u\>Quarkus\</u\> (sollte \<u\>openapi\</u\> haben)\</span\>
+  - \<span style="color:blue;"\>Datenbank: Postgres + \<u\>JPA\</u\>\</span\>
 
-***
+-----
 
 ### Features 
 
-- **Benutzerverwaltung:** Rollen, Gruppen und projektbasierte Berechtigungen.
-- **Ticket-System:** Flexibles Vorlagensystem für Jira-ähnliche Tickets.
-- **KI-Anbindung:**
-    - Automatische Ticketerstellung aus Texten.
-    - Intelligente Zusammenfassungen von Kommentaren und Beschreibungen.
-- **Versionskontrolle:** Anbindung an **GitHub** zur Verknüpfung von Commits und Pull Requests mit Tickets.
+  - **Benutzerverwaltung:** Rollen, Gruppen und projektbasierte Berechtigungen.
+  - **Ticket-System:** Flexibles Vorlagensystem für Jira-ähnliche Tickets.
+  - \<span style="color:green;"\>**KI-Anbindung:** Automatische Ticketerstellung, \<u\>Zusammenfassung\</u\> etc.\</span\>
+  - \<span style="color:green;"\>**Versionskontrolle:** Github Anbindung\</span\>
 
-***
+-----
 
 ### Architektur & DevOps
 
-- **Deployment:** Die gesamte Anwendung wird über **Docker** containerisiert.
-- **Authentifizierung:** **Keycloak** für die zentrale Benutzerregistrierung und -verwaltung.
-- **Sicherheit:** Absicherung der Verbindung über **Let's Encrypt** SSL-Zertifikate.
-- **CI/CD:**
-    - Automatisierung von Builds und Tests.
-    - Deployment-Pipeline via **GitHub Actions**.
+  - **Deployment:** Die gesamte Anwendung wird über **Docker** containerisiert.
+  - **Authentifizierung:** **Keycloak** für die zentrale Benutzerregistrierung und -verwaltung.
+  - **Sicherheit:** Absicherung der Verbindung über **\<span style="color:red;"\>\<u\>letsencrypt\</u\>\</span\>** SSL-Zertifikate.
+  - **CI/CD:** Deployment-Pipeline via **Github \<u\>Actions\</u\>** (falls zeitlich passend).
