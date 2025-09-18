@@ -1,0 +1,1 @@
+Jenga ermöglicht mir eine transparente Planung und Steuerung von Projekten. Ich kann Roadmaps erstellen, Ressourcen zuweisen, den Fortschritt über Dashboards und Berichte in Echtzeit verfolgen und sicherstellen, dass wir unsere Meilensteine pünktlich erreichen. Es ist das Single Source of Truth für unseren Projektstatus.
