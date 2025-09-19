@@ -4,3 +4,6 @@ Jenga is a free, open-source project management and issue tracking tool, featuri
 
 ## Architecture
 ![Architecture](docs/architecture.png)
+
+## License
+This project is released under the MIT License—see LICENSE for details.
