@@ -1,1 +1,6 @@
-Jenga ermöglicht mir eine transparente Planung und Steuerung von Projekten. Ich kann Roadmaps erstellen, Ressourcen zuweisen, den Fortschritt über Dashboards und Berichte in Echtzeit verfolgen und sicherstellen, dass wir unsere Meilensteine pünktlich erreichen. Es ist das Single Source of Truth für unseren Projektstatus.
+# Jenga
+Jenga is a free, open-source project management and issue tracking tool, featuring an integrated AI agent as a smart assistant for support and automating tasks.
+
+
+## Architecture
+![Architecture](docs/architecture.png)
