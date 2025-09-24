@@ -1,35 +1,50 @@
-##  Jenga: Projektübersicht 
+## Projektskizze: „Jenga“ – Ein KI-gestütztes Projektmanagement-Tool
 
-### Frontend 
+**Jenga** ist ein Projektmanagement- und Issue-Tracking-Tool, das einen integrierten KI-Agenten als smarten Assistenten zur Unterstützung und zur Automatisierung von Aufgaben bietet.
 
-- **PWA:** Die Anwendung soll als Progressive Web App entwickelt werden. (Jonas)
-- **Framework:** **SolidJS** (Jonas)
+### 1\. Kernkomponenten & Technologie-Stack
 
-***
+  * **Frontend** `(Verantwortlich: Jonas)`
 
-### Backend 
+      * **Framework:** **SolidJS** für ein reaktives und performantes Nutzererlebnis.
+      * **Plattform:** Entwicklung als **Progressive Web App (PWA)** für eine nahtlose Desktop- und Mobilnutzung.
 
-- **Frameworks:** **Spring Boot** oder **Quarkus** (Voraussetzung: Unterstützung für OpenAPI). (Dyonis)
-- **Datenbank:** **PostgreSQL** in Kombination mit **JPA** (Java Persistence API). (Dyonis)
+  * **Backend** `(Verantwortlich: Dyonis)`
 
-***
+      * **Framework:** **Quarkus** für schnelle Startzeiten und einen geringen Ressourcenverbrauch (Cloud-Native).
+      * **API:** Generierung einer **OpenAPI-Spezifikation** zur klaren Definition der Schnittstellen.
+      * **Datenbank:** **PostgreSQL** in Kombination mit **JPA (Java Persistence API)** für eine robuste und standardkonforme Datenpersistenz.
 
-### Features 
+### 2\. Geplante Features
 
-- **Benutzerverwaltung:** Rollen, Gruppen und projektbasierte Berechtigungen.
-- **Ticket-System:** Flexibles Vorlagensystem für Jira-ähnliche Tickets.
-- **KI-Anbindung:** (Adam)
-    - Automatische Ticketerstellung aus Texten.
-    - Intelligente Zusammenfassungen von Kommentaren und Beschreibungen.
-- **Versionskontrolle:** Anbindung an **GitHub** zur Verknüpfung von Commits und Pull Requests mit Tickets. (Adam)
+  * **Benutzer- & Rechteverwaltung**
 
-***
+      * Implementierung von Rollen, Gruppen und projektbasierten Berechtigungen zur feingranularen Zugriffskontrolle.
 
-### Architektur & DevOps 
+  * **Flexibles Ticket-System**
 
-- **Deployment:** Die gesamte Anwendung wird über **Docker** containerisiert.
-- **Authentifizierung:** **Keycloak** für die zentrale Benutzerregistrierung und -verwaltung.
-- **Sicherheit:** Absicherung der Verbindung über **Let's Encrypt** SSL-Zertifikate.
-- **CI/CD:**
-    - Automatisierung von Builds und Tests.
-    - Deployment-Pipeline via **GitHub Actions**.
+      * Ein anpassbares Vorlagensystem für Tickets (vergleichbar mit Jira), um verschiedene Projekt-Workflows abzubilden.
+
+  * **KI-Integration** `(Verantwortlich: Adam)`
+
+      * **Automatische Ticketerstellung:** Analyse von eingehenden Texten (z.B. E-Mails), um automatisch Tickets zu erstellen und zu kategorisieren.
+      * **Intelligente Zusammenfassungen:** KI-gestützte Generierung von prägnanten Zusammenfassungen langer Kommentarthreads und Ticketbeschreibungen.
+
+  * **Versionskontrolle & GitHub-Anbindung** `(Verantwortlich: Adam)`
+
+      * Verknüpfung von GitHub Commits und Pull Requests direkt mit den entsprechenden Tickets im System.
+
+### 3\. Architektur & DevOps-Konzepte
+
+  * **Deployment & Containerisierung**
+
+      * Die gesamte Anwendung (Frontend, Backend, Datenbank) wird vollständig über **Docker** containerisiert, um eine konsistente und portable Umgebung zu gewährleisten.
+
+  * **Authentifizierung & Sicherheit**
+
+      * Einsatz von **Keycloak** als zentraler Identity-Provider für die Benutzerregistrierung, -anmeldung und -verwaltung via OAuth.
+      * Absicherung der Web-Verbindung durch **Let's Encrypt SSL-Zertifikate**.
+
+  * **CI/CD-Pipeline**
+
+      * Einrichtung einer automatisierten Build-, Test- und Deployment-Pipeline mithilfe von **GitHub Actions**.
