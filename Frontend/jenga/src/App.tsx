@@ -1,19 +1,23 @@
-import { AppBar, Card, Toolbar } from '@suid/material';
+import { AppBar, Card, createTheme, CssBaseline, Theme, ThemeProvider, Toolbar } from '@suid/material';
 import type { Component } from 'solid-js';
 
-
+const theme = createTheme()
 
 const App: Component = () => {
   return (
     <>
-    <AppBar>
-      <Toolbar>
-        Jenga
-      </Toolbar>
-    </AppBar>
-      <Card>
+      <CssBaseline />
+      <ThemeProvider theme={theme}>
 
-      </Card>
+        <AppBar>
+          <Toolbar>
+            Jenga
+          </Toolbar>
+        </AppBar>
+        <Card>
+
+        </Card>
+      </ThemeProvider>
     </>
   );
 };
