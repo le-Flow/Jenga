@@ -28,23 +28,28 @@
   * **KI-Integration** `(Verantwortlich: Adam)`
 
       * **Automatische Ticketerstellung:** Analyse von eingehenden Texten (z.B. E-Mails), um automatisch Tickets zu erstellen und zu kategorisieren.
+      * **Automatische Zusammenhänge erfassen:** Automatische Zuweisung von Verwandten Tickets
       * **Intelligente Zusammenfassungen:** KI-gestützte Generierung von prägnanten Zusammenfassungen langer Kommentarthreads und Ticketbeschreibungen.
-
+      * **Intelligente Search:** KI-gestützte suche (Keyword erstellung + Fuzzy Search oder RAG)
+  * **KI-Integration Architektur** `(Verantwortlich: Adam)`
+      * **MPC Server (Model/Pipeline/Compute):** Stellt über APIs dedizierte Inferenz-Endpunkte für die KI-Modelle bereit und ist für das Management der zugrundeliegenden Compute-Ressourcen verantwortlich.
+      * **LangChain:** Ein Orchestrierungs-Framework, das die logische Verkettung (Chaining) von LLMs mit anderen Komponenten (z. B. Vektordatenbanken, APIs) zur Erstellung komplexer KI-Applikationen ermöglicht.
+      * **LiteLLM:** Eine Abstraktionsschicht, die als Proxy fungiert, um API-Aufrufe an diverse LLM-Anbieter in ein einheitliches Format zu übersetzen und so die Interoperabilität der Modelle sicherstellt.
   * **Versionskontrolle & GitHub-Anbindung** `(Verantwortlich: Adam)`
 
       * Verknüpfung von GitHub Commits und Pull Requests direkt mit den entsprechenden Tickets im System.
 
 ### 3\. Architektur & DevOps-Konzepte
 
-  * **Deployment & Containerisierung**
+  * **Deployment & Containerisierung** `(Verantwortlich: Lin)`
 
       * Die gesamte Anwendung (Frontend, Backend, Datenbank) wird vollständig über **Docker** containerisiert, um eine konsistente und portable Umgebung zu gewährleisten.
 
-  * **Authentifizierung & Sicherheit**
+  * **Authentifizierung & Sicherheit** `(Verantwortlich: Lin)`
 
-      * Einsatz von **Keycloak** als zentraler Identity-Provider für die Benutzerregistrierung, -anmeldung und -verwaltung via OAuth.
+      * Einsatz von **Keycloak** als zentraler Identity-Provider für die Benutzerregistrierung, -anmeldung und -verwaltung via OAuth. 
       * Absicherung der Web-Verbindung durch **Let's Encrypt SSL-Zertifikate**.
 
   * **CI/CD-Pipeline**
 
-      * Einrichtung einer automatisierten Build-, Test- und Deployment-Pipeline mithilfe von **GitHub Actions**.
+      * Einrichtung einer automatisierten Build-, Test- und Deployment-Pipeline mithilfe von **GitHub Actions**. `(Verantwortlich: Lin)`
