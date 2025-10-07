@@ -13,8 +13,7 @@ import java.util.List;
 @Path("/api/projects/{projectId}/tickets")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-public class TicketResource {
-
+public class TicketApi {
     @Inject
     TicketService ticketService;
 
