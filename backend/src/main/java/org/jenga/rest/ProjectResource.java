@@ -1,4 +1,4 @@
-package org.jenga.api;
+package org.jenga.rest;
 
 import org.jenga.service.ProjectService;
 import org.jenga.model.Project;
@@ -12,7 +12,7 @@ import java.util.List;
 @Path("/api/projects")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-public class ProjectApi {
+public class ProjectResource {
     @Inject
     ProjectService projectService;
 

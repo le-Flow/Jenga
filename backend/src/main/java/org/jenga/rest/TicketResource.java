@@ -1,4 +1,4 @@
-package org.jenga.api;
+package org.jenga.rest;
 
 import org.jenga.service.TicketService;
 import org.jenga.model.Ticket;
@@ -13,7 +13,7 @@ import java.util.List;
 @Path("/api/projects/{projectId}/tickets")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-public class TicketApi {
+public class TicketResource {
     @Inject
     TicketService ticketService;
 
