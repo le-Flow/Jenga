@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.Data;
 
+import org.jenga.model.User;
 import org.jenga.model.TicketPriority;
 import org.jenga.model.TicketSize;
 import org.jenga.model.TicketStatus;
@@ -39,6 +40,14 @@ public class Ticket {
 
     private LocalDateTime createDate;
     private LocalDateTime modifyDate;
+
+    @ManyToOne
+    @JoinColumn(name = "reporter_id")
+    private User reporter;
+
+    @ManyToOne
+    @JoinColumn(name = "assignee_id")
+    private User assignee;
 
     @PrePersist
     public void onCreate() {
