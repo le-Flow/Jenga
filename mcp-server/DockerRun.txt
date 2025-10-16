@@ -1,0 +1,17 @@
+Activate venv:
+source venv/bin/activate
+deactivate
+
+get requirements.txt:
+pip freeze > requirements.txt
+
+Docker:
+docker build -t mcp-server .
+docker run -p 8000:8000 --env-file .env -d --name mcp-instance mcp-server
+docker system prune
+docker rm mcp-instance
+docker stop mcp-instance
+docker ps -a
+
+uvicorn:
+python -m uvicorn src.main:app --reload
