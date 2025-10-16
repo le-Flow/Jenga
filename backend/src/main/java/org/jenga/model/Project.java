@@ -1,10 +1,36 @@
 package org.jenga.model;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntity;
-import jakarta.persistence.Entity;
+import java.time.LocalDateTime;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Data;
 
 @Entity
-public class Project extends PanacheEntity {
-    public String name;
-    public String description;
+@Table(name = "projects")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class Project {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String name;
+    private String description;
+    
+    private LocalDateTime createDate;
+    private LocalDateTime modifyDate;
+
+    @PrePersist
+    public void onCreate() {
+        createDate = LocalDateTime.now();
+        modifyDate = createDate;
+    }
+
+    @PreUpdate
+    public void onUpdate() {
+        modifyDate = LocalDateTime.now();
+    }
 }

@@ -13,21 +13,32 @@ import java.util.List;
 
 @ApplicationScoped
 public class TicketService {
-    @Inject
-    TicketRepository ticketRepository;
+
+    private final TicketRepository ticketRepository;
+    private final ProjectRepository projectRepository;
 
     @Inject
-    ProjectRepository projectRepository;
+    public TicketService(TicketRepository ticketRepository, ProjectRepository projectRepository) {
+        this.ticketRepository = ticketRepository;
+        this.projectRepository = projectRepository;
+    }
 
     @Transactional
     public void create(Long projectId, Ticket ticket) {
         Project project = projectRepository.findByIdOptional(projectId)
                 .orElseThrow(() -> new NotFoundException("Project not found"));
-        if (ticket.title == null || ticket.title.isBlank()) {
+
+        // Validate ticket title using getter
+        if (ticket.getTitle() == null || ticket.getTitle().isBlank()) {
             throw new IllegalArgumentException("Ticket title cannot be null or empty");
         }
-        ticket.id = null;
-        ticket.project = project;
+
+        // Reset ID to ensure it's treated as a new entity
+        ticket.setId(null);
+
+        // Use setter for associating the project
+        ticket.setProject(project);
+
         ticketRepository.persist(ticket);
     }
 
@@ -40,6 +51,7 @@ public class TicketService {
     public Ticket findById(Long projectId, Long ticketId) {
         projectRepository.findByIdOptional(projectId)
                 .orElseThrow(() -> new NotFoundException("Project not found"));
+
         Ticket ticket = ticketRepository.findByIdAndProjectId(ticketId, projectId);
         if (ticket == null) {
             throw new NotFoundException("Ticket not found");
@@ -51,12 +63,14 @@ public class TicketService {
     public void update(Long projectId, Long ticketId, Ticket ticket) {
         projectRepository.findByIdOptional(projectId)
                 .orElseThrow(() -> new NotFoundException("Project not found"));
+
         Ticket existing = ticketRepository.findByIdAndProjectId(ticketId, projectId);
         if (existing == null) {
             throw new NotFoundException("Ticket not found");
         }
-        existing.title = ticket.title;
-        existing.description = ticket.description;
+
+        existing.setTitle(ticket.getTitle());
+        existing.setDescription(ticket.getDescription());
         ticketRepository.persist(existing);
     }
 
@@ -64,10 +78,12 @@ public class TicketService {
     public void delete(Long projectId, Long ticketId) {
         projectRepository.findByIdOptional(projectId)
                 .orElseThrow(() -> new NotFoundException("Project not found"));
+
         Ticket ticket = ticketRepository.findByIdAndProjectId(ticketId, projectId);
         if (ticket == null) {
             throw new NotFoundException("Ticket not found");
         }
+
         ticketRepository.delete(ticket);
     }
 }

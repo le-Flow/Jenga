@@ -11,11 +11,19 @@ import java.util.List;
 
 @ApplicationScoped
 public class ProjectService {
+
+    private final ProjectRepository projectRepository;
+
     @Inject
-    ProjectRepository projectRepository;
-    
+    public ProjectService(ProjectRepository projectRepository) {
+        this.projectRepository = projectRepository;
+    }
+
     @Transactional
     public void create(Project project) {
+        if (project.getName() == null || project.getName().isBlank()) {
+            throw new IllegalArgumentException("Project name cannot be null or empty");
+        }
         projectRepository.persist(project);
     }
 
@@ -27,16 +35,17 @@ public class ProjectService {
         return projectRepository.findByIdOptional(id)
             .orElseThrow(() -> new NotFoundException("Project not found"));
     }
-    
+
     @Transactional
     public void update(Long id, Project project) {
         Project existingProject = projectRepository.findByIdOptional(id)
                 .orElseThrow(() -> new NotFoundException("Project not found"));
-        existingProject.name = project.name;
-        existingProject.description = project.description;
+
+        existingProject.setName(project.getName());
+        existingProject.setDescription(project.getDescription());
         projectRepository.persist(existingProject);
     }
-    
+
     @Transactional
     public void delete(Long id) {
         projectRepository.deleteById(id);

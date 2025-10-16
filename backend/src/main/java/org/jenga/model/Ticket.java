@@ -1,13 +1,54 @@
 package org.jenga.model;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
+import java.time.LocalDateTime;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Data;
+
+import org.jenga.model.TicketPriority;
+import org.jenga.model.TicketSize;
+import org.jenga.model.TicketStatus;
 
 @Entity
-public class Ticket extends PanacheEntity {
+@Table(name = "tickets")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class Ticket {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String title;
+    private String description;
+
     @ManyToOne
-    public Project project;
-    public String title;
-    public String description;
+    @JoinColumn(name = "project_id")
+    private Project project;
+
+    @Enumerated(EnumType.STRING)
+    private TicketPriority priority;
+
+    @Enumerated(EnumType.STRING)
+    private TicketSize size;
+
+    @Enumerated(EnumType.STRING)
+    private TicketStatus status;
+
+    private LocalDateTime createDate;
+    private LocalDateTime modifyDate;
+
+    @PrePersist
+    public void onCreate() {
+        createDate = LocalDateTime.now();
+        modifyDate = createDate;
+    }
+
+    @PreUpdate
+    public void onUpdate() {
+        modifyDate = LocalDateTime.now();
+    }
 }
+
