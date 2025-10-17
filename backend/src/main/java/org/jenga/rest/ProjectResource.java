@@ -1,7 +1,8 @@
 package org.jenga.rest;
 
 import org.jenga.service.ProjectService;
-import org.jenga.model.Project;
+import org.jenga.dto.ProjectDTO;
+import org.jenga.dto.CreateProjectDTO;
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -13,37 +14,38 @@ import java.util.List;
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class ProjectResource {
+
     @Inject
     ProjectService projectService;
 
     @POST
-    public Response createProject(Project project) {
-        projectService.create(project);
+    public Response createProject(CreateProjectDTO createProjectDTO) {
+        projectService.create(createProjectDTO);
         return Response.status(Response.Status.CREATED).build();
     }
 
     @GET
-    public List<Project> getAllProjects() {
+    public List<ProjectDTO> getAllProjects() {
         return projectService.findAll();
     }
 
     @GET
-    @Path("/{id}")
-    public Project getProjectById(@PathParam("id") Long id) {
-        return projectService.findById(id);
+    @Path("/{projectId}")
+    public ProjectDTO getProjectById(@PathParam("projectId") Long projectId) {
+        return projectService.findById(projectId);
     }
 
     @PUT
-    @Path("/{id}")
-    public Response updateProject(@PathParam("id") Long id, Project project) {
-        projectService.update(id, project);
+    @Path("/{projectId}")
+    public Response updateProject(@PathParam("projectId") Long projectId, ProjectDTO projectDTO) {
+        projectService.update(projectId, projectDTO);
         return Response.ok().build();
     }
 
     @DELETE
-    @Path("/{id}")
-    public Response deleteProject(@PathParam("id") Long id) {
-        projectService.delete(id);
+    @Path("/{projectId}")
+    public Response deleteProject(@PathParam("projectId") Long projectId) {
+        projectService.delete(projectId);
         return Response.noContent().build();
     }
 }

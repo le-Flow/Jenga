@@ -4,51 +4,59 @@ import org.jenga.db.ProjectRepository;
 import org.jenga.db.TicketRepository;
 import org.jenga.model.Ticket;
 import org.jenga.model.Project;
+import org.jenga.dto.TicketDTO;
+import org.jenga.dto.CreateTicketDTO;
+import org.jenga.mapper.TicketMapper;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class TicketService {
 
     private final TicketRepository ticketRepository;
     private final ProjectRepository projectRepository;
+    private final TicketMapper ticketMapper;
 
     @Inject
-    public TicketService(TicketRepository ticketRepository, ProjectRepository projectRepository) {
+    public TicketService(TicketRepository ticketRepository, ProjectRepository projectRepository, TicketMapper ticketMapper) {
         this.ticketRepository = ticketRepository;
         this.projectRepository = projectRepository;
+        this.ticketMapper = ticketMapper;
     }
 
     @Transactional
-    public void create(Long projectId, Ticket ticket) {
+    public void create(Long projectId, CreateTicketDTO createTicketDTO) {
         Project project = projectRepository.findByIdOptional(projectId)
                 .orElseThrow(() -> new NotFoundException("Project not found"));
 
-        // Validate ticket title using getter
-        if (ticket.getTitle() == null || ticket.getTitle().isBlank()) {
+        if (createTicketDTO.getTitle() == null || createTicketDTO.getTitle().isBlank()) {
             throw new IllegalArgumentException("Ticket title cannot be null or empty");
         }
 
-        // Reset ID to ensure it's treated as a new entity
-        ticket.setId(null);
+        Ticket ticket = ticketMapper.createTicketDTOToTicket(createTicketDTO);
 
-        // Use setter for associating the project
         ticket.setProject(project);
+        
+        //ticket.setReporter(getCurrentUser()); TODO
 
         ticketRepository.persist(ticket);
     }
 
-    public List<Ticket> findAll(Long projectId) {
+    public List<TicketDTO> findAll(Long projectId) {
         projectRepository.findByIdOptional(projectId)
                 .orElseThrow(() -> new NotFoundException("Project not found"));
-        return ticketRepository.findByProjectId(projectId);
+
+        return ticketRepository.findByProjectId(projectId).stream()
+                .map(ticketMapper::ticketToTicketDTO)
+                .collect(Collectors.toList());
     }
 
-    public Ticket findById(Long projectId, Long ticketId) {
+    public TicketDTO findById(Long projectId, Long ticketId) {
         projectRepository.findByIdOptional(projectId)
                 .orElseThrow(() -> new NotFoundException("Project not found"));
 
@@ -56,11 +64,12 @@ public class TicketService {
         if (ticket == null) {
             throw new NotFoundException("Ticket not found");
         }
-        return ticket;
+
+        return ticketMapper.ticketToTicketDTO(ticket);
     }
 
     @Transactional
-    public void update(Long projectId, Long ticketId, Ticket ticket) {
+    public void update(Long projectId, Long ticketId, TicketDTO ticketDTO) {
         projectRepository.findByIdOptional(projectId)
                 .orElseThrow(() -> new NotFoundException("Project not found"));
 
@@ -69,8 +78,9 @@ public class TicketService {
             throw new NotFoundException("Ticket not found");
         }
 
-        existing.setTitle(ticket.getTitle());
-        existing.setDescription(ticket.getDescription());
+        existing.setTitle(ticketDTO.getTitle());
+        existing.setDescription(ticketDTO.getDescription());
+
         ticketRepository.persist(existing);
     }
 
