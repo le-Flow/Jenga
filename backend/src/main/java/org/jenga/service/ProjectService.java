@@ -38,19 +38,19 @@ public class ProjectService {
                 .collect(Collectors.toList());
     }
 
-    public ProjectDTO findById(Long projectId) {
-        Project project = projectRepository.findById(projectId);
+    public ProjectDTO findByName(String projectName) {
+        Project project = projectRepository.findByName(projectName);
         if (project == null) {
-            throw new NotFoundException("Project not found");
+            throw new NotFoundException("Project not found with name: " + projectName);
         }
         return projectMapper.projectToProjectDTO(project);
     }
 
     @Transactional
-    public void update(Long projectId, ProjectDTO projectDTO) {
-        Project existing = projectRepository.findById(projectId);
+    public void update(String projectName, ProjectDTO projectDTO) {
+        Project existing = projectRepository.findByName(projectName);
         if (existing == null) {
-            throw new NotFoundException("Project not found");
+            throw new NotFoundException("Project not found with name: " + projectName);
         }
 
         existing.setName(projectDTO.getName());
@@ -60,10 +60,10 @@ public class ProjectService {
     }
 
     @Transactional
-    public void delete(Long projectId) {
-        Project project = projectRepository.findById(projectId);
+    public void delete(String projectName) {
+        Project project = projectRepository.findByName(projectName);
         if (project == null) {
-            throw new NotFoundException("Project not found");
+            throw new NotFoundException("Project not found with name: " + projectName);
         }
 
         projectRepository.delete(project);

@@ -12,7 +12,7 @@ public class CreateTicketDTO {
     private TicketPriority priority;
     private TicketSize size;
     private TicketStatus status;
-    private Long projectId;
-    private Long assigneeId;
+    private String projectName;
+    private String assigneeName;
 }
 

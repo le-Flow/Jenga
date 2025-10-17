@@ -30,37 +30,42 @@ public class TicketService {
     }
 
     @Transactional
-    public void create(Long projectId, CreateTicketDTO createTicketDTO) {
-        Project project = projectRepository.findByIdOptional(projectId)
-                .orElseThrow(() -> new NotFoundException("Project not found"));
+    public void create(String projectName, CreateTicketDTO createTicketDTO) {
+        Project project = projectRepository.findByName(projectName);
+        if (project == null) {
+            throw new NotFoundException("Project not found with name: " + projectName);
+        }
 
         if (createTicketDTO.getTitle() == null || createTicketDTO.getTitle().isBlank()) {
             throw new IllegalArgumentException("Ticket title cannot be null or empty");
         }
 
         Ticket ticket = ticketMapper.createTicketDTOToTicket(createTicketDTO);
-
         ticket.setProject(project);
-        
-        //ticket.setReporter(getCurrentUser()); TODO
+
+        //ticket.setReporter(getCurrentUser()); // TODO: Add reporter
 
         ticketRepository.persist(ticket);
     }
 
-    public List<TicketDTO> findAll(Long projectId) {
-        projectRepository.findByIdOptional(projectId)
-                .orElseThrow(() -> new NotFoundException("Project not found"));
+    public List<TicketDTO> findAll(String projectName) {
+        Project project = projectRepository.findByName(projectName);
+        if (project == null) {
+            throw new NotFoundException("Project not found with name: " + projectName);
+        }
 
-        return ticketRepository.findByProjectId(projectId).stream()
+        return ticketRepository.findByProjectName(project.getName()).stream()
                 .map(ticketMapper::ticketToTicketDTO)
                 .collect(Collectors.toList());
     }
 
-    public TicketDTO findById(Long projectId, Long ticketId) {
-        projectRepository.findByIdOptional(projectId)
-                .orElseThrow(() -> new NotFoundException("Project not found"));
+    public TicketDTO findById(String projectName, Long ticketId) {
+        Project project = projectRepository.findByName(projectName);
+        if (project == null) {
+            throw new NotFoundException("Project not found with name: " + projectName);
+        }
 
-        Ticket ticket = ticketRepository.findByIdAndProjectId(ticketId, projectId);
+        Ticket ticket = ticketRepository.findByIdAndProjectName(ticketId, project.getName());
         if (ticket == null) {
             throw new NotFoundException("Ticket not found");
         }
@@ -69,11 +74,13 @@ public class TicketService {
     }
 
     @Transactional
-    public void update(Long projectId, Long ticketId, TicketDTO ticketDTO) {
-        projectRepository.findByIdOptional(projectId)
-                .orElseThrow(() -> new NotFoundException("Project not found"));
+    public void update(String projectName, Long ticketId, TicketDTO ticketDTO) {
+        Project project = projectRepository.findByName(projectName);
+        if (project == null) {
+            throw new NotFoundException("Project not found with name: " + projectName);
+        }
 
-        Ticket existing = ticketRepository.findByIdAndProjectId(ticketId, projectId);
+        Ticket existing = ticketRepository.findByIdAndProjectName(ticketId, project.getName());
         if (existing == null) {
             throw new NotFoundException("Ticket not found");
         }
@@ -85,11 +92,13 @@ public class TicketService {
     }
 
     @Transactional
-    public void delete(Long projectId, Long ticketId) {
-        projectRepository.findByIdOptional(projectId)
-                .orElseThrow(() -> new NotFoundException("Project not found"));
+    public void delete(String projectName, Long ticketId) {
+        Project project = projectRepository.findByName(projectName);
+        if (project == null) {
+            throw new NotFoundException("Project not found with name: " + projectName);
+        }
 
-        Ticket ticket = ticketRepository.findByIdAndProjectId(ticketId, projectId);
+        Ticket ticket = ticketRepository.findByIdAndProjectName(ticketId, project.getName());
         if (ticket == null) {
             throw new NotFoundException("Ticket not found");
         }

@@ -12,13 +12,13 @@ public interface TicketMapper {
 
     TicketMapper INSTANCE = Mappers.getMapper(TicketMapper.class);
 
-    @Mapping(source = "project.id", target = "projectId")
-    @Mapping(source = "reporter.id", target = "reporterId")
-    @Mapping(source = "assignee.id", target = "assigneeId")
+    @Mapping(source = "project.name", target = "projectName")
+    @Mapping(source = "reporter.username", target = "reporterName")
+    @Mapping(source = "assignee.username", target = "assigneeName")
     TicketDTO ticketToTicketDTO(Ticket ticket);
 
-    @Mapping(source = "projectId", target = "project.id")
-    @Mapping(source = "assigneeId", target = "assignee.id")
+    @Mapping(source = "projectName", target = "project.name")
+    @Mapping(source = "assigneeName", target = "assignee.username")
     Ticket ticketDTOToTicket(TicketDTO ticketDTO);
 
     @Mapping(target = "id", ignore = true)

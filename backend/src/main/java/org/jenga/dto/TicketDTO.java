@@ -12,12 +12,12 @@ public class TicketDTO {
     private Long id;
     private String title;
     private String description;
-    private Long projectId;
+    private String projectName;
     private TicketPriority priority;
     private TicketSize size;
     private TicketStatus status;
     private LocalDateTime createDate;
     private LocalDateTime modifyDate;
-    private Long reporterId;
-    private Long assigneeId;
+    private String reporterName;
+    private String assigneeName;
 }
