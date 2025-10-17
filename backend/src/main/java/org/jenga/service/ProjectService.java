@@ -7,6 +7,7 @@ import org.jenga.dto.CreateProjectDTO;
 import org.jenga.mapper.ProjectMapper;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.ws.rs.BadRequestException;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
@@ -27,6 +28,11 @@ public class ProjectService {
 
     @Transactional
     public void create(CreateProjectDTO createProjectDTO) {
+        Project existingProject = projectRepository.findByName(createProjectDTO.getName());
+        if (existingProject != null) {
+            throw new BadRequestException("Project already exists");
+        }
+
         Project project = projectMapper.createProjectDTOToProject(createProjectDTO);
 
         projectRepository.persist(project);
