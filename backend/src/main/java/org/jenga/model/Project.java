@@ -1,6 +1,8 @@
 package org.jenga.model;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -19,6 +21,9 @@ public class Project {
     
     private LocalDateTime createDate;
     private LocalDateTime modifyDate;
+
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Ticket> tickets = new ArrayList<>();
 
     @PrePersist
     public void onCreate() {
