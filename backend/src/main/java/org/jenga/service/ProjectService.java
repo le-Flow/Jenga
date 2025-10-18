@@ -2,43 +2,76 @@ package org.jenga.service;
 
 import org.jenga.db.ProjectRepository;
 import org.jenga.model.Project;
+import org.jenga.dto.ProjectDTO;
+import org.jenga.dto.CreateProjectDTO;
+import org.jenga.mapper.ProjectMapper;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.ws.rs.BadRequestException;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class ProjectService {
+
+    private final ProjectRepository projectRepository;
+    private final ProjectMapper projectMapper;
+
     @Inject
-    ProjectRepository projectRepository;
-    
+    public ProjectService(ProjectRepository projectRepository, ProjectMapper projectMapper) {
+        this.projectRepository = projectRepository;
+        this.projectMapper = projectMapper;
+    }
+
     @Transactional
-    public void create(Project project) {
+    public void create(CreateProjectDTO createProjectDTO) {
+        Project existingProject = projectRepository.findByName(createProjectDTO.getName());
+        if (existingProject != null) {
+            throw new BadRequestException("Project already exists");
+        }
+
+        Project project = projectMapper.createProjectDTOToProject(createProjectDTO);
+
         projectRepository.persist(project);
     }
 
-    public List<Project> findAll() {
-        return projectRepository.findAll().list();
+    public List<ProjectDTO> findAll() {
+        return projectRepository.findAll().stream()
+                .map(projectMapper::projectToProjectDTO)
+                .collect(Collectors.toList());
     }
 
-    public Project findById(Long id) {
-        return projectRepository.findByIdOptional(id)
-            .orElseThrow(() -> new NotFoundException("Project not found"));
+    public ProjectDTO findByName(String projectName) {
+        Project project = projectRepository.findByName(projectName);
+        if (project == null) {
+            throw new NotFoundException("Project not found with name: " + projectName);
+        }
+        return projectMapper.projectToProjectDTO(project);
     }
-    
+
     @Transactional
-    public void update(Long id, Project project) {
-        Project existingProject = projectRepository.findByIdOptional(id)
-                .orElseThrow(() -> new NotFoundException("Project not found"));
-        existingProject.name = project.name;
-        existingProject.description = project.description;
-        projectRepository.persist(existingProject);
+    public void update(String projectName, ProjectDTO projectDTO) {
+        Project existing = projectRepository.findByName(projectName);
+        if (existing == null) {
+            throw new NotFoundException("Project not found with name: " + projectName);
+        }
+
+        existing.setName(projectDTO.getName());
+        existing.setDescription(projectDTO.getDescription());
+
+        projectRepository.persist(existing);
     }
-    
+
     @Transactional
-    public void delete(Long id) {
-        projectRepository.deleteById(id);
+    public void delete(String projectName) {
+        Project project = projectRepository.findByName(projectName);
+        if (project == null) {
+            throw new NotFoundException("Project not found with name: " + projectName);
+        }
+
+        projectRepository.delete(project);
     }
 }

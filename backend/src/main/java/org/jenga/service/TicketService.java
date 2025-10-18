@@ -4,70 +4,105 @@ import org.jenga.db.ProjectRepository;
 import org.jenga.db.TicketRepository;
 import org.jenga.model.Ticket;
 import org.jenga.model.Project;
+import org.jenga.dto.TicketDTO;
+import org.jenga.dto.CreateTicketDTO;
+import org.jenga.mapper.TicketMapper;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class TicketService {
-    @Inject
-    TicketRepository ticketRepository;
+
+    private final TicketRepository ticketRepository;
+    private final ProjectRepository projectRepository;
+    private final TicketMapper ticketMapper;
 
     @Inject
-    ProjectRepository projectRepository;
+    public TicketService(TicketRepository ticketRepository, ProjectRepository projectRepository, TicketMapper ticketMapper) {
+        this.ticketRepository = ticketRepository;
+        this.projectRepository = projectRepository;
+        this.ticketMapper = ticketMapper;
+    }
 
     @Transactional
-    public void create(Long projectId, Ticket ticket) {
-        Project project = projectRepository.findByIdOptional(projectId)
-                .orElseThrow(() -> new NotFoundException("Project not found"));
-        if (ticket.title == null || ticket.title.isBlank()) {
+    public void create(String projectName, CreateTicketDTO createTicketDTO) {
+        Project project = projectRepository.findByName(projectName);
+        if (project == null) {
+            throw new NotFoundException("Project not found with name: " + projectName);
+        }
+
+        if (createTicketDTO.getTitle() == null || createTicketDTO.getTitle().isBlank()) {
             throw new IllegalArgumentException("Ticket title cannot be null or empty");
         }
-        ticket.id = null;
-        ticket.project = project;
+
+        Ticket ticket = ticketMapper.createTicketDTOToTicket(createTicketDTO);
+        ticket.setProject(project);
+
+        //ticket.setReporter(getCurrentUser()); // TODO: Add reporter
+
         ticketRepository.persist(ticket);
     }
 
-    public List<Ticket> findAll(Long projectId) {
-        projectRepository.findByIdOptional(projectId)
-                .orElseThrow(() -> new NotFoundException("Project not found"));
-        return ticketRepository.findByProjectId(projectId);
+    public List<TicketDTO> findAll(String projectName) {
+        Project project = projectRepository.findByName(projectName);
+        if (project == null) {
+            throw new NotFoundException("Project not found with name: " + projectName);
+        }
+
+        return ticketRepository.findByProjectName(project.getName()).stream()
+                .map(ticketMapper::ticketToTicketDTO)
+                .collect(Collectors.toList());
     }
 
-    public Ticket findById(Long projectId, Long ticketId) {
-        projectRepository.findByIdOptional(projectId)
-                .orElseThrow(() -> new NotFoundException("Project not found"));
-        Ticket ticket = ticketRepository.findByIdAndProjectId(ticketId, projectId);
+    public TicketDTO findById(String projectName, Long ticketId) {
+        Project project = projectRepository.findByName(projectName);
+        if (project == null) {
+            throw new NotFoundException("Project not found with name: " + projectName);
+        }
+
+        Ticket ticket = ticketRepository.findByIdAndProjectName(ticketId, project.getName());
         if (ticket == null) {
             throw new NotFoundException("Ticket not found");
         }
-        return ticket;
+
+        return ticketMapper.ticketToTicketDTO(ticket);
     }
 
     @Transactional
-    public void update(Long projectId, Long ticketId, Ticket ticket) {
-        projectRepository.findByIdOptional(projectId)
-                .orElseThrow(() -> new NotFoundException("Project not found"));
-        Ticket existing = ticketRepository.findByIdAndProjectId(ticketId, projectId);
+    public void update(String projectName, Long ticketId, TicketDTO ticketDTO) {
+        Project project = projectRepository.findByName(projectName);
+        if (project == null) {
+            throw new NotFoundException("Project not found with name: " + projectName);
+        }
+
+        Ticket existing = ticketRepository.findByIdAndProjectName(ticketId, project.getName());
         if (existing == null) {
             throw new NotFoundException("Ticket not found");
         }
-        existing.title = ticket.title;
-        existing.description = ticket.description;
+
+        existing.setTitle(ticketDTO.getTitle());
+        existing.setDescription(ticketDTO.getDescription());
+
         ticketRepository.persist(existing);
     }
 
     @Transactional
-    public void delete(Long projectId, Long ticketId) {
-        projectRepository.findByIdOptional(projectId)
-                .orElseThrow(() -> new NotFoundException("Project not found"));
-        Ticket ticket = ticketRepository.findByIdAndProjectId(ticketId, projectId);
+    public void delete(String projectName, Long ticketId) {
+        Project project = projectRepository.findByName(projectName);
+        if (project == null) {
+            throw new NotFoundException("Project not found with name: " + projectName);
+        }
+
+        Ticket ticket = ticketRepository.findByIdAndProjectName(ticketId, project.getName());
         if (ticket == null) {
             throw new NotFoundException("Ticket not found");
         }
+
         ticketRepository.delete(ticket);
     }
 }

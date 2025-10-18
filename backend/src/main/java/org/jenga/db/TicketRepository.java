@@ -8,10 +8,11 @@ import java.util.List;
 
 @ApplicationScoped
 public class TicketRepository implements PanacheRepository<Ticket> {
-    public List<Ticket> findByProjectId(Long projectId) {
-        return find("project.id", projectId).list();
+    public List<Ticket> findByProjectName(String projectName) {
+        return find("project.name", projectName).list();
     }
-    public Ticket findByIdAndProjectId(Long ticketId, Long projectId) {
-        return find("id = ?1 and project.id = ?2", ticketId, projectId).firstResult();
+
+    public Ticket findByIdAndProjectName(Long ticketId, String projectName) {
+        return find("id = ?1 and project.name = ?2", ticketId, projectName).firstResult();
     }
 }

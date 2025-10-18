@@ -1,29 +1,27 @@
 package org.jenga.model;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 import jakarta.persistence.*;
+
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.Data;
 
+
 @Entity
-@Table(name = "projects")
+@Table(name = "users")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Project {
+public class User {
     @Id
-    private String name;
-    private String description;
-    
+    private String username;
+    private String email;
+    private String password;
+
     private LocalDateTime createDate;
     private LocalDateTime modifyDate;
-
-    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Ticket> tickets = new ArrayList<>();
 
     @PrePersist
     public void onCreate() {
