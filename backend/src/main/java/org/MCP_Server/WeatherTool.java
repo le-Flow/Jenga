@@ -1,4 +1,4 @@
-package org.MCP_Server;
+package org.jenga.MCP_Server;
 import dev.langchain4j.agent.tool.Tool;
 import dev.langchain4j.agent.tool.P;
 import jakarta.enterprise.context.ApplicationScoped;
