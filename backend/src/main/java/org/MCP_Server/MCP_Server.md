@@ -1,0 +1,1 @@
+Environment variable: QUARKUS_LANGCHAIN4J_AI_GEMINI_API_KEY
