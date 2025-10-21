@@ -10,6 +10,7 @@ import lombok.Data;
 @Data
 public class TicketDTO {
     private Long id;
+    private Long ticketNumber;
     private String title;
     private String description;
     private String projectName;

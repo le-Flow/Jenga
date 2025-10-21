@@ -43,6 +43,8 @@ public class TicketService {
         Ticket ticket = ticketMapper.createTicketDTOToTicket(createTicketDTO);
         ticket.setProject(project);
 
+        ticket.setTicketNumber(ticketRepository.findMaxTicketNumberByProject(project) + 1);
+
         //ticket.setReporter(getCurrentUser()); // TODO: Add reporter
 
         ticketRepository.persist(ticket);
@@ -66,6 +68,20 @@ public class TicketService {
         }
 
         Ticket ticket = ticketRepository.findByIdAndProjectName(ticketId, project.getName());
+        if (ticket == null) {
+            throw new NotFoundException("Ticket not found");
+        }
+
+        return ticketMapper.ticketToTicketDTO(ticket);
+    }
+
+    public TicketDTO findByTicketNumber(String projectName, Long ticketNumber) {
+        Project project = projectRepository.findByName(projectName);
+        if (project == null) {
+            throw new NotFoundException("Project not found with name: " + projectName);
+        }
+
+        Ticket ticket = ticketRepository.findByTicketNumberAndProjectName(ticketNumber, project.getName());
         if (ticket == null) {
             throw new NotFoundException("Ticket not found");
         }
