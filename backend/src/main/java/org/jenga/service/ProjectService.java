@@ -28,9 +28,31 @@ public class ProjectService {
 
     @Transactional
     public void create(CreateProjectDTO createProjectDTO) {
-        Project existingProject = projectRepository.findById(createProjectDTO.getIdentifier());
+        String identifier = createProjectDTO.getIdentifier();
+
+        if (identifier == null || identifier.trim().isEmpty()) {
+            throw new BadRequestException("Project identifier cannot be empty");
+        }
+
+        if (identifier.length() > 10) {
+            throw new BadRequestException("Project identifier cannot exceed 10 characters");
+        }
+
+        if (!identifier.equals(identifier.trim())) {
+            throw new BadRequestException("Project identifier cannot have leading or trailing spaces");
+        }
+
+        if (identifier.contains(" ")) {
+            throw new BadRequestException("Project identifier cannot contain spaces");
+        }
+
+        if (!identifier.matches("[a-zA-Z0-9]+")) {
+            throw new BadRequestException("Project identifier must only contain letters and numbers (no special characters)");
+        }
+
+        Project existingProject = projectRepository.findById(identifier);
         if (existingProject != null) {
-            throw new BadRequestException("Project already exists");
+            throw new BadRequestException("Project already exists with this identifier");
         }
 
         Project project = projectMapper.createProjectDTOToProject(createProjectDTO);
