@@ -7,10 +7,12 @@
     "start": "vite",
     "dev": "vite",
     "build": "vite build",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "gen:api": "npx openapi-typescript-codegen --input http://localhost:8080/openapi --output ./src/api --client fetch"
   },
   "license": "MIT",
   "devDependencies": {
+    "openapi-typescript-codegen": "^0.29.0",
     "solid-devtools": "^0.34.3",
     "typescript": "^5.7.2",
     "vite": "^6.3.6",
