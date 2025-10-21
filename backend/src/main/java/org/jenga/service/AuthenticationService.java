@@ -11,32 +11,35 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import javax.security.auth.login.LoginException;
 import io.quarkus.elytron.security.common.BcryptUtil;
+import io.smallrye.jwt.build.Jwt;
 
 @ApplicationScoped
 public class AuthenticationService {
+
+    private static final int EXPIRATION_TIME_SECONDS = 3600;
 
     @Inject
     UserRepository userRepository;
 
     @Transactional
     public LoginResponseDTO register(RegisterRequestDTO registerRequest) {
-        User user = userRepository.findByUsername(registerRequest.getUsername());
+        User existingUser = userRepository.findByUsername(registerRequest.getUsername());
 
-        if (user != null) {
+        if (existingUser != null) {
             throw new RuntimeException("User already exists");
         }
 
         String username = registerRequest.getUsername();
         String email = registerRequest.getEmail();
         String hashedPassword = BcryptUtil.bcryptHash(registerRequest.getPassword());
-        User newUser = new User(username, email, hashedPassword, null, null);
-        userRepository.persist(newUser);
+        User user = new User(username, email, hashedPassword, null, null);
+        userRepository.persist(user);
 
 
         LoginResponseDTO loginResponse = new LoginResponseDTO();
         loginResponse.setUsername(username);
-        loginResponse.setToken("Token");
-        loginResponse.setExpirationDate("2025-12-25");
+        loginResponse.setToken(generateToken(user));
+        loginResponse.setExpiresIn(EXPIRATION_TIME_SECONDS);
 
         return loginResponse;
     }
@@ -54,9 +57,20 @@ public class AuthenticationService {
 
         LoginResponseDTO loginResponse = new LoginResponseDTO();
         loginResponse.setUsername(loginRequest.getUsername());
-        loginResponse.setToken("Token");
-        loginResponse.setExpirationDate("2025-12-25");
+        loginResponse.setToken(generateToken(user));
+        loginResponse.setExpiresIn(EXPIRATION_TIME_SECONDS);
 
         return loginResponse;
+    }
+
+    public String generateToken(User user) {
+        long expirationTime = (System.currentTimeMillis() + EXPIRATION_TIME_SECONDS * 1000L) / 1000L;
+        expirationTime = (System.currentTimeMillis() / 1000L) + EXPIRATION_TIME_SECONDS;
+
+        return Jwt.issuer("jenga")
+                  .upn(user.getUsername())
+                  .claim("groups", "user")
+                  .expiresAt(expirationTime)
+                  .sign();
     }
 }
