@@ -30,13 +30,13 @@ public class TicketResource {
     }
 
     @GET
-    @Path("/id/{ticketId}")
+    @Path("/{ticketId}")
     public TicketDTO getTicketById(@PathParam("projectId") String projectId, @PathParam("ticketId") Long ticketId) {
         return ticketService.findById(projectId, ticketId);
     }
 
     @GET
-    @Path("/{ticketNumber}")
+    @Path("/nr/{ticketNumber}")
     public TicketDTO getTicketByNumber(@PathParam("projectId") String projectId, @PathParam("ticketNumber") Long ticketNumber) {
         return ticketService.findByTicketNumber(projectId, ticketNumber);
     }
