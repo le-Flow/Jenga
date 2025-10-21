@@ -7,11 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.Data;
 
-import org.jenga.model.User;
-import org.jenga.model.TicketPriority;
-import org.jenga.model.TicketSize;
-import org.jenga.model.TicketStatus;
-
 @Entity
 @Table(name = "tickets")
 @Data
