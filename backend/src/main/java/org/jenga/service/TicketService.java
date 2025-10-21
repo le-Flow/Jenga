@@ -75,6 +75,20 @@ public class TicketService {
         return ticketMapper.ticketToTicketDTO(ticket);
     }
 
+    public TicketDTO findByTicketNumber(String projectName, Long ticketNumber) {
+        Project project = projectRepository.findByName(projectName);
+        if (project == null) {
+            throw new NotFoundException("Project not found with name: " + projectName);
+        }
+
+        Ticket ticket = ticketRepository.findByTicketNumberAndProjectName(ticketNumber, project.getName());
+        if (ticket == null) {
+            throw new NotFoundException("Ticket not found");
+        }
+
+        return ticketMapper.ticketToTicketDTO(ticket);
+    }
+
     @Transactional
     public void update(String projectName, Long ticketId, TicketDTO ticketDTO) {
         Project project = projectRepository.findByName(projectName);
