@@ -35,7 +35,6 @@ public class AuthenticationService {
         User user = new User(username, email, hashedPassword, null, null);
         userRepository.persist(user);
 
-
         LoginResponseDTO loginResponse = new LoginResponseDTO();
         loginResponse.setUsername(username);
         loginResponse.setToken(generateToken(user));
@@ -69,7 +68,6 @@ public class AuthenticationService {
 
         return Jwt.issuer("jenga")
                   .upn(user.getUsername())
-                  .claim("groups", "user")
                   .expiresAt(expirationTime)
                   .sign();
     }
