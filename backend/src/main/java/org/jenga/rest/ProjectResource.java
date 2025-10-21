@@ -30,22 +30,22 @@ public class ProjectResource {
     }
 
     @GET
-    @Path("/{projectName}")
-    public ProjectDTO getProjectByName(@PathParam("projectName") String projectName) {
-        return projectService.findByName(projectName);
+    @Path("/{projectId}")
+    public ProjectDTO getProjectByIdentifier(@PathParam("projectId") String projectId) {
+        return projectService.findById(projectId);
     }
 
     @PUT
-    @Path("/{projectName}")
-    public Response updateProject(@PathParam("projectName") String projectName, ProjectDTO projectDTO) {
-        projectService.update(projectName, projectDTO);
+    @Path("/{projectId}")
+    public Response updateProject(@PathParam("projectId") String projectId, ProjectDTO projectDTO) {
+        projectService.update(projectId, projectDTO);
         return Response.ok().build();
     }
 
     @DELETE
-    @Path("/{projectName}")
-    public Response deleteProject(@PathParam("projectName") String projectName) {
-        projectService.delete(projectName);
+    @Path("/{projectId}")
+    public Response deleteProject(@PathParam("projectId") String projectId) {
+        projectService.delete(projectId);
         return Response.noContent().build();
     }
 }

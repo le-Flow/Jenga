@@ -16,6 +16,7 @@ import lombok.Data;
 @NoArgsConstructor
 public class Project {
     @Id
+    private String id;
     private String name;
     private String description;
     

@@ -30,10 +30,10 @@ public class TicketService {
     }
 
     @Transactional
-    public void create(String projectName, CreateTicketDTO createTicketDTO) {
-        Project project = projectRepository.findByName(projectName);
+    public void create(String projectId, CreateTicketDTO createTicketDTO) {
+        Project project = projectRepository.findById(projectId);
         if (project == null) {
-            throw new NotFoundException("Project not found with name: " + projectName);
+            throw new NotFoundException("Project not found with name: " + projectId);
         }
 
         if (createTicketDTO.getTitle() == null || createTicketDTO.getTitle().isBlank()) {
@@ -50,10 +50,10 @@ public class TicketService {
         ticketRepository.persist(ticket);
     }
 
-    public List<TicketDTO> findAll(String projectName) {
-        Project project = projectRepository.findByName(projectName);
+    public List<TicketDTO> findAll(String projectId) {
+        Project project = projectRepository.findById(projectId);
         if (project == null) {
-            throw new NotFoundException("Project not found with name: " + projectName);
+            throw new NotFoundException("Project not found with name: " + projectId);
         }
 
         return ticketRepository.findByProjectName(project.getName()).stream()
@@ -61,10 +61,10 @@ public class TicketService {
                 .collect(Collectors.toList());
     }
 
-    public TicketDTO findById(String projectName, Long ticketId) {
-        Project project = projectRepository.findByName(projectName);
+    public TicketDTO findById(String projectId, Long ticketId) {
+        Project project = projectRepository.findById(projectId);
         if (project == null) {
-            throw new NotFoundException("Project not found with name: " + projectName);
+            throw new NotFoundException("Project not found with name: " + projectId);
         }
 
         Ticket ticket = ticketRepository.findByIdAndProjectName(ticketId, project.getName());
@@ -75,10 +75,10 @@ public class TicketService {
         return ticketMapper.ticketToTicketDTO(ticket);
     }
 
-    public TicketDTO findByTicketNumber(String projectName, Long ticketNumber) {
-        Project project = projectRepository.findByName(projectName);
+    public TicketDTO findByTicketNumber(String projectId, Long ticketNumber) {
+        Project project = projectRepository.findById(projectId);
         if (project == null) {
-            throw new NotFoundException("Project not found with name: " + projectName);
+            throw new NotFoundException("Project not found with name: " + projectId);
         }
 
         Ticket ticket = ticketRepository.findByTicketNumberAndProjectName(ticketNumber, project.getName());
@@ -90,10 +90,10 @@ public class TicketService {
     }
 
     @Transactional
-    public void update(String projectName, Long ticketId, TicketDTO ticketDTO) {
-        Project project = projectRepository.findByName(projectName);
+    public void update(String projectId, Long ticketId, TicketDTO ticketDTO) {
+        Project project = projectRepository.findById(projectId);
         if (project == null) {
-            throw new NotFoundException("Project not found with name: " + projectName);
+            throw new NotFoundException("Project not found with name: " + projectId);
         }
 
         Ticket existing = ticketRepository.findByIdAndProjectName(ticketId, project.getName());
@@ -108,10 +108,10 @@ public class TicketService {
     }
 
     @Transactional
-    public void delete(String projectName, Long ticketId) {
-        Project project = projectRepository.findByName(projectName);
+    public void delete(String projectId, Long ticketId) {
+        Project project = projectRepository.findById(projectId);
         if (project == null) {
-            throw new NotFoundException("Project not found with name: " + projectName);
+            throw new NotFoundException("Project not found with name: " + projectId);
         }
 
         Ticket ticket = ticketRepository.findByIdAndProjectName(ticketId, project.getName());

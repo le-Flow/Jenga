@@ -10,7 +10,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.util.List;
 
-@Path("/api/projects/{projectName}/tickets")
+@Path("/api/projects/{projectId}/tickets")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class TicketResource {
@@ -19,39 +19,39 @@ public class TicketResource {
     TicketService ticketService;
 
     @POST
-    public Response createTicket(@PathParam("projectName") String projectName, CreateTicketDTO createTicketDTO) {
-        ticketService.create(projectName, createTicketDTO);
+    public Response createTicket(@PathParam("projectId") String projectId, CreateTicketDTO createTicketDTO) {
+        ticketService.create(projectId, createTicketDTO);
         return Response.status(Response.Status.CREATED).build();
     }
 
     @GET
-    public List<TicketDTO> getAllTickets(@PathParam("projectName") String projectName) {
-        return ticketService.findAll(projectName);
+    public List<TicketDTO> getAllTickets(@PathParam("projectId") String projectId) {
+        return ticketService.findAll(projectId);
     }
 
     @GET
-    @Path("/id/{ticketId}")
-    public TicketDTO getTicketById(@PathParam("projectName") String projectName, @PathParam("ticketId") Long ticketId) {
-        return ticketService.findById(projectName, ticketId);
+    @Path("/{ticketId}")
+    public TicketDTO getTicketById(@PathParam("projectId") String projectId, @PathParam("ticketId") Long ticketId) {
+        return ticketService.findById(projectId, ticketId);
     }
 
     @GET
-    @Path("/{ticketNumber}")
-    public TicketDTO getTicketByNumber(@PathParam("projectName") String projectName, @PathParam("ticketNumber") Long ticketNumber) {
-        return ticketService.findByTicketNumber(projectName, ticketNumber);
+    @Path("/nr/{ticketNumber}")
+    public TicketDTO getTicketByNumber(@PathParam("projectId") String projectId, @PathParam("ticketNumber") Long ticketNumber) {
+        return ticketService.findByTicketNumber(projectId, ticketNumber);
     }
 
     @PUT
     @Path("/{ticketId}")
-    public Response updateTicket(@PathParam("projectName") String projectName, @PathParam("ticketId") Long ticketId, TicketDTO ticketDTO) {
-        ticketService.update(projectName, ticketId, ticketDTO);
+    public Response updateTicket(@PathParam("projectId") String projectId, @PathParam("ticketId") Long ticketId, TicketDTO ticketDTO) {
+        ticketService.update(projectId, ticketId, ticketDTO);
         return Response.ok().build();
     }
 
     @DELETE
     @Path("/{ticketId}")
-    public Response deleteTicket(@PathParam("projectName") String projectName, @PathParam("ticketId") Long ticketId) {
-        ticketService.delete(projectName, ticketId);
+    public Response deleteTicket(@PathParam("projectId") String projectId, @PathParam("ticketId") Long ticketId) {
+        ticketService.delete(projectId, ticketId);
         return Response.noContent().build();
     }
 }
