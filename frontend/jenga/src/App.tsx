@@ -2,6 +2,7 @@ import { AppBar, Card, createTheme, CssBaseline, ThemeProvider, Toolbar } from '
 import type { JSXElement } from 'solid-js';
 import { UserProvider } from './provider/UserProvider';
 import { ProjectProvider } from './provider/ProjectProvider';
+import logo from "../assets/Logo.png"
 
 const theme = createTheme()
 
@@ -16,9 +17,9 @@ const App = (props: AppProps) => {
       <ThemeProvider theme={theme}>
         <UserProvider>
           <ProjectProvider>
-            <AppBar>
+            <AppBar position="static">
               <Toolbar>
-                Jenga
+                <img src={logo} style={{ "height": "2vw", "width": "auto" }}></img>
               </Toolbar>
             </AppBar>
             <Card>
