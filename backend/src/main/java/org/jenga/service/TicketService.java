@@ -43,6 +43,8 @@ public class TicketService {
         Ticket ticket = ticketMapper.createTicketDTOToTicket(createTicketDTO);
         ticket.setProject(project);
 
+        ticket.setTicketNumber(ticketRepository.findMaxTicketNumberByProject(project) + 1);
+
         //ticket.setReporter(getCurrentUser()); // TODO: Add reporter
 
         ticketRepository.persist(ticket);
