@@ -6,7 +6,7 @@ import './index.css';
 import App from './App';
 import { Route, Router } from '@solidjs/router';
 import { Sprint } from './pages/Sprint';
-import { Home } from './pages/About';
+import { Home } from './pages/Home';
 
 const root = document.getElementById('root');
 
