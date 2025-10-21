@@ -1,9 +1,13 @@
-import { AppBar, Card, createTheme, CssBaseline, Theme, ThemeProvider, Toolbar } from '@suid/material';
-import type { Component } from 'solid-js';
+import { AppBar, Card, createTheme, CssBaseline, ThemeProvider, Toolbar } from '@suid/material';
+import type { JSXElement } from 'solid-js';
 
 const theme = createTheme()
 
-const App: Component = () => {
+interface AppProps {
+  children?: JSXElement;
+}
+
+const App = (props: AppProps) => {
   return (
     <>
       <CssBaseline />
@@ -15,7 +19,7 @@ const App: Component = () => {
           </Toolbar>
         </AppBar>
         <Card>
-
+          {props.children}
         </Card>
       </ThemeProvider>
     </>
