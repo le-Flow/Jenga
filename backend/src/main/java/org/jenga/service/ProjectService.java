@@ -28,7 +28,7 @@ public class ProjectService {
 
     @Transactional
     public void create(CreateProjectDTO createProjectDTO) {
-        Project existingProject = projectRepository.findByName(createProjectDTO.getName());
+        Project existingProject = projectRepository.findById(createProjectDTO.getIdentifier());
         if (existingProject != null) {
             throw new BadRequestException("Project already exists");
         }
@@ -44,21 +44,22 @@ public class ProjectService {
                 .collect(Collectors.toList());
     }
 
-    public ProjectDTO findByName(String projectName) {
-        Project project = projectRepository.findByName(projectName);
+    public ProjectDTO findById(String projectId) {
+        Project project = projectRepository.findById(projectId);
         if (project == null) {
-            throw new NotFoundException("Project not found with name: " + projectName);
+            throw new NotFoundException("Project not found with ID: " + projectId);
         }
         return projectMapper.projectToProjectDTO(project);
     }
 
     @Transactional
-    public void update(String projectName, ProjectDTO projectDTO) {
-        Project existing = projectRepository.findByName(projectName);
+    public void update(String projectId, ProjectDTO projectDTO) {
+        Project existing = projectRepository.findById(projectId);
         if (existing == null) {
-            throw new NotFoundException("Project not found with name: " + projectName);
+            throw new NotFoundException("Project not found with ID: " + projectId);
         }
 
+        existing.setId(projectDTO.getIdentifier());
         existing.setName(projectDTO.getName());
         existing.setDescription(projectDTO.getDescription());
 
@@ -66,10 +67,10 @@ public class ProjectService {
     }
 
     @Transactional
-    public void delete(String projectName) {
-        Project project = projectRepository.findByName(projectName);
+    public void delete(String projectId) {
+        Project project = projectRepository.findById(projectId);
         if (project == null) {
-            throw new NotFoundException("Project not found with name: " + projectName);
+            throw new NotFoundException("Project not found with ID: " + projectId);
         }
 
         projectRepository.delete(project);
