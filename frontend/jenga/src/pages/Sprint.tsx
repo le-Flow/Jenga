@@ -1,13 +1,16 @@
 import { Add } from "@suid/icons-material"
-import { Button, Card, CardActions, CardContent, CardHeader, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, IconButton, List, ListItem, ListItemButton, ListItemText, MenuItem, Select, Stack, TextField } from "@suid/material"
-import { createSignal, For } from "solid-js"
-import { TicketDTO, TicketPriority, TicketSize, TicketStatus } from "../api"
+import { Button, Card, CardActions, CardContent, CardHeader, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, IconButton, List, ListItem, ListItemButton, ListItemText, MenuItem, Select, Stack, TextField, Table, TableContainer, TableBody, TableHead, TableCell, TableRow, Paper } from "@suid/material"
+import { createMemo, createSignal, For, useContext } from "solid-js"
+import { CreateTicketDTO, TicketDTO, TicketPriority, TicketResourceService, TicketSize, TicketStatus, User } from "../api"
+import { ProjectContext } from "../provider/ProjectProvider"
 
 interface BacklogProps {
     tickets: TicketDTO[]
 }
 
 const Backlog = (props: BacklogProps) => {
+
+    const pCtx = useContext(ProjectContext)
 
     const [open, setOpen] = createSignal(false)
 
@@ -25,7 +28,7 @@ const Backlog = (props: BacklogProps) => {
                 <CardHeader title="Backlog"></CardHeader>
                 <CardContent>
                     <List>
-                        <For each={props.tickets}>
+                        <For each={pCtx?.tickets() ?? []}>
                             {
                                 (t) => {
                                     return <ListItem>
@@ -97,18 +100,81 @@ const Backlog = (props: BacklogProps) => {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => { setOpen(false) }}>cancel</Button>
-                    <Button onClick={() => { setOpen(false) }}>create</Button>
+                    <Button onClick={() => {
+                        const createTicketDTO: CreateTicketDTO = {
+                            projectName: pCtx?.selectedProject().name,
+                            title: title(),
+                            description: desc(),
+                            priority: prio(),
+                            size: size(),
+                            status: status(),
+                            assigneeName: assignee(),
+                        }
+                        const ticket: TicketDTO = {
+                            ...createTicketDTO
+                        }
+                        TicketResourceService.postApiProjectsTickets(pCtx?.selectedProject().identifier ?? "", createTicketDTO)
+                        pCtx?.setTickets([...pCtx?.tickets() ?? [], ticket])
+                        setOpen(false)
+
+                    }}>create</Button>
                 </DialogActions>
             </Dialog>
         </>
     )
 }
 
+interface RowProps {
+    dev: string
+    tickets?: TicketDTO[]
+}
+
+const Row = (props: RowProps) => {
+    return (
+        <TableRow>
+            <TableCell>{props.dev}</TableCell>
+            <TableCell></TableCell>
+            <TableCell></TableCell>
+            <TableCell></TableCell>
+            <TableCell></TableCell>
+        </TableRow>
+    )
+}
+
+
 const Kanban = () => {
+
+    const pCtx = useContext(ProjectContext)
+
+    const tickets = createMemo(() =>
+        Map.groupBy(pCtx?.tickets() ?? [], t => t.assigneeName ?? "")
+    )
+
     return (
         <Card>
             <CardHeader title="Kanban"></CardHeader>
-            <CardContent></CardContent>
+            <CardContent>
+                <TableContainer component={Paper}>
+                    <Table>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>Dev</TableCell>
+                                <TableCell>Todo</TableCell>
+                                <TableCell>In Progress</TableCell>
+                                <TableCell>In Review</TableCell>
+                                <TableCell>Done</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            <For each={[...tickets().entries()]}>
+                                {
+                                    t => <Row dev={t[0]} tickets={t[1]}></Row>
+                                }
+                            </For>
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </CardContent>
         </Card>
     )
 }
