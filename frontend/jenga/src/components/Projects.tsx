@@ -32,7 +32,7 @@ export const Projects = () => {
             ...request
         }
         ProjectResourceService.postApiProjects(request)
-        pCtx?.setProjects([...pCtx?.projects() ?? [], newProject])
+        pCtx?.setProjects(prev => [ ...(prev ?? []), { ...request } ])
         setOpen(false)
     }
 
