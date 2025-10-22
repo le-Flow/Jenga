@@ -1,26 +1,21 @@
 import { Button, Card, CardActions, CardContent, CardHeader, Dialog, DialogActions, DialogContent, DialogTitle, List, ListItem, ListItemButton, ListItemText, Stack, TextField } from "@suid/material"
 import { ProjectContext } from "../provider/ProjectProvider"
-import { createSignal, For, useContext } from "solid-js"
+import { createSignal, For, Setter, useContext } from "solid-js"
 import { ProjectResourceService, CreateProjectDTO, ProjectDTO } from "../api"
 
 
-const NewProject = () => {
-    return (
-        <></>
-    )
+interface NewProjectDialogProps {
+    open: boolean
+    setOpen: Setter<boolean>
 }
 
-export const Projects = () => {
+const NewProjectDialog = (props: NewProjectDialogProps) => {
 
     const pCtx = useContext(ProjectContext)
-
-    const [open, setOpen] = createSignal(false)
 
     const [id, setId] = createSignal("")
     const [name, setName] = createSignal("")
     const [desc, setDesc] = createSignal("")
-
-    const projectCtx = useContext(ProjectContext)
 
     const onCreate = () => {
         const request: CreateProjectDTO = {
@@ -32,16 +27,48 @@ export const Projects = () => {
             ...request
         }
         ProjectResourceService.postApiProjects(request)
-        pCtx?.setProjects(prev => [ ...(prev ?? []), { ...request } ])
-        setOpen(false)
+        pCtx?.setProjects(prev => [...(prev ?? []), { ...request }])
+        props.setOpen(false)
     }
 
     return (
+        <Dialog open={props.open}>
+            <DialogTitle>New Project</DialogTitle>
+            <DialogContent>
+                <Stack spacing={1}>
+                    <TextField name="id" label="identifier" value={id()} onChange={(_, value) => { setId(value) }}></TextField>
+                    <TextField name="name" label="name" value={name()} onChange={(_, value) => { setName(value) }}></TextField>
+                    <TextField name="description" label="description" value={desc()} onChange={(_, value) => { setDesc(value) }} multiline></TextField>
+                </Stack>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={() => { props.setOpen(false) }}>
+                    cancel
+                </Button>
+                <Button onClick={() => {
+                    onCreate()
+                }}>
+                    create
+                </Button>
+            </DialogActions>
+        </Dialog>
+    )
+}
+
+export const Projects = () => {
+
+    const pCtx = useContext(ProjectContext)
+
+    const [open, setOpen] = createSignal(false)
+
+    const projectCtx = useContext(ProjectContext)
+
+    return (
         <>
-            <Card>
+            <Card sx={{ "height": "100%" }}>
                 <CardHeader title="Projects" />
-                <CardContent>
-                    <List>
+                <CardContent sx={{ "height": "80%" }}>
+                    <List sx={{ "flex": "1", "height": "100", "maxHeight": "100%", "overflow": "auto" }}>
                         <For each={projectCtx?.projects() ?? []}>
                             {
                                 (p) => {
@@ -66,27 +93,7 @@ export const Projects = () => {
                     </Button>
                 </CardActions>
             </Card>
-            <Dialog open={open()}>
-                <DialogTitle>New Project</DialogTitle>
-                <DialogContent>
-                    <Stack spacing={1}>
-                        <TextField name="id" label="identifier" value={id()} onChange={(_, value) => { setId(value) }}></TextField>
-                        <TextField name="name" label="name" value={name()} onChange={(_, value) => { setName(value) }}></TextField>
-                        <TextField name="description" label="description" value={desc()} onChange={(_, value) => { setDesc(value) }} multiline></TextField>
-                    </Stack>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => { setOpen(false) }}>
-                        cancel
-                    </Button>
-                    <Button onClick={() => {
-                        onCreate()
-                    }}>
-                        create
-                    </Button>
-                </DialogActions>
-
-            </Dialog>
+            <NewProjectDialog open={open()} setOpen={setOpen}></NewProjectDialog>
         </>
     )
 }
