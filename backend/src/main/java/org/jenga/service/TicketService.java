@@ -52,6 +52,15 @@ public class TicketService {
 
         //ticket.setReporter(getCurrentUser()); // TODO: Add reporter
 
+        if (createTicketDTO.getAssignee() != null && !createTicketDTO.getAssignee().isBlank()) {
+            User user = userRepository.findByUsername(createTicketDTO.getAssignee());
+            if (user != null) {
+                ticket.setAssignee(user);
+            } else {
+                throw new BadRequestException("User not found with username: " + createTicketDTO.getAssignee());
+            }
+        }
+
         ticketRepository.persist(ticket);
     }
 
