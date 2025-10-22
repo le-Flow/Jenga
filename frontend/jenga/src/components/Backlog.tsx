@@ -1,5 +1,5 @@
 import { Add } from "@suid/icons-material"
-import { Card, CardHeader, CardContent, List, ListItem, ListItemButton, ListItemText, CardActions, IconButton, Dialog, DialogTitle, DialogContent, Stack, TextField, FormControl, InputLabel, Select, MenuItem, DialogActions, Button } from "@suid/material"
+import { Card, CardHeader, CardContent, List, ListItem, ListItemButton, ListItemText, CardActions, IconButton, Dialog, DialogTitle, DialogContent, Stack, TextField, FormControl, InputLabel, Select, MenuItem, DialogActions, Button, ListItemAvatar } from "@suid/material"
 import { useContext, createSignal, For, Setter } from "solid-js"
 import { TicketDTO, TicketPriority, TicketSize, TicketStatus, CreateTicketDTO, TicketResourceService } from "../api"
 import { ProjectContext } from "../provider/ProjectProvider"
@@ -117,7 +117,8 @@ export const Backlog = (props: BacklogProps) => {
                                 (t) => {
                                     return <ListItem>
                                         <ListItemButton>
-                                            <ListItemText></ListItemText>
+                                        <ListItemAvatar></ListItemAvatar>
+                                            <ListItemText primary={t.title} secondary={`reporter: ${t.reporterName} assignee: ${t.assigneeName}`}></ListItemText>
                                         </ListItemButton>
                                     </ListItem>
                                 }
