@@ -1,6 +1,7 @@
 import { Button, Card, CardActions, CardContent, CardHeader, Dialog, DialogActions, DialogContent, DialogTitle, List, ListItem, ListItemButton, ListItemText, Stack, TextField } from "@suid/material"
 import { ProjectContext } from "../provider/ProjectProvider"
 import { createSignal, For, useContext } from "solid-js"
+import { ProjectResourceService, CreateProjectDTO } from "../api"
 
 
 const NewProject = () => {
@@ -19,7 +20,14 @@ export const Projects = () => {
     const projectCtx = useContext(ProjectContext)
 
     const onCreate = () => {
+        const request: CreateProjectDTO = {
+            identifier: "1", // TODO
+            name: name(),
+            description: desc()
+        }
 
+        ProjectResourceService.postApiProjects(request)
+        setOpen(false)
     }
 
     return (
@@ -61,12 +69,11 @@ export const Projects = () => {
                     </Stack>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => { setOpen(false)}}>
+                    <Button onClick={() => { setOpen(false) }}>
                         cancel
                     </Button>
-                    <Button onClick={() => { 
-
-                        setOpen(false)
+                    <Button onClick={() => {
+                        onCreate()
                     }}>
                         create
                     </Button>
