@@ -20,19 +20,17 @@ public class AuthenticationResource {
 
     @POST
     @Path("/register")
-    public Response register(RegisterRequestDTO registerRequest) {
-            LoginResponseDTO loginResponse = authenticationService.register(registerRequest);
-            return Response.ok().entity(loginResponse).build();
+    public LoginResponseDTO register(RegisterRequestDTO registerRequest) {
+        return authenticationService.register(registerRequest);
     }
 
     @POST
     @Path("/login")
-    public Response login(LoginRequestDTO loginRequest) {
+    public LoginResponseDTO login(LoginRequestDTO loginRequest) {
         try {
-            LoginResponseDTO loginResponse = authenticationService.login(loginRequest);
-            return Response.ok().entity(loginResponse).build();
+            return authenticationService.login(loginRequest);
         } catch (Exception e) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid username or password").build();
+            throw new WebApplicationException("Invalid username or password", Response.Status.BAD_REQUEST);
         }
     }
 }
