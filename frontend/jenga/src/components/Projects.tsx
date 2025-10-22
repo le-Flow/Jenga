@@ -12,6 +12,8 @@ const NewProject = () => {
 
 export const Projects = () => {
 
+    const pCtx = useContext(ProjectContext)
+
     const [open, setOpen] = createSignal(false)
 
     const [id, setId] = createSignal("")
@@ -42,7 +44,7 @@ export const Projects = () => {
                                 (p) => {
                                     return (
                                         <ListItem>
-                                            <ListItemButton>
+                                            <ListItemButton onClick={() => { pCtx?.setSelectedProject(p) }}>
                                                 <ListItemText
                                                     primary={p.name}
                                                     secondary={((p.createDate ?? "") + " | " + (p.modifyDate ?? ""))}
