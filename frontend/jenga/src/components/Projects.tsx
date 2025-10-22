@@ -14,6 +14,7 @@ export const Projects = () => {
 
     const [open, setOpen] = createSignal(false)
 
+    const [id, setId] = createSignal("")
     const [name, setName] = createSignal("")
     const [desc, setDesc] = createSignal("")
 
@@ -21,7 +22,7 @@ export const Projects = () => {
 
     const onCreate = () => {
         const request: CreateProjectDTO = {
-            identifier: "1", // TODO
+            identifier: id(),
             name: name(),
             description: desc()
         }
@@ -64,6 +65,7 @@ export const Projects = () => {
                 <DialogTitle>New Project</DialogTitle>
                 <DialogContent>
                     <Stack spacing={1}>
+                        <TextField name="id" label="identifier" value={id()} onChange={(_, value) => { setId(value) }}></TextField>
                         <TextField name="name" label="name" value={name()} onChange={(_, value) => { setName(value) }}></TextField>
                         <TextField name="description" label="description" value={desc()} onChange={(_, value) => { setDesc(value) }} multiline></TextField>
                     </Stack>
