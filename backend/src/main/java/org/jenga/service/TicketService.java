@@ -2,8 +2,10 @@ package org.jenga.service;
 
 import org.jenga.db.ProjectRepository;
 import org.jenga.db.TicketRepository;
+import org.jenga.db.UserRepository;
 import org.jenga.model.Ticket;
 import org.jenga.model.Project;
+import org.jenga.model.User;
 import org.jenga.dto.TicketDTO;
 import org.jenga.dto.CreateTicketDTO;
 import org.jenga.mapper.TicketMapper;
@@ -11,6 +13,7 @@ import org.jenga.mapper.TicketMapper;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,12 +23,14 @@ public class TicketService {
 
     private final TicketRepository ticketRepository;
     private final ProjectRepository projectRepository;
+    private final UserRepository userRepository;
     private final TicketMapper ticketMapper;
 
     @Inject
-    public TicketService(TicketRepository ticketRepository, ProjectRepository projectRepository, TicketMapper ticketMapper) {
+    public TicketService(TicketRepository ticketRepository, ProjectRepository projectRepository,  UserRepository userRepository, TicketMapper ticketMapper) {
         this.ticketRepository = ticketRepository;
         this.projectRepository = projectRepository;
+        this.userRepository = userRepository;
         this.ticketMapper = ticketMapper;
     }
 
@@ -47,6 +52,15 @@ public class TicketService {
 
         //ticket.setReporter(getCurrentUser()); // TODO: Add reporter
 
+        if (createTicketDTO.getAssignee() != null && !createTicketDTO.getAssignee().isBlank()) {
+            User user = userRepository.findByUsername(createTicketDTO.getAssignee());
+            if (user != null) {
+                ticket.setAssignee(user);
+            } else {
+                throw new BadRequestException("User not found with username: " + createTicketDTO.getAssignee());
+            }
+        }
+
         ticketRepository.persist(ticket);
     }
 
@@ -67,7 +81,7 @@ public class TicketService {
             throw new NotFoundException("Project not found with name: " + projectId);
         }
 
-        Ticket ticket = ticketRepository.findByIdAndProjectName(ticketId, project.getName());
+        Ticket ticket = ticketRepository.findByIdAndProjectId(ticketId, project.getId());
         if (ticket == null) {
             throw new NotFoundException("Ticket not found");
         }
@@ -96,7 +110,7 @@ public class TicketService {
             throw new NotFoundException("Project not found with name: " + projectId);
         }
 
-        Ticket existing = ticketRepository.findByIdAndProjectName(ticketId, project.getName());
+        Ticket existing = ticketRepository.findByIdAndProjectId(ticketId, project.getId());
         if (existing == null) {
             throw new NotFoundException("Ticket not found");
         }
@@ -114,11 +128,36 @@ public class TicketService {
             throw new NotFoundException("Project not found with name: " + projectId);
         }
 
-        Ticket ticket = ticketRepository.findByIdAndProjectName(ticketId, project.getName());
+        Ticket ticket = ticketRepository.findByIdAndProjectId(ticketId, project.getId());
         if (ticket == null) {
             throw new NotFoundException("Ticket not found");
         }
 
         ticketRepository.delete(ticket);
+    }
+
+    @Transactional
+    public void assignTicket(String projectId, Long ticketId, String username) {
+        Ticket ticket = ticketRepository.findByIdAndProjectId(ticketId, projectId);
+        if (ticket == null) {
+            throw new BadRequestException("Ticket not found");
+        }
+        User assignee = userRepository.findByUsername(username);
+        if (assignee == null) {
+            throw new BadRequestException("User not found");
+        }
+
+        ticket.setAssignee(assignee);
+        ticketRepository.persist(ticket);
+    }
+
+    @Transactional
+    public void unassignTicket(String projectId, Long ticketId) {
+        Ticket ticket = ticketRepository.findByIdAndProjectId(ticketId, projectId);
+        if (ticket == null) {
+            throw new BadRequestException("Ticket not found");
+        }
+        ticket.setAssignee(null);
+        ticketRepository.persist(ticket);
     }
 }

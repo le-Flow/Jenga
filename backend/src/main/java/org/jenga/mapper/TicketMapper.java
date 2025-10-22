@@ -25,5 +25,6 @@ public interface TicketMapper {
     @Mapping(target = "createDate", ignore = true)
     @Mapping(target = "modifyDate", ignore = true)
     @Mapping(target = "reporter", ignore = true)
+    @Mapping(target = "assignee", ignore = true)
     Ticket createTicketDTOToTicket(CreateTicketDTO createTicketDTO);
 }
