@@ -12,6 +12,9 @@ export const Sidebar = () => {
                     <ListItem>
                         <ListItemButton component={A} href="/Sprint">Sprint</ListItemButton>
                     </ListItem>
+                    <ListItem>
+                        <ListItemButton component={A} href="/About">About</ListItemButton>
+                    </ListItem>
                 </List>
             </nav>
         </Box>)
