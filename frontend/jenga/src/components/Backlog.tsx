@@ -81,7 +81,7 @@ const NewTicketDialog = (props: NewTicketDialogProps) => {
                         priority: prio(),
                         size: size(),
                         status: status(),
-                        assigneeName: assignee(),
+                        assignee: assignee(),
                     }
                     const ticket: TicketDTO = {
                         ...createTicketDTO
