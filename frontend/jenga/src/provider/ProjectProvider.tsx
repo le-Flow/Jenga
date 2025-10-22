@@ -3,6 +3,7 @@ import { ProjectDTO, ProjectResourceService, TicketDTO, TicketResourceService } 
 
 type ProjectContextType = {
     projects: Resource<ProjectDTO[]>
+    setProjects: Setter<ProjectDTO[]>
 
     selectedProject: Accessor<ProjectDTO>
     setSelectedProject: Setter<ProjectDTO>
@@ -19,20 +20,21 @@ interface ProviderProps {
 
 export const ProjectProvider = (props: ProviderProps) => {
 
-    const [projects] = createResource(async () => await ProjectResourceService.getApiProjects())
+    const [projects, { mutate: setProjects }] = createResource(async () => await ProjectResourceService.getApiProjects())
 
     const [selectedProject, setSelectedProject] = createSignal<ProjectDTO>()
-    
-    const [tickets, {mutate}] = createResource(selectedProject, async (q)=> await TicketResourceService.getApiProjectsTickets(q.identifier))
 
-    createEffect(()=> console.log(tickets()))
+    const [tickets, { mutate: setTickets }] = createResource(selectedProject, async (q) => await TicketResourceService.getApiProjectsTickets(q.identifier))
+
+    createEffect(() => console.log(tickets()))
 
     const value = {
         projects: projects,
+        setProjects: setProjects,
         selectedProject: selectedProject,
         setSelectedProject: setSelectedProject,
         tickets: tickets,
-        setTickets: mutate
+        setTickets: setTickets
     }
 
     return (
