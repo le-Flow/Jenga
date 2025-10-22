@@ -13,6 +13,5 @@ public class CreateTicketDTO {
     private TicketSize size;
     private TicketStatus status;
     private String projectName;
-    private String assigneeName;
 }
 

@@ -54,4 +54,18 @@ public class TicketResource {
         ticketService.delete(projectId, ticketId);
         return Response.noContent().build();
     }
+
+    @PUT
+    @Path("/{ticketId}/assign")
+    public Response assignTicket(@PathParam("projectId") String projectId, @PathParam("ticketId") Long ticketId, @QueryParam("username") String username) {
+        ticketService.assignTicket(projectId, ticketId, username);
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @PUT
+    @Path("/{ticketId}/unassign")
+    public Response unassignTicket(@PathParam("projectId") String projectId, @PathParam("ticketId") Long ticketId) {
+        ticketService.unassignTicket(projectId, ticketId);
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
 }
