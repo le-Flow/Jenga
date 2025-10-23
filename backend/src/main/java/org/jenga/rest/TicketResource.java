@@ -4,6 +4,12 @@ import org.jenga.service.TicketService;
 import org.jenga.dto.TicketDTO;
 import org.jenga.dto.CreateTicketDTO;
 
+import org.jenga.dto.ImportStatusDTO;
+import org.jenga.dto.GitHubIssueDTO;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.InputStream;
+
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -67,5 +73,27 @@ public class TicketResource {
     public Response unassignTicket(@PathParam("projectId") String projectId, @PathParam("ticketId") Long ticketId) {
         ticketService.unassignTicket(projectId, ticketId);
         return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @POST
+    @Path("/import/json")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response importFromJsonFile(@PathParam("projectId") String projectId, InputStream jsonFileStream) {
+        
+        List<GitHubIssueDTO> issues;
+        try {
+            TypeReference<List<GitHubIssueDTO>> typeRef = new TypeReference<>() {};
+            issues = objectMapper.readValue(jsonFileStream, typeRef);
+
+        } catch (Exception e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                           .entity(new ImportStatusDTO(false, "Failed to parse JSON file: " + e.getMessage()))
+                           .build();
+        }
+
+        ImportStatusDTO status = ticketService.importFromGitHub(projectId, issues);
+
+        return Response.ok(status).build();
     }
 }

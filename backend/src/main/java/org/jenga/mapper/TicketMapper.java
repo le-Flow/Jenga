@@ -3,6 +3,8 @@ package org.jenga.mapper;
 import org.jenga.model.Ticket;
 import org.jenga.dto.TicketDTO;
 import org.jenga.dto.CreateTicketDTO;
+import org.jenga.dto.GitHubIssueDTO;
+import org.jenga.model.TicketStatus;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;

@@ -28,4 +28,8 @@ public class TicketRepository implements PanacheRepository<Ticket> {
                             .firstResult();
         return ticket != null && ticket.getTicketNumber() != null ? ticket.getTicketNumber() : 0L;
     }
+
+    public boolean existsByGithubIssueId(Long githubIssueId) {
+        return count("githubIssueId", githubIssueId) > 0;
+    }
 }
