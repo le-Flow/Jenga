@@ -1,9 +1,9 @@
-import { Avatar, Box, Dialog, DialogContent, DialogTitle, IconButton, Stack, ToggleButton, ToggleButtonGroup } from "@suid/material"
-import { Match, Switch, createSignal, useContext } from "solid-js"
-import { Register } from "./Register"
-import { Login, Logout } from "@suid/icons-material"
-import { LogIn } from "./Login"
-import { UserContext } from "../provider/UserProvider"
+import { Avatar, Dialog, DialogContent, DialogTitle, IconButton, Stack, ToggleButton, ToggleButtonGroup } from "@suid/material";
+import { Login, Logout } from "@suid/icons-material";
+import { Match, Switch, createSignal, useContext } from "solid-js";
+import { LogIn } from "./Login";
+import { Register } from "./Register";
+import { AuthContext } from "../provider/AuthProvider";
 
 const enum AuthE {
     SignIn,
@@ -12,7 +12,7 @@ const enum AuthE {
 
 const LoggedIn = () => {
 
-    const uCtx = useContext(UserContext)
+    const aCtx = useContext(AuthContext);
 
     const [showProfile, setShowProfile] = createSignal(false)
 
@@ -73,14 +73,14 @@ const LoggedOut = () => {
 
 export const Auth = () => {
 
-    const uCtx = useContext(UserContext)
+    const aCtx = useContext(AuthContext);
 
     return (
         <Switch>
-            <Match when={uCtx?.isLoggedIn()}>
+            <Match when={aCtx?.isLoggedIn()}>
                 <LoggedIn></LoggedIn>
             </Match>
-            <Match when={!uCtx?.isLoggedIn()}>
+            <Match when={!aCtx?.isLoggedIn()}>
                 <LoggedOut></LoggedOut>
             </Match>
         </Switch>

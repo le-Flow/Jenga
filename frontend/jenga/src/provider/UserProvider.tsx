@@ -1,57 +1,37 @@
-import { createContext, Resource, createResource, JSXElement, createSignal, createEffect, Accessor, createMemo } from "solid-js"
-import { AuthenticationResourceService, LoginRequestDTO, LoginResponseDTO, OpenAPI, RegisterRequestDTO, User } from "../api"
+import { JSXElement, Resource, createContext, createResource, useContext } from "solid-js";
+import { User, UserResourceService } from "../api";
+import { AuthContext } from "./AuthProvider";
 
 type UserContextType = {
-    user?: User
-    login?: (request: LoginRequestDTO) => void;
-    isLoggedIn: Accessor<boolean>
-    register?: (request: RegisterRequestDTO) => void;
+    user: Resource<User | undefined>;
+    setUser: (next: User | undefined) => void;
+    refetchUser: () => Promise<User | undefined>;
+};
 
-    jwt: Resource<LoginResponseDTO>
-}
-
-
-export const UserContext = createContext<UserContextType>()
+export const UserContext = createContext<UserContextType>();
 
 interface ProviderProps {
-    children: JSXElement
+    children: JSXElement;
 }
 
 export const UserProvider = (props: ProviderProps) => {
+    const auth = useContext(AuthContext);
 
-    const register = (request: RegisterRequestDTO) => {
-        setRegisterRequestDTO(request)
-    }
+    const [user, { mutate: setUser, refetch }] = createResource(
+        () => auth?.jwt()?.username ?? null,
+        async (username) => {
+            if (!username) {
+                return undefined;
+            }
+            return await UserResourceService.getApiUsers(username);
+        }
+    );
 
-    const login = (request: LoginRequestDTO) => {
-        setLoginRequestDTO(request)
-    }
+    const value: UserContextType = {
+        user,
+        setUser: (next) => setUser(() => next),
+        refetchUser: refetch,
+    };
 
-    const [registerRequestDTO, setRegisterRequestDTO] = createSignal<RegisterRequestDTO>()
-    const [loginRequestDTO, setLoginRequestDTO] = createSignal<LoginRequestDTO>()
-
-    const [registerResult] = createResource(registerRequestDTO, async (q: RegisterRequestDTO) => await AuthenticationResourceService.postApiAuthRegister(q))
-    const [loginResult] = createResource(loginRequestDTO, async (q: LoginRequestDTO) => {
-        const jwt = await AuthenticationResourceService.postApiAuthLogin(q);
-        OpenAPI.TOKEN = jwt.token
-        OpenAPI.USERNAME = jwt.username
-
-        return jwt
-    })
-
-    const loggedIn = createMemo(() => !!(!loginResult.error && loginResult()?.token));
-
-    const value = {
-        login: login,
-        isLoggedIn: loggedIn,
-        register: register,
-        jwt: loginResult
-    }
-
-
-    return (
-        <UserContext.Provider value={value}>
-            {props.children}
-        </UserContext.Provider>
-    )
-}
+    return <UserContext.Provider value={value}>{props.children}</UserContext.Provider>;
+};
