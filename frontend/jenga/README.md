@@ -14,6 +14,9 @@ $ npm install # or pnpm install or yarn install
 
 In the project directory, you can run:
 
+### `npm run gen:api`
+Generates api
+
 ### `npm run dev` or `npm start`
 
 Runs the app in the development mode.<br>
