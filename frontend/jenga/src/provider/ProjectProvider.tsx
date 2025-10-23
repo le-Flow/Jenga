@@ -1,5 +1,6 @@
-import { createContext, Resource, createResource, JSXElement, createEffect, Accessor, Setter, createSignal } from "solid-js"
+import { createContext, Resource, createResource, JSXElement, createEffect, Accessor, Setter, createSignal, useContext, on } from "solid-js"
 import { ProjectDTO, ProjectResourceService, TicketDTO, TicketResourceService } from "../api"
+import { UserContext } from "./UserProvider"
 
 type ProjectContextType = {
     projects: Resource<ProjectDTO[]>
@@ -20,13 +21,21 @@ interface ProviderProps {
 
 export const ProjectProvider = (props: ProviderProps) => {
 
-    const [projects, { mutate: setProjects }] = createResource(async () => await ProjectResourceService.getApiProjects())
+    const uCtx = useContext(UserContext)
+
+    const [projects, { mutate: setProjects, refetch }] = createResource(async () => await ProjectResourceService.getApiProjects())
 
     const [selectedProject, setSelectedProject] = createSignal<ProjectDTO>()
 
     const [tickets, { mutate: setTickets }] = createResource(selectedProject, async (q) => await TicketResourceService.getApiProjectsTickets(q.identifier))
 
     createEffect(() => console.log(tickets()))
+    createEffect(()=>{
+        if(uCtx?.isLoggedIn()){
+            console.log("refetch") 
+            refetch()
+        }
+    })
 
     const value = {
         projects: projects,
