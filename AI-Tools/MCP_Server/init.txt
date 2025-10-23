@@ -1,0 +1,3 @@
+https://composio.dev/blog/mcp-server-step-by-step-guide-to-building-from-scrtch
+
+source devenv/bin/activate
