@@ -1,6 +1,6 @@
-import { TableRow, TableCell, Card, CardHeader, CardContent, TableContainer, Paper, Table, TableHead, TableBody } from "@suid/material"
+import { TableRow, TableCell, Card, CardHeader, CardContent, TableContainer, Paper, Table, TableHead, TableBody, ListItem, List } from "@suid/material"
 import { useContext, createMemo, For } from "solid-js"
-import { TicketDTO } from "../api"
+import { TicketDTO, TicketStatus } from "../api"
 import { ProjectContext } from "../provider/ProjectProvider"
 
 interface RowProps {
@@ -8,14 +8,86 @@ interface RowProps {
     tickets?: TicketDTO[]
 }
 
+interface KanbanItemProps {
+    ticket: TicketDTO
+}
+
+const KanbanItem = (props: KanbanItemProps) => {
+    return (
+        <ListItem>{props.ticket.title}</ListItem>
+    )
+}
+
 const Row = (props: RowProps) => {
     return (
         <TableRow>
             <TableCell>{props.dev}</TableCell>
-            <TableCell></TableCell>
-            <TableCell></TableCell>
-            <TableCell></TableCell>
-            <TableCell></TableCell>
+            <TableCell>
+                <List>
+                    <For each={props.tickets?.filter(t => t.status === TicketStatus.OPEN)}>
+
+                        {
+                            (t) => {
+                                return (
+                                    <KanbanItem ticket={t} />
+                                )
+                            }
+                        }
+                    </For>
+                </List>
+            </TableCell>
+            <TableCell>
+                <List>
+                    <For each={props.tickets?.filter(t => t.status === TicketStatus.IN_PROGRESS)}>
+                        {
+                            (t) => {
+                                return (
+                                    <KanbanItem ticket={t} />
+                                )
+                            }
+                        }
+                    </For>
+                </List>
+            </TableCell>
+            <TableCell>
+                <List>
+                    <For each={props.tickets?.filter(t => t.status === TicketStatus.IN_REVIEW)}>
+                        {
+                            (t) => {
+                                return (
+                                    <KanbanItem ticket={t} />
+                                )
+                            }
+                        }
+                    </For>
+                </List>
+            </TableCell>
+            <TableCell>
+                <List>
+                    <For each={props.tickets?.filter(t => t.status === TicketStatus.RESOLVED)}>
+                        {
+                            (t) => {
+                                return (
+                                    <KanbanItem ticket={t} />
+                                )
+                            }
+                        }
+                    </For>
+                </List>
+            </TableCell>
+            <TableCell>
+                <List>
+                    <For each={props.tickets?.filter(t => t.status === TicketStatus.CLOSED)}>
+                        {
+                            (t) => {
+                                return (
+                                    <KanbanItem ticket={t} />
+                                )
+                            }
+                        }
+                    </For>
+                </List>
+            </TableCell>
         </TableRow>
     )
 }
@@ -41,6 +113,7 @@ export const Kanban = () => {
                                 <TableCell>Todo</TableCell>
                                 <TableCell>In Progress</TableCell>
                                 <TableCell>In Review</TableCell>
+                                <TableCell>Resolved</TableCell>
                                 <TableCell>Done</TableCell>
                             </TableRow>
                         </TableHead>
