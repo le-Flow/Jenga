@@ -1,4 +1,4 @@
-package org.MCP_Server;
+package org.jenga.MCP_Server;
 import dev.langchain4j.service.UserMessage;
 import io.quarkiverse.langchain4j.RegisterAiService;
 

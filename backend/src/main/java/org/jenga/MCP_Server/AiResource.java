@@ -1,4 +1,4 @@
-package org.MCP_Server;
+package org.jenga.MCP_Server;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;

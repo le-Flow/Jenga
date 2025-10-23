@@ -31,7 +31,7 @@ gh auth login -h github.com -s read:project
 Run this command to fetch all issues (both open and closed) and save them to a file named `issues.json`.
 
 ```bash
-gh issue list --state all \
-  --json number,title,body,state,assignees,labels,milestone,comments,createdAt,updatedAt,projectItems \
-  > issues.json
+gh issue list --repo Jenga-PMS/Jenga --state all --limit 1000 --json number,title,body,state,assignees,labels,milestone,comments,createdAt,updatedAt,projectItems > all-issues.json
 ```
+
+Size, Estimate and Priority could not be extracted

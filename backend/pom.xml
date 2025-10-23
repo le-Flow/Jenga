@@ -44,7 +44,6 @@
             
         </dependencies>
     </dependencyManagement>
-
     <dependencies>
         <dependency>
             <groupId>io.quarkus</groupId>
@@ -73,21 +72,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-<<<<<<< HEAD
-=======
-            <groupId>io.quarkiverse.mcp</groupId>
-            <artifactId>quarkus-mcp-server-sse</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.quarkiverse.mcp</groupId>
-            <artifactId>quarkus-mcp-server-stdio</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.quarkiverse.langchain4j</groupId>
-            <artifactId>quarkus-langchain4j-ai-gemini</artifactId>
-        </dependency>
-        <dependency>
->>>>>>> 45ee01f (merged backend to MCP_SERVER)
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-jdbc-postgresql</artifactId>
         </dependency>
