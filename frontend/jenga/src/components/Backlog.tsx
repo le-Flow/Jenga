@@ -87,7 +87,7 @@ const NewTicketDialog = (props: NewTicketDialogProps) => {
                         ...createTicketDTO
                     }
                     TicketResourceService.postApiProjectsTickets(pCtx?.selectedProject().identifier ?? "", createTicketDTO)
-                    pCtx?.setTickets([...pCtx?.tickets() ?? [], ticket])
+                    pCtx?.setTickets(prev=>[...prev, ticket])
                     props.setOpen(false)
 
                 }}>create</Button>
