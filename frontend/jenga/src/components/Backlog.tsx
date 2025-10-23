@@ -83,7 +83,7 @@ const NewTicketDialog = (props: NewTicketDialogProps) => {
                         status: status(),
                         assignee: assignee(),
                     }
-                    
+
                     const { assignee: name, ...rest } = createTicketDTO;
                     const ticket: TicketDTO = {
                         ...rest,
@@ -97,6 +97,23 @@ const NewTicketDialog = (props: NewTicketDialogProps) => {
                 }}>create</Button>
             </DialogActions>
         </Dialog>
+    )
+}
+
+interface BacklogItemProps {
+    ticket: TicketDTO
+}
+
+const BacklogItem = (props: BacklogItemProps) => {
+    return (
+        <ListItem>
+            <ListItemButton>
+                <ListItemAvatar></ListItemAvatar>
+                <ListItemText 
+                primary={props.ticket.title} 
+                secondary={`reporter: ${props.ticket.reporterName} assignee: ${props.ticket.assigneeName}`} />
+            </ListItemButton>
+        </ListItem>
     )
 }
 
@@ -118,14 +135,7 @@ export const Backlog = (props: BacklogProps) => {
                     <List>
                         <For each={pCtx?.tickets() ?? []}>
                             {
-                                (t) => {
-                                    return <ListItem>
-                                        <ListItemButton>
-                                            <ListItemAvatar></ListItemAvatar>
-                                            <ListItemText primary={t.title} secondary={`reporter: ${t.reporterName} assignee: ${t.assigneeName}`}></ListItemText>
-                                        </ListItemButton>
-                                    </ListItem>
-                                }
+                                (t) => <BacklogItem ticket={t}></BacklogItem>
                             }
                         </For>
                     </List>
