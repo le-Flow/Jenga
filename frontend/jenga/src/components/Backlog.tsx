@@ -1,5 +1,5 @@
 import { Add } from "@suid/icons-material"
-import { Card, CardHeader, CardContent, List, ListItem, ListItemButton, ListItemText, CardActions, IconButton, Dialog, DialogTitle, DialogContent, Stack, TextField, FormControl, InputLabel, Select, MenuItem, DialogActions, Button, ListItemAvatar } from "@suid/material"
+import { Card, CardHeader, CardContent, List, ListItem, ListItemButton, ListItemText, CardActions, IconButton, Dialog, DialogTitle, DialogContent, Stack, TextField, FormControl, InputLabel, Select, MenuItem, DialogActions, Button, ListItemAvatar, Avatar } from "@suid/material"
 import { useContext, createSignal, For, Setter } from "solid-js"
 import { TicketDTO, TicketPriority, TicketSize, TicketStatus, CreateTicketDTO, TicketResourceService } from "../api"
 import { ProjectContext } from "../provider/ProjectProvider"
@@ -110,7 +110,9 @@ const BacklogItem = (props: BacklogItemProps) => {
     return (
         <ListItem draggable>
             <ListItemButton onClick={() => pCtx?.setSelectedTicket(props.ticket)}>
-                <ListItemAvatar></ListItemAvatar>
+                <ListItemAvatar>
+                    <Avatar></Avatar>
+                </ListItemAvatar>
                 <ListItemText
                     primary={props.ticket.title}
                     secondary={`reporter: ${props.ticket.reporterName} assignee: ${props.ticket.assigneeName}`} />
