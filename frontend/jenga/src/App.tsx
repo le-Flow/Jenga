@@ -1,7 +1,8 @@
-import { AppBar, Box, Button, Card, createTheme, CssBaseline, Drawer, IconButton, Stack, ThemeProvider, Toolbar } from '@suid/material';
-import { createSignal, Show, type JSXElement } from 'solid-js';
-import { UserProvider } from './provider/UserProvider';
+import { AppBar, Box, Card, CssBaseline, IconButton, Stack, ThemeProvider, Toolbar, createTheme } from '@suid/material';
+import { Show, createSignal, type JSXElement } from 'solid-js';
 import { ProjectProvider } from './provider/ProjectProvider';
+import { AuthProvider } from './provider/AuthProvider';
+import { UserProvider } from './provider/UserProvider';
 import logo from "../assets/Logo.png"
 import { Auth } from './components/Auth';
 import { Sidebar } from './components/Sidebar';
@@ -20,31 +21,33 @@ const App = (props: AppProps) => {
     <>
       <CssBaseline />
       <ThemeProvider theme={theme}>
-        <UserProvider>
-          <ProjectProvider>
-            <AppBar position="static">
-              <Toolbar>
-                <IconButton onClick={() => { setOpen(prev => !prev) }}>
-                  <Menu></Menu>
-                </IconButton>
-                <img src={logo} style={{ "height": "2vw", "width": "auto" }}></img>
-                <Box marginLeft={"auto"}>
-                  <Auth></Auth>
+        <AuthProvider>
+          <UserProvider>
+            <ProjectProvider>
+              <AppBar position="static">
+                <Toolbar>
+                  <IconButton onClick={() => { setOpen(prev => !prev) }}>
+                    <Menu></Menu>
+                  </IconButton>
+                  <img src={logo} style={{ "height": "2vw", "width": "auto" }}></img>
+                  <Box marginLeft={"auto"}>
+                    <Auth></Auth>
+                  </Box>
+                </Toolbar>
+              </AppBar>
+              <Stack direction="row">
+                <Show when={open()}>
+                  <Card sx={{ "height": "100vh", "width": "10vw" }}>
+                    <Sidebar />
+                  </Card>
+                </Show>
+                <Box flex={1}>
+                  {props.children}
                 </Box>
-              </Toolbar>
-            </AppBar>
-            <Stack direction="row">
-              <Show when={open()}>
-                <Card sx={{"height": "100vh", "width": "10vw"}}>
-                  <Sidebar />
-                </Card>
-              </Show>
-              <Box flex={1}>
-                {props.children}
-              </Box>
-            </Stack>
-          </ProjectProvider>
-        </UserProvider>
+              </Stack>
+            </ProjectProvider>
+          </UserProvider>
+        </AuthProvider>
       </ThemeProvider>
     </>
   );
