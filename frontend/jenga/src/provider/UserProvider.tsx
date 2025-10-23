@@ -31,14 +31,15 @@ export const UserProvider = (props: ProviderProps) => {
     const [loginRequestDTO, setLoginRequestDTO] = createSignal<LoginRequestDTO>()
 
     const [registerResult] = createResource(registerRequestDTO, async (q: RegisterRequestDTO) => await AuthenticationResourceService.postApiAuthRegister(q))
-    const [loginResult] = createResource(loginRequestDTO, async (q: LoginRequestDTO) => await AuthenticationResourceService.postApiAuthLogin(q))
+    const [loginResult] = createResource(loginRequestDTO, async (q: LoginRequestDTO) => {
+        const jwt = await AuthenticationResourceService.postApiAuthLogin(q);
+        OpenAPI.TOKEN = jwt.token
+        OpenAPI.USERNAME = jwt.username
+
+        return jwt
+    })
 
     const loggedIn = createMemo(() => !!(!loginResult.error && loginResult()?.token));
-
-    createEffect(() => {
-        OpenAPI.TOKEN = loginResult()?.token
-        OpenAPI.USERNAME = loginResult()?.username
-    })
 
     const value = {
         login: login,
