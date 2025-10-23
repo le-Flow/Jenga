@@ -83,11 +83,15 @@ const NewTicketDialog = (props: NewTicketDialogProps) => {
                         status: status(),
                         assignee: assignee(),
                     }
+                    
+                    const { assignee: name, ...rest } = createTicketDTO;
                     const ticket: TicketDTO = {
-                        ...createTicketDTO
-                    }
+                        ...rest,
+                        assigneeName: name,
+                    };
+
                     TicketResourceService.postApiProjectsTickets(pCtx?.selectedProject().identifier ?? "", createTicketDTO)
-                    pCtx?.setTickets(prev=>[...prev, ticket])
+                    pCtx?.setTickets(prev => [...prev, ticket])
                     props.setOpen(false)
 
                 }}>create</Button>
@@ -117,7 +121,7 @@ export const Backlog = (props: BacklogProps) => {
                                 (t) => {
                                     return <ListItem>
                                         <ListItemButton>
-                                        <ListItemAvatar></ListItemAvatar>
+                                            <ListItemAvatar></ListItemAvatar>
                                             <ListItemText primary={t.title} secondary={`reporter: ${t.reporterName} assignee: ${t.assigneeName}`}></ListItemText>
                                         </ListItemButton>
                                     </ListItem>
