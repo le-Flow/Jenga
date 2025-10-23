@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogTitle, IconButton, Stack, ToggleButton, ToggleButtonGroup } from "@suid/material"
+import { Avatar, Box, Dialog, DialogContent, DialogTitle, IconButton, Stack, ToggleButton, ToggleButtonGroup } from "@suid/material"
 import { Match, Switch, createSignal, useContext } from "solid-js"
 import { Register } from "./Register"
 import { Login, Logout } from "@suid/icons-material"
@@ -10,13 +10,35 @@ const enum AuthE {
     SignUp
 }
 
-export const Auth = () => {
+const LoggedIn = () => {
 
-    const [mode, setMode] = createSignal(AuthE.SignIn)
+    const uCtx = useContext(UserContext)
+
+    const [showProfile, setShowProfile] = createSignal(false)
+
+    const logout = () => {
+        console.log("logout", "todo")
+    }
+
+    return (
+        <Stack direction="row">
+            <IconButton onClick={() => {setShowProfile(true); console.log("todo")}}>
+                <Avatar></Avatar>
+            </IconButton>
+            <IconButton onClick={logout}>
+                <Logout></Logout>
+            </IconButton>
+        </Stack>
+    )
+}
+
+const LoggedOut = () => {
     const [open, setOpen] = createSignal(false)
+    const [mode, setMode] = createSignal(AuthE.SignIn)
 
     return (
         <>
+
             <IconButton onClick={() => setOpen(true)} color="inherit">
                 <Login></Login>
             </IconButton>
@@ -44,7 +66,23 @@ export const Auth = () => {
                         </Switch>
                     </Stack>
                 </DialogContent>
-            </Dialog>
+            </Dialog >
         </>
+    )
+}
+
+export const Auth = () => {
+
+    const uCtx = useContext(UserContext)
+
+    return (
+        <Switch>
+            <Match when={uCtx?.isLoggedIn()}>
+                <LoggedIn></LoggedIn>
+            </Match>
+            <Match when={!uCtx?.isLoggedIn()}>
+                <LoggedOut></LoggedOut>
+            </Match>
+        </Switch>
     )
 }
