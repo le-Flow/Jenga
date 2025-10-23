@@ -1,8 +1,9 @@
 import { Dialog, DialogContent, DialogTitle, IconButton, Stack, ToggleButton, ToggleButtonGroup } from "@suid/material"
-import { Match, Switch, createSignal } from "solid-js"
+import { Match, Switch, createSignal, useContext } from "solid-js"
 import { Register } from "./Register"
 import { Login, Logout } from "@suid/icons-material"
 import { LogIn } from "./Login"
+import { UserContext } from "../provider/UserProvider"
 
 const enum AuthE {
     SignIn,

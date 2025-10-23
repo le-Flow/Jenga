@@ -1,8 +1,15 @@
-import { createContext, Resource, createResource, JSXElement } from "solid-js"
+import { createContext, Resource, createResource, JSXElement, createSignal, createEffect, Accessor, createMemo } from "solid-js"
+import { AuthenticationResourceService, LoginRequestDTO, LoginResponseDTO, OpenAPI, RegisterRequestDTO, User } from "../api"
 
 type UserContextType = {
+    user?: User
+    login?: (request: LoginRequestDTO) => void;
+    isLoggedIn: Accessor<boolean>
+    register?: (request: RegisterRequestDTO) => void;
 
+    jwt: Resource<LoginResponseDTO>
 }
+
 
 export const UserContext = createContext<UserContextType>()
 
@@ -12,11 +19,34 @@ interface ProviderProps {
 
 export const UserProvider = (props: ProviderProps) => {
 
+    const register = (request: RegisterRequestDTO) => {
+        setRegisterRequestDTO(request)
+    }
 
+    const login = (request: LoginRequestDTO) => {
+        setLoginRequestDTO(request)
+    }
+
+    const [registerRequestDTO, setRegisterRequestDTO] = createSignal<RegisterRequestDTO>()
+    const [loginRequestDTO, setLoginRequestDTO] = createSignal<LoginRequestDTO>()
+
+    const [registerResult] = createResource(registerRequestDTO, async (q: RegisterRequestDTO) => await AuthenticationResourceService.postApiAuthRegister(q))
+    const [loginResult] = createResource(loginRequestDTO, async (q: LoginRequestDTO) => await AuthenticationResourceService.postApiAuthLogin(q))
+
+    const loggedIn = createMemo(() => !!(!loginResult.error && loginResult()?.token));
+
+    createEffect(() => {
+        OpenAPI.TOKEN = loginResult()?.token
+        OpenAPI.USERNAME = loginResult()?.username
+    })
 
     const value = {
-
+        login: login,
+        isLoggedIn: loggedIn,
+        register: register,
+        jwt: loginResult
     }
+
 
     return (
         <UserContext.Provider value={value}>
