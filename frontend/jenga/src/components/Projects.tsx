@@ -1,6 +1,6 @@
 import { Button, Card, CardActions, CardContent, CardHeader, Dialog, DialogActions, DialogContent, DialogTitle, List, ListItem, ListItemButton, ListItemText, Stack, TextField } from "@suid/material"
 import { ProjectContext } from "../provider/ProjectProvider"
-import { createSignal, For, Setter, useContext } from "solid-js"
+import { createMemo, createSignal, For, Setter, useContext } from "solid-js"
 import { ProjectResourceService, CreateProjectDTO, ProjectDTO } from "../api"
 
 
@@ -63,13 +63,23 @@ export const Projects = () => {
 
     const projectCtx = useContext(ProjectContext)
 
+    const projects = createMemo(() => {
+        if (projectCtx?.projects.error) return
+
+        return (projectCtx?.projects())
+    })
+
     return (
         <>
             <Card sx={{ "height": "100%" }}>
                 <CardHeader title="Projects" />
                 <CardContent sx={{ "height": "80%" }}>
                     <List sx={{ "flex": "1", "height": "100", "maxHeight": "100%", "overflow": "auto" }}>
-                        <For each={projectCtx?.projects() ?? []}>
+                        <For
+                            each={projects()}
+                            fallback={<div>No projects found</div>
+                            }
+                        >
                             {
                                 (p) => {
                                     return (
@@ -92,7 +102,7 @@ export const Projects = () => {
                         NEW
                     </Button>
                 </CardActions>
-            </Card>
+            </Card >
             <NewProjectDialog open={open()} setOpen={setOpen}></NewProjectDialog>
         </>
     )
