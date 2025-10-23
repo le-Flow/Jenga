@@ -108,7 +108,7 @@ const BacklogItem = (props: BacklogItemProps) => {
     const pCtx = useContext(ProjectContext)
 
     return (
-        <ListItem>
+        <ListItem draggable>
             <ListItemButton onClick={() => pCtx?.setSelectedTicket(props.ticket)}>
                 <ListItemAvatar></ListItemAvatar>
                 <ListItemText

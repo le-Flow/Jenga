@@ -17,7 +17,7 @@ const KanbanItem = (props: KanbanItemProps) => {
     const pCtx = useContext(ProjectContext)
 
     return (
-        <ListItem>
+        <ListItem draggable>
             <ListItemButton onClick={()=> pCtx?.setSelectedTicket(props.ticket)}>
                 {props.ticket.title}
             </ListItemButton>
