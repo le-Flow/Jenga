@@ -1,5 +1,5 @@
-import { Button, Card, CardHeader, Stack, TextField } from "@suid/material"
-import { createSignal, useContext } from "solid-js"
+import { Alert, AlertTitle, Button, Card, CardHeader, Stack, TextField } from "@suid/material"
+import { createSignal, Show, useContext } from "solid-js"
 import { UserContext } from "../provider/UserProvider"
 import { LoginRequestDTO } from "../api"
 
@@ -23,6 +23,11 @@ export const LogIn = () => {
         <Stack spacing={1}>
             <TextField label="username" value={username()} onChange={(e) => setUsername(e.currentTarget.value)}></TextField>
             <TextField label="password" value={password()} onChange={(e) => setPassword(e.currentTarget.value)} type="password"></TextField>
+            <Show when={uCtx?.jwt.error}>
+                <Alert severity="error">
+                    <AlertTitle>Wrong username or password</AlertTitle>
+                </Alert>
+            </Show>
             <Button onClick={onClick}>
                 Login
             </Button>
