@@ -11,6 +11,9 @@ type ProjectContextType = {
 
     tickets: Resource<TicketDTO[]>
     setTickets: Setter<TicketDTO[]>
+
+    selectedTicket: Accessor<TicketDTO>
+    setSelectedTicket: Setter<TicketDTO>
 }
 
 export const ProjectContext = createContext<ProjectContextType>()
@@ -29,10 +32,12 @@ export const ProjectProvider = (props: ProviderProps) => {
 
     const [tickets, { mutate: setTickets }] = createResource(selectedProject, async (q) => await TicketResourceService.getApiProjectsTickets(q.identifier))
 
+    const [selectedTicket, setSelectedTicket] = createSignal()
+
     createEffect(() => console.log(tickets()))
-    createEffect(()=>{
-        if(uCtx?.isLoggedIn()){
-            console.log("refetch") 
+    createEffect(() => {
+        if (uCtx?.isLoggedIn()) {
+            console.log("refetch")
             refetch()
         }
     })
@@ -43,7 +48,9 @@ export const ProjectProvider = (props: ProviderProps) => {
         selectedProject: selectedProject,
         setSelectedProject: setSelectedProject,
         tickets: tickets,
-        setTickets: setTickets
+        setTickets: setTickets,
+        selectedTicket: selectedTicket,
+        setSelectedTicket: setSelectedTicket
     }
 
     return (

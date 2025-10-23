@@ -105,13 +105,15 @@ interface BacklogItemProps {
 }
 
 const BacklogItem = (props: BacklogItemProps) => {
+    const pCtx = useContext(ProjectContext)
+
     return (
         <ListItem>
-            <ListItemButton>
+            <ListItemButton onClick={() => pCtx?.setSelectedTicket(props.ticket)}>
                 <ListItemAvatar></ListItemAvatar>
-                <ListItemText 
-                primary={props.ticket.title} 
-                secondary={`reporter: ${props.ticket.reporterName} assignee: ${props.ticket.assigneeName}`} />
+                <ListItemText
+                    primary={props.ticket.title}
+                    secondary={`reporter: ${props.ticket.reporterName} assignee: ${props.ticket.assigneeName}`} />
             </ListItemButton>
         </ListItem>
     )
