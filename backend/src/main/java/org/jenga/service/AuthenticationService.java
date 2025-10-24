@@ -57,7 +57,7 @@ public class AuthenticationService {
     }
 
     public LoginResponseDTO login(LoginRequestDTO loginRequest) throws LoginException {
-        User user = userRepository.findByUsername(loginRequest.getUsername());
+        User user = userRepository.findByUsername(loginRequest.getUsername().toLowerCase());
 
         if (user == null) {
             throw new RuntimeException("Invalid username or password");
@@ -68,7 +68,7 @@ public class AuthenticationService {
         }
 
         LoginResponseDTO loginResponse = new LoginResponseDTO();
-        loginResponse.setUsername(loginRequest.getUsername());
+        loginResponse.setUsername(user.getUsername());
         loginResponse.setToken(generateToken(user));
         loginResponse.setExpiresIn(EXPIRATION_TIME_SECONDS);
 

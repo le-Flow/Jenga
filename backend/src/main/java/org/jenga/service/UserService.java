@@ -26,6 +26,7 @@ public class UserService {
 
     @Transactional
     public UserDTO findByUsername(String username) {
+        username = username.toLowerCase();
         User user = userRepository.findByUsername(username);
         if (user == null) {
             throw new NotFoundException("User not found with username: " + username);
@@ -35,9 +36,7 @@ public class UserService {
 
     @Transactional
     public List<UserDTO> searchUsers(String usernamePart) {
-        List<User> users = userRepository.searchByUsernameStartsWith(usernamePart);
-        return users.stream()
-                    .map(userMapper::userToUserDTO)
-                    .collect(Collectors.toList());
+        List<User> users = userRepository.searchByUsernameStartsWith(usernamePart.toLowerCase());
+        return users.stream().map(userMapper::userToUserDTO).collect(Collectors.toList());
     }
 }
