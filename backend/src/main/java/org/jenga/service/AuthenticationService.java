@@ -10,6 +10,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import javax.security.auth.login.LoginException;
+import jakarta.ws.rs.BadRequestException;
 import io.quarkus.elytron.security.common.BcryptUtil;
 import io.smallrye.jwt.build.Jwt;
 
@@ -23,13 +24,25 @@ public class AuthenticationService {
 
     @Transactional
     public LoginResponseDTO register(RegisterRequestDTO registerRequest) {
-        User existingUser = userRepository.findByUsername(registerRequest.getUsername());
+        String username = registerRequest.getUsername().toLowerCase();
 
+        User existingUser = userRepository.findByUsername(username);
         if (existingUser != null) {
             throw new RuntimeException("User already exists");
         }
 
-        String username = registerRequest.getUsername();
+        if (username == null || username.isEmpty()) {
+            throw new BadRequestException("Username cannot be empty");
+        }
+
+        if (username.contains(" ")) {
+            throw new BadRequestException("Username cannot contain spaces");
+        }
+
+        if (!username.matches("[a-zA-Z0-9]+")) {
+            throw new BadRequestException("Username must only contain letters and numbers");
+        }
+
         String email = registerRequest.getEmail();
         String hashedPassword = BcryptUtil.bcryptHash(registerRequest.getPassword());
         User user = new User(username, email, hashedPassword, null, null);
