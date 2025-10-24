@@ -1,5 +1,7 @@
 package org.jenga.rest;
 
+import java.util.List;
+
 import org.jenga.service.UserService;
 import org.jenga.dto.UserDTO;
 
@@ -19,5 +21,14 @@ public class UserResource {
     @Path("/{username}")
     public UserDTO getUserByUsername(@PathParam("username") String username) {
         return userService.findByUsername(username);
+    }
+
+    @GET
+    @Path("/search")
+    public List<UserDTO> searchUsers(@QueryParam("username") String usernamePart) {
+        if (usernamePart == null || usernamePart.trim().isEmpty()) {
+            throw new BadRequestException("Username must be provided");
+        }
+        return userService.searchUsers(usernamePart);
     }
 }

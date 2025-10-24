@@ -1,5 +1,8 @@
 package org.jenga.service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.jenga.db.UserRepository;
 import org.jenga.model.User;
 import org.jenga.dto.UserDTO;
@@ -28,5 +31,13 @@ public class UserService {
             throw new NotFoundException("User not found with username: " + username);
         }
         return userMapper.userToUserDTO(user);
+    }
+
+    @Transactional
+    public List<UserDTO> searchUsers(String usernamePart) {
+        List<User> users = userRepository.searchByUsernameStartsWith(usernamePart);
+        return users.stream()
+                    .map(userMapper::userToUserDTO)
+                    .collect(Collectors.toList());
     }
 }
