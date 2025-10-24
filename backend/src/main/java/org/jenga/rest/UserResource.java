@@ -1,7 +1,7 @@
 package org.jenga.rest;
 
 import org.jenga.service.UserService;
-import org.jenga.model.User;
+import org.jenga.dto.UserDTO;
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -17,7 +17,7 @@ public class UserResource {
 
     @GET
     @Path("/{username}")
-    public User getUserByUsername(@PathParam("username") String username) {
+    public UserDTO getUserByUsername(@PathParam("username") String username) {
         return userService.findByUsername(username);
     }
 }

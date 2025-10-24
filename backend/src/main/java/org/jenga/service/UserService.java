@@ -2,6 +2,8 @@ package org.jenga.service;
 
 import org.jenga.db.UserRepository;
 import org.jenga.model.User;
+import org.jenga.dto.UserDTO;
+import org.jenga.mapper.UserMapper;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -11,18 +13,20 @@ import jakarta.ws.rs.NotFoundException;
 @ApplicationScoped
 public class UserService {
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     @Inject
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, UserMapper userMapper) {
         this.userRepository = userRepository;
+        this.userMapper= userMapper;
     }
 
     @Transactional
-    public User findByUsername(String username) {
+    public UserDTO findByUsername(String username) {
         User user = userRepository.findByUsername(username);
         if (user == null) {
             throw new NotFoundException("User not found with username: " + username);
         }
-        return user;
+        return userMapper.userToUserDTO(user);
     }
 }
