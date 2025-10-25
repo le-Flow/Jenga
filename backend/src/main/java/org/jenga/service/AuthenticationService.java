@@ -28,7 +28,7 @@ public class AuthenticationService {
 
         User existingUser = userRepository.findByUsername(username);
         if (existingUser != null) {
-            throw new RuntimeException("User already exists");
+            throw new BadRequestException("User already exists");
         }
 
         if (username == null || username.isEmpty()) {
@@ -60,11 +60,11 @@ public class AuthenticationService {
         User user = userRepository.findByUsername(loginRequest.getUsername().toLowerCase());
 
         if (user == null) {
-            throw new RuntimeException("Invalid username or password");
+            throw new BadRequestException("Invalid username or password");
         }
 
         if (!BcryptUtil.matches(loginRequest.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid username or password");
+            throw new BadRequestException("Invalid username or password");
         }
 
         LoginResponseDTO loginResponse = new LoginResponseDTO();
