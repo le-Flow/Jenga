@@ -1,5 +1,8 @@
 package org.jenga.model;
 
+import java.util.List;
+import java.util.ArrayList;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -21,4 +24,7 @@ public class Label {
     @ManyToOne
     @JoinColumn(name = "project_id")
     private Project project;
+
+    @ManyToMany(mappedBy = "labels")
+    private List<Ticket> tickets = new ArrayList<>();
 }

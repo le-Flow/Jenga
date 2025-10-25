@@ -3,6 +3,7 @@ package org.jenga.service;
 import org.jenga.db.ProjectRepository;
 import org.jenga.db.LabelRepository;
 import org.jenga.model.Project;
+import org.jenga.model.Ticket;
 import org.jenga.model.Label;
 import org.jenga.dto.ProjectDTO;
 import org.jenga.dto.CreateProjectDTO;
@@ -148,9 +149,13 @@ public class ProjectService {
     public void deleteLabel(String projectId, String labelName) {
         Label label = labelRepository.findByProjectIdAndLabelName(projectId, labelName);
         if (label != null) {
+            for (Ticket ticket : label.getTickets()) {
+                ticket.getLabels().remove(label);
+            }
+
             labelRepository.delete(label);
         } else {
             throw new NotFoundException("Label not found");
         }
-    }
+}
 }
