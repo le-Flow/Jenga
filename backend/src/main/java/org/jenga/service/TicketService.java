@@ -14,7 +14,6 @@ import org.jenga.dto.CommentRequestDTO;
 import org.jenga.dto.CommentResponseDTO;
 import org.jenga.mapper.TicketMapper;
 import org.jenga.mapper.CommentMapper;
-import org.jenga.service.AuthenticationService;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
