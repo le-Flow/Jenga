@@ -202,7 +202,7 @@ public class TicketService {
     public void deleteComment(String projectId, Long ticketId, Long commentId) {
         Comment comment = commentRepository.findByIdAndTicketId(commentId, ticketId);
         if (comment == null) {
-            throw new RuntimeException("Comment not found");
+            throw new NotFoundException("Comment not found");
         }
 
         commentRepository.deleteByIdAndTicketId(commentId, ticketId);
