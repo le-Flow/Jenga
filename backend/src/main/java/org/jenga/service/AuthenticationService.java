@@ -9,6 +9,8 @@ import org.jenga.dto.LoginResponseDTO;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.SecurityContext;
 import javax.security.auth.login.LoginException;
 import jakarta.ws.rs.BadRequestException;
 import io.quarkus.elytron.security.common.BcryptUtil;
@@ -21,6 +23,9 @@ public class AuthenticationService {
 
     @Inject
     UserRepository userRepository;
+
+    @Context
+    SecurityContext securityContext;
 
     @Transactional
     public LoginResponseDTO register(RegisterRequestDTO registerRequest) {
@@ -83,5 +88,17 @@ public class AuthenticationService {
                   .upn(user.getUsername())
                   .expiresAt(expirationTime)
                   .sign();
+    }
+
+    public User getCurrentUser() {
+        String username = securityContext.getUserPrincipal().getName();
+
+        User currentUser = userRepository.findByUsername(username);
+
+        if (currentUser == null) {
+            throw new RuntimeException("Failed to get user from security context: " + username);
+        }
+
+        return currentUser;
     }
 }
