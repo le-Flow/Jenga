@@ -47,7 +47,7 @@ public class Ticket {
     @JoinColumn(name = "assignee_id")
     private User assignee;
 
-    @OneToMany(mappedBy = "ticket")
+    @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
 
     @PrePersist
