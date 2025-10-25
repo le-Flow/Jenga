@@ -19,5 +19,6 @@ public interface CommentMapper {
     @Mapping(target = "modifyDate", ignore = true)
     Comment commentRequestDTOToComment(CommentRequestDTO commentDTO);
 
+    @Mapping(source = "author.username", target = "author")
     CommentResponseDTO commentToCommentResponseDTO(Comment comment);
 }

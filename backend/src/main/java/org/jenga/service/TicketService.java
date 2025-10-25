@@ -14,6 +14,7 @@ import org.jenga.dto.CommentRequestDTO;
 import org.jenga.dto.CommentResponseDTO;
 import org.jenga.mapper.TicketMapper;
 import org.jenga.mapper.CommentMapper;
+import org.jenga.service.AuthenticationService;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -32,6 +33,7 @@ public class TicketService {
     private final CommentRepository commentRepository;
     private final TicketMapper ticketMapper;
     private final CommentMapper commentMapper;
+    private final AuthenticationService authenticationService;
 
     @Inject
     public TicketService(
@@ -40,7 +42,8 @@ public class TicketService {
         UserRepository userRepository,
         CommentRepository commentRepository,
         TicketMapper ticketMapper,
-        CommentMapper commentMapper
+        CommentMapper commentMapper,
+        AuthenticationService authenticationService
     ) {
         this.ticketRepository = ticketRepository;
         this.projectRepository = projectRepository;
@@ -48,6 +51,7 @@ public class TicketService {
         this.commentRepository = commentRepository;
         this.ticketMapper = ticketMapper;
         this.commentMapper = commentMapper;
+        this.authenticationService = authenticationService;
     }
 
     @Transactional
@@ -66,7 +70,8 @@ public class TicketService {
 
         ticket.setTicketNumber(ticketRepository.findMaxTicketNumberByProject(project) + 1);
 
-        //ticket.setReporter(getCurrentUser()); // TODO: Add reporter
+        User currentUser = authenticationService.getCurrentUser();
+        ticket.setReporter(currentUser);
 
         if (createTicketDTO.getAssignee() != null && !createTicketDTO.getAssignee().isBlank()) {
             User user = userRepository.findByUsername(createTicketDTO.getAssignee());
@@ -185,6 +190,10 @@ public class TicketService {
         }
 
         Comment comment = commentMapper.commentRequestDTOToComment(commentDTO);
+
+        User currentUser = authenticationService.getCurrentUser();
+        comment.setAuthor(currentUser);
+
         comment.setTicket(ticket);
 
         commentRepository.persist(comment);

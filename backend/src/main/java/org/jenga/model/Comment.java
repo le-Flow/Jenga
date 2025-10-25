@@ -21,7 +21,9 @@ public class Comment {
     @JoinColumn(name = "ticket_id")
     private Ticket ticket;
 
-    private String author;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User author;
     private String comment;
 
     private LocalDateTime createDate;
