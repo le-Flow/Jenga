@@ -3,6 +3,8 @@ package org.jenga.rest;
 import org.jenga.service.TicketService;
 import org.jenga.dto.TicketDTO;
 import org.jenga.dto.CreateTicketDTO;
+import org.jenga.dto.CommentRequestDTO;
+import org.jenga.dto.CommentResponseDTO;
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -67,5 +69,25 @@ public class TicketResource {
     public Response unassignTicket(@PathParam("projectId") String projectId, @PathParam("ticketId") Long ticketId) {
         ticketService.unassignTicket(projectId, ticketId);
         return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @POST
+    @Path("/{ticketId}/comments")
+    public Response createComment(@PathParam("projectId") String projectId, @PathParam("ticketId") Long ticketId, CommentRequestDTO commentDTO) {
+        ticketService.createComment(projectId, ticketId, commentDTO);
+        return Response.status(Response.Status.CREATED).build();
+    }
+
+    @GET
+    @Path("/{ticketId}/comments")
+    public List<CommentResponseDTO> getAllComments(@PathParam("projectId") String projectId, @PathParam("ticketId") Long ticketId) {
+        return ticketService.getAllComments(projectId, ticketId);
+    }
+
+    @DELETE
+    @Path("/{ticketId}/comments/{commentId}")
+    public Response deleteComment(@PathParam("projectId") String projectId, @PathParam("ticketId") Long ticketId, @PathParam("commentId") Long commentId) {
+        ticketService.deleteComment(projectId, ticketId, commentId);
+        return Response.noContent().build();
     }
 }
