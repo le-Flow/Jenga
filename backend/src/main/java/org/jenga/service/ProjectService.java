@@ -1,10 +1,15 @@
 package org.jenga.service;
 
 import org.jenga.db.ProjectRepository;
+import org.jenga.db.LabelRepository;
 import org.jenga.model.Project;
+import org.jenga.model.Ticket;
+import org.jenga.model.Label;
 import org.jenga.dto.ProjectDTO;
 import org.jenga.dto.CreateProjectDTO;
+import org.jenga.dto.LabelDTO;
 import org.jenga.mapper.ProjectMapper;
+import org.jenga.mapper.LabelMapper;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -18,12 +23,21 @@ import java.util.stream.Collectors;
 public class ProjectService {
 
     private final ProjectRepository projectRepository;
+    private final LabelRepository labelRepository;
     private final ProjectMapper projectMapper;
+    private final LabelMapper labelMapper;
 
     @Inject
-    public ProjectService(ProjectRepository projectRepository, ProjectMapper projectMapper) {
+    public ProjectService(
+        ProjectRepository projectRepository, 
+        LabelRepository labelRepository,
+        ProjectMapper projectMapper,
+        LabelMapper labelMapper
+    ) {
         this.projectRepository = projectRepository;
+        this.labelRepository = labelRepository;
         this.projectMapper = projectMapper;
+        this.labelMapper = labelMapper;
     }
 
     @Transactional
@@ -97,4 +111,51 @@ public class ProjectService {
 
         projectRepository.delete(project);
     }
+
+    @Transactional
+    public void createLabel(String projectId, LabelDTO labelDTO) {
+        Project project = projectRepository.findById(projectId);
+        if (project == null) {
+            throw new NotFoundException("Project not found with ID: " + projectId);
+        }
+
+        boolean labelExists = labelRepository.findByProjectIdAndLabelName(projectId, labelDTO.getName()) != null;
+        if (labelExists) {
+            throw new BadRequestException("Label already exists");
+        }
+
+        if (!isValidHexColor(labelDTO.getColor())) {
+            throw new BadRequestException("Invalid color format. Color format must be #RRGGBB");
+        }
+
+        Label label = labelMapper.labelDTOToLabel(labelDTO);
+        label.setProject(project);
+        labelRepository.persist(label);
+    }
+
+    private boolean isValidHexColor(String color) {
+        return color != null && color.matches("^#(?:[0-9a-fA-F]{3}){1,2}$");
+    }
+
+    public List<LabelDTO> getAllLabels(String projectId) {
+        List<Label> labels = labelRepository.findByProjectId(projectId);
+
+        return labels.stream()
+                     .map(labelMapper::labelToLabelDTO)
+                     .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void deleteLabel(String projectId, String labelName) {
+        Label label = labelRepository.findByProjectIdAndLabelName(projectId, labelName);
+        if (label != null) {
+            for (Ticket ticket : label.getTickets()) {
+                ticket.getLabels().remove(label);
+            }
+
+            labelRepository.delete(label);
+        } else {
+            throw new NotFoundException("Label not found");
+        }
+}
 }

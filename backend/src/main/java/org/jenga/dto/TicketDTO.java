@@ -1,5 +1,7 @@
 package org.jenga.dto;
 
+import java.util.List;
+
 import java.time.LocalDateTime;
 import org.jenga.model.TicketPriority;
 import org.jenga.model.TicketSize;
@@ -21,4 +23,5 @@ public class TicketDTO {
     private LocalDateTime modifyDate;
     private String reporterName;
     private String assigneeName;
+    private List<String> labels;
 }

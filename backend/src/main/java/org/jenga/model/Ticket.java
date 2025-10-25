@@ -19,7 +19,6 @@ public class Ticket {
     private Long id;
 
     private Long ticketNumber;
-
     private String title;
     private String description;
 
@@ -50,6 +49,14 @@ public class Ticket {
     @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
 
+    @ManyToMany
+    @JoinTable(
+        name = "ticket_labels",
+        joinColumns = @JoinColumn(name = "ticket_id"),
+        inverseJoinColumns = @JoinColumn(name = "label_id")
+    )
+    private List<Label> labels;
+
     @PrePersist
     public void onCreate() {
         createDate = LocalDateTime.now();
@@ -61,4 +68,3 @@ public class Ticket {
         modifyDate = LocalDateTime.now();
     }
 }
-
