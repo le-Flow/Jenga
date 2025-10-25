@@ -16,4 +16,8 @@ public class LabelRepository implements PanacheRepository<Label> {
     public Label findByProjectIdAndLabelName(String projectId, String labelName) {
         return find("project.id = ?1 and name = ?2", projectId, labelName).firstResult();
     }
+
+    public List<Label> findByProjectIdAndNames(String projectId, List<String> labelNames) {
+    return find("project.id = ?1 and name in ?2", projectId, labelNames).list();
+}
 }

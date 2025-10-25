@@ -1,5 +1,7 @@
 package org.jenga.dto;
 
+import java.util.List;
+
 import org.jenga.model.TicketPriority;
 import org.jenga.model.TicketSize;
 import org.jenga.model.TicketStatus;
@@ -14,5 +16,6 @@ public class CreateTicketDTO {
     private TicketStatus status;
     private String projectName;
     private String assignee;
+    private List<String> labels;
 }
 

@@ -4,10 +4,12 @@ import org.jenga.db.ProjectRepository;
 import org.jenga.db.TicketRepository;
 import org.jenga.db.UserRepository;
 import org.jenga.db.CommentRepository;
+import org.jenga.db.LabelRepository;
 import org.jenga.model.Ticket;
 import org.jenga.model.Project;
 import org.jenga.model.User;
 import org.jenga.model.Comment;
+import org.jenga.model.Label;
 import org.jenga.dto.TicketDTO;
 import org.jenga.dto.CreateTicketDTO;
 import org.jenga.dto.CommentRequestDTO;
@@ -30,6 +32,7 @@ public class TicketService {
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
+    private final LabelRepository labelRepository;
     private final TicketMapper ticketMapper;
     private final CommentMapper commentMapper;
     private final AuthenticationService authenticationService;
@@ -42,7 +45,8 @@ public class TicketService {
         CommentRepository commentRepository,
         TicketMapper ticketMapper,
         CommentMapper commentMapper,
-        AuthenticationService authenticationService
+        AuthenticationService authenticationService,
+        LabelRepository labelRepository
     ) {
         this.ticketRepository = ticketRepository;
         this.projectRepository = projectRepository;
@@ -51,6 +55,7 @@ public class TicketService {
         this.ticketMapper = ticketMapper;
         this.commentMapper = commentMapper;
         this.authenticationService = authenticationService;
+        this.labelRepository = labelRepository;
     }
 
     @Transactional
@@ -80,6 +85,14 @@ public class TicketService {
                 throw new BadRequestException("User not found with username: " + createTicketDTO.getAssignee());
             }
         }
+
+        if (createTicketDTO.getLabels() != null && !createTicketDTO.getLabels().isEmpty()) {
+        List<Label> labels = labelRepository.findByProjectIdAndNames(projectId, createTicketDTO.getLabels());
+        if (labels.size() != createTicketDTO.getLabels().size()) {
+            throw new BadRequestException("Label does not exist");
+        }
+        ticket.setLabels(labels);
+    }
 
         ticketRepository.persist(ticket);
     }
