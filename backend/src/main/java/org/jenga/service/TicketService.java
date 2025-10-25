@@ -3,12 +3,17 @@ package org.jenga.service;
 import org.jenga.db.ProjectRepository;
 import org.jenga.db.TicketRepository;
 import org.jenga.db.UserRepository;
+import org.jenga.db.CommentRepository;
 import org.jenga.model.Ticket;
 import org.jenga.model.Project;
 import org.jenga.model.User;
+import org.jenga.model.Comment;
 import org.jenga.dto.TicketDTO;
 import org.jenga.dto.CreateTicketDTO;
+import org.jenga.dto.CommentRequestDTO;
+import org.jenga.dto.CommentResponseDTO;
 import org.jenga.mapper.TicketMapper;
+import org.jenga.mapper.CommentMapper;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -24,14 +29,25 @@ public class TicketService {
     private final TicketRepository ticketRepository;
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
     private final TicketMapper ticketMapper;
+    private final CommentMapper commentMapper;
 
     @Inject
-    public TicketService(TicketRepository ticketRepository, ProjectRepository projectRepository,  UserRepository userRepository, TicketMapper ticketMapper) {
+    public TicketService(
+        TicketRepository ticketRepository,
+        ProjectRepository projectRepository,
+        UserRepository userRepository,
+        CommentRepository commentRepository,
+        TicketMapper ticketMapper,
+        CommentMapper commentMapper
+    ) {
         this.ticketRepository = ticketRepository;
         this.projectRepository = projectRepository;
         this.userRepository = userRepository;
+        this.commentRepository = commentRepository;
         this.ticketMapper = ticketMapper;
+        this.commentMapper = commentMapper;
     }
 
     @Transactional
@@ -159,5 +175,36 @@ public class TicketService {
         }
         ticket.setAssignee(null);
         ticketRepository.persist(ticket);
+    }
+
+    @Transactional
+    public void createComment(String projectId, Long ticketId, CommentRequestDTO commentDTO) {
+        Ticket ticket = ticketRepository.findById(ticketId);
+        if (ticket == null) {
+            throw new RuntimeException("Ticket not found");
+        }
+
+        Comment comment = commentMapper.commentRequestDTOToComment(commentDTO);
+        comment.setTicket(ticket);
+
+        commentRepository.persist(comment);
+    }
+
+    public List<CommentResponseDTO> getAllComments(String projectId, Long ticketId) {
+        List<Comment> comments = commentRepository.findByTicketId(ticketId);
+
+        return comments.stream()
+                .map(commentMapper::commentToCommentResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void deleteComment(String projectId, Long ticketId, Long commentId) {
+        Comment comment = commentRepository.findByIdAndTicketId(commentId, ticketId);
+        if (comment == null) {
+            throw new RuntimeException("Comment not found");
+        }
+
+        commentRepository.deleteByIdAndTicketId(commentId, ticketId);
     }
 }

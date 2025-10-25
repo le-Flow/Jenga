@@ -22,7 +22,7 @@ public class Comment {
     private Ticket ticket;
 
     private String author;
-    private String text;
+    private String comment;
 
     private LocalDateTime createDate;
     private LocalDateTime modifyDate;
