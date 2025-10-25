@@ -114,14 +114,26 @@ public class ProjectService {
     @Transactional
     public void createLabel(String projectId, LabelDTO labelDTO) {
         Project project = projectRepository.findById(projectId);
-
         if (project == null) {
             throw new NotFoundException("Project not found with ID: " + projectId);
+        }
+
+        boolean labelExists = labelRepository.findByProjectIdAndLabelName(projectId, labelDTO.getName()) != null;
+        if (labelExists) {
+            throw new BadRequestException("Label already exists");
+        }
+
+        if (!isValidHexColor(labelDTO.getColor())) {
+            throw new BadRequestException("Invalid color format. Color format must be #RRGGBB");
         }
 
         Label label = labelMapper.labelDTOToLabel(labelDTO);
         label.setProject(project);
         labelRepository.persist(label);
+    }
+
+    private boolean isValidHexColor(String color) {
+        return color != null && color.matches("^#(?:[0-9a-fA-F]{3}){1,2}$");
     }
 
     public List<LabelDTO> getAllLabels(String projectId) {
@@ -135,7 +147,6 @@ public class ProjectService {
     @Transactional
     public void deleteLabel(String projectId, String labelName) {
         Label label = labelRepository.findByProjectIdAndLabelName(projectId, labelName);
-
         if (label != null) {
             labelRepository.delete(label);
         } else {
