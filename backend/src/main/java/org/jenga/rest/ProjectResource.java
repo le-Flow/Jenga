@@ -3,6 +3,8 @@ package org.jenga.rest;
 import org.jenga.service.ProjectService;
 import org.jenga.dto.ProjectDTO;
 import org.jenga.dto.CreateProjectDTO;
+import org.jenga.dto.LabelDTO;
+
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -46,6 +48,26 @@ public class ProjectResource {
     @Path("/{projectId}")
     public Response deleteProject(@PathParam("projectId") String projectId) {
         projectService.delete(projectId);
+        return Response.noContent().build();
+    }
+
+    @POST
+    @Path("/{projectId}/labels")
+    public Response createLabel(@PathParam("projectId") String projectId, LabelDTO labelDTO) {
+        projectService.createLabel(projectId, labelDTO);
+        return Response.status(Response.Status.CREATED).build();
+    }
+
+    @GET
+    @Path("/{projectId}/labels")
+    public List<LabelDTO> getAllLabels(@PathParam("projectId") String projectId) {
+        return projectService.getAllLabels(projectId);
+    }
+
+    @DELETE
+    @Path("/{projectId}/labels/{labelName}")
+    public Response deleteLabel(@PathParam("projectId") String projectId, @PathParam("labelName") String labelName) {
+        projectService.deleteLabel(projectId, labelName);
         return Response.noContent().build();
     }
 }
