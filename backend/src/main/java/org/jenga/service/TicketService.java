@@ -87,12 +87,12 @@ public class TicketService {
         }
 
         if (createTicketDTO.getLabels() != null && !createTicketDTO.getLabels().isEmpty()) {
-        List<Label> labels = labelRepository.findByProjectIdAndNames(projectId, createTicketDTO.getLabels());
-        if (labels.size() != createTicketDTO.getLabels().size()) {
-            throw new BadRequestException("Label does not exist");
+            List<Label> labels = labelRepository.findByProjectIdAndNames(projectId, createTicketDTO.getLabels());
+            if (labels.size() != createTicketDTO.getLabels().size()) {
+                throw new BadRequestException("Label does not exist");
+            }
+            ticket.setLabels(labels);
         }
-        ticket.setLabels(labels);
-    }
 
         ticketRepository.persist(ticket);
     }
@@ -103,7 +103,7 @@ public class TicketService {
             throw new NotFoundException("Project not found with name: " + projectId);
         }
 
-        return ticketRepository.findByProjectName(project.getName()).stream()
+        return ticketRepository.findByProjectId(project.getId()).stream()
                 .map(ticketMapper::ticketToTicketDTO)
                 .collect(Collectors.toList());
     }
@@ -128,7 +128,7 @@ public class TicketService {
             throw new NotFoundException("Project not found with name: " + projectId);
         }
 
-        Ticket ticket = ticketRepository.findByTicketNumberAndProjectName(ticketNumber, project.getName());
+        Ticket ticket = ticketRepository.findByTicketNumberAndProjectId(ticketNumber, project.getId());
         if (ticket == null) {
             throw new NotFoundException("Ticket not found");
         }
