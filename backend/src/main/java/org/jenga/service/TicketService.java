@@ -203,6 +203,55 @@ public class TicketService {
     }
 
     @Transactional
+    public TicketDTO duplicateTicket(String projectId, Long ticketId) {
+        Ticket originalTicket = ticketRepository.findByIdAndProjectId(ticketId, projectId);
+
+        if (originalTicket == null) {
+            throw new NotFoundException("Ticket not found");
+        }
+
+        Project project = projectRepository.findById(projectId);
+
+        Ticket duplicatedTicket = new Ticket();
+        duplicatedTicket.setTicketNumber(ticketRepository.findMaxTicketNumberByProject(project) + 1);
+        duplicatedTicket.setTitle(originalTicket.getTitle());
+        duplicatedTicket.setDescription(originalTicket.getDescription());
+        duplicatedTicket.setProject(project);
+        duplicatedTicket.setPriority(originalTicket.getPriority());
+        duplicatedTicket.setSize(originalTicket.getSize());
+        duplicatedTicket.setStatus(originalTicket.getStatus());
+        duplicatedTicket.setReporter(authenticationService.getCurrentUser());
+        duplicatedTicket.setAssignee(originalTicket.getAssignee());
+
+        List<Label> duplicatedLabels = originalTicket.getLabels().stream()
+                .map(label -> {
+                    Label newLabel = new Label();
+                    newLabel.setId(label.getId());
+                    newLabel.setName(label.getName());
+                    return newLabel;
+                })
+                .collect(Collectors.toList());
+
+        duplicatedTicket.setLabels(duplicatedLabels);
+
+        List<AcceptanceCriteria> duplicatedCriteria = originalTicket.getAcceptanceCriteria().stream()
+                .map(criterion -> {
+                    AcceptanceCriteria newCriterion = new AcceptanceCriteria();
+                    newCriterion.setDescription(criterion.getDescription());
+                    newCriterion.setCompleted(criterion.isCompleted());
+                    newCriterion.setTicket(duplicatedTicket);
+                    return newCriterion;
+                })
+                .collect(Collectors.toList());
+
+        duplicatedTicket.setAcceptanceCriteria(duplicatedCriteria);
+
+        ticketRepository.persist(duplicatedTicket);
+
+        return ticketMapper.ticketToTicketDTO(duplicatedTicket);
+    }
+
+    @Transactional
     public void assignTicket(String projectId, Long ticketId, String username) {
         Ticket ticket = ticketRepository.findByIdAndProjectId(ticketId, projectId);
         if (ticket == null) {

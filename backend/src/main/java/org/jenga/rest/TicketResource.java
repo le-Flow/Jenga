@@ -59,6 +59,13 @@ public class TicketResource {
         return Response.noContent().build();
     }
 
+    @POST
+    @Path("/{ticketId}/duplicate")
+    public Response duplicateTicket(@PathParam("projectId") String projectId, @PathParam("ticketId") Long ticketId) {
+        TicketDTO duplicatedTicketDTO = ticketService.duplicateTicket(projectId, ticketId);
+        return Response.ok(duplicatedTicketDTO).build();
+    }
+
     @PUT
     @Path("/{ticketId}/assign")
     public Response assignTicket(@PathParam("projectId") String projectId, @PathParam("ticketId") Long ticketId, @QueryParam("username") String username) {
