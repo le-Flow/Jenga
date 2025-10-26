@@ -20,5 +20,5 @@ public class AcceptanceCriteria {
     private Ticket ticket;
 
     private String description;
-    private String status;
+    private boolean completed;
 }

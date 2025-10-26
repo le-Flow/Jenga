@@ -5,5 +5,5 @@ import lombok.Data;
 @Data
 public class AcceptanceCriteriaRequest {
     private String description;
-    private String status;
+    private boolean completed;
 }

@@ -16,8 +16,8 @@ import org.jenga.dto.TicketDTO;
 import org.jenga.dto.CreateTicketDTO;
 import org.jenga.dto.CommentRequestDTO;
 import org.jenga.dto.CommentResponseDTO;
-import org.jenga.dto.AcceptanceCriteriaResponse;
 import org.jenga.dto.AcceptanceCriteriaRequest;
+import org.jenga.dto.AcceptanceCriteriaResponse;
 import org.jenga.mapper.TicketMapper;
 import org.jenga.mapper.CommentMapper;
 import org.jenga.mapper.AcceptanceCriteriaMapper;
@@ -279,7 +279,7 @@ public class TicketService {
         }
 
         criteria.setDescription(request.getDescription());
-        criteria.setStatus(request.getStatus());
+        criteria.setCompleted(request.isCompleted());
 
         acceptanceCriteriaRepository.persist(criteria);
     }

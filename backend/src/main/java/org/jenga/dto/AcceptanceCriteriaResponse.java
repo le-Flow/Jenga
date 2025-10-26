@@ -6,5 +6,5 @@ import lombok.Data;
 public class AcceptanceCriteriaResponse {
     private Long id;
     private String description;
-    private String status;
+    private boolean completed;
 }
