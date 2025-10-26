@@ -5,17 +5,22 @@ import org.jenga.db.TicketRepository;
 import org.jenga.db.UserRepository;
 import org.jenga.db.CommentRepository;
 import org.jenga.db.LabelRepository;
+import org.jenga.db.AcceptanceCriteriaRepository;
 import org.jenga.model.Ticket;
 import org.jenga.model.Project;
 import org.jenga.model.User;
 import org.jenga.model.Comment;
 import org.jenga.model.Label;
+import org.jenga.model.AcceptanceCriteria;
 import org.jenga.dto.TicketDTO;
 import org.jenga.dto.CreateTicketDTO;
 import org.jenga.dto.CommentRequestDTO;
 import org.jenga.dto.CommentResponseDTO;
+import org.jenga.dto.AcceptanceCriteriaResponse;
+import org.jenga.dto.AcceptanceCriteriaRequest;
 import org.jenga.mapper.TicketMapper;
 import org.jenga.mapper.CommentMapper;
+import org.jenga.mapper.AcceptanceCriteriaMapper;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -33,8 +38,10 @@ public class TicketService {
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
     private final LabelRepository labelRepository;
+    private final AcceptanceCriteriaRepository acceptanceCriteriaRepository;
     private final TicketMapper ticketMapper;
     private final CommentMapper commentMapper;
+    private final AcceptanceCriteriaMapper acceptanceCriteriaMapper;
     private final AuthenticationService authenticationService;
 
     @Inject
@@ -43,19 +50,23 @@ public class TicketService {
         ProjectRepository projectRepository,
         UserRepository userRepository,
         CommentRepository commentRepository,
+        LabelRepository labelRepository,
+        AcceptanceCriteriaRepository acceptanceCriteriaRepository,
         TicketMapper ticketMapper,
         CommentMapper commentMapper,
-        AuthenticationService authenticationService,
-        LabelRepository labelRepository
+        AcceptanceCriteriaMapper acceptanceCriteriaMapper,
+        AuthenticationService authenticationService
     ) {
         this.ticketRepository = ticketRepository;
         this.projectRepository = projectRepository;
         this.userRepository = userRepository;
         this.commentRepository = commentRepository;
+        this.labelRepository = labelRepository;
+        this.acceptanceCriteriaRepository = acceptanceCriteriaRepository;
         this.ticketMapper = ticketMapper;
         this.commentMapper = commentMapper;
+        this.acceptanceCriteriaMapper = acceptanceCriteriaMapper;
         this.authenticationService = authenticationService;
-        this.labelRepository = labelRepository;
     }
 
     @Transactional
@@ -227,5 +238,64 @@ public class TicketService {
         }
 
         commentRepository.deleteByIdAndTicketId(commentId, ticketId);
+    }
+
+    @Transactional
+    public AcceptanceCriteriaResponse addAcceptanceCriteria(String projectId, Long ticketId, AcceptanceCriteriaRequest request) {
+        Ticket ticket = ticketRepository.findByIdAndProjectId(ticketId, projectId);
+        if (ticket == null) {
+            throw new NotFoundException("Ticket not found");
+        }
+
+        AcceptanceCriteria criteria = acceptanceCriteriaMapper.toEntity(request);
+        criteria.setTicket(ticket);
+
+        acceptanceCriteriaRepository.persist(criteria);
+        return acceptanceCriteriaMapper.toResponse(criteria);
+    }
+
+    public List<AcceptanceCriteriaResponse> getAllAcceptanceCriteria(String projectId, Long ticketId) {
+        Ticket ticket = ticketRepository.findByIdAndProjectId(ticketId, projectId);
+        if (ticket == null) {
+            throw new NotFoundException("Ticket not found");
+        }
+
+        List<AcceptanceCriteria> criteriaList = acceptanceCriteriaRepository.findByTicketId(ticketId);
+        return criteriaList.stream()
+                .map(acceptanceCriteriaMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void updateAcceptanceCriteria(String projectId, Long ticketId, Long criteriaId, AcceptanceCriteriaRequest request) {
+        Ticket ticket = ticketRepository.findByIdAndProjectId(ticketId, projectId);
+        if (ticket == null) {
+            throw new NotFoundException("Ticket not found");
+        }
+
+        AcceptanceCriteria criteria = acceptanceCriteriaRepository.findByIdAndTicketId(criteriaId, ticketId);
+        if (criteria == null) {
+            throw new NotFoundException("Acceptance criteria not found");
+        }
+
+        criteria.setDescription(request.getDescription());
+        criteria.setStatus(request.getStatus());
+
+        acceptanceCriteriaRepository.persist(criteria);
+    }
+
+    @Transactional
+    public void deleteAcceptanceCriteria(String projectId, Long ticketId, Long criteriaId) {
+        Ticket ticket = ticketRepository.findByIdAndProjectId(ticketId, projectId);
+        if (ticket == null) {
+            throw new NotFoundException("Ticket not found");
+        }
+
+        AcceptanceCriteria criteria = acceptanceCriteriaRepository.findByIdAndTicketId(criteriaId, ticketId);
+        if (criteria == null) {
+            throw new NotFoundException("Acceptance criteria not found");
+        }
+
+        acceptanceCriteriaRepository.deleteByIdAndTicketId(criteriaId, ticketId);
     }
 }
