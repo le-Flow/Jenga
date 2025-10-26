@@ -57,6 +57,9 @@ public class Ticket {
     )
     private List<Label> labels;
 
+    @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AcceptanceCriteria> acceptanceCriteria;
+
     @PrePersist
     public void onCreate() {
         createDate = LocalDateTime.now();

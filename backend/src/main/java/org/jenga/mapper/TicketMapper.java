@@ -5,8 +5,10 @@ import java.util.stream.Collectors;
 
 import org.jenga.model.Ticket;
 import org.jenga.model.Label;
+import org.jenga.model.AcceptanceCriteria;
 import org.jenga.dto.TicketDTO;
 import org.jenga.dto.CreateTicketDTO;
+import org.jenga.dto.AcceptanceCriteriaResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -20,6 +22,7 @@ public interface TicketMapper {
     @Mapping(source = "reporter.username", target = "reporterName")
     @Mapping(source = "assignee.username", target = "assigneeName")
     @Mapping(source = "labels", target = "labels")
+    @Mapping(target = "acceptanceCriteria", source = "acceptanceCriteria")
     TicketDTO ticketToTicketDTO(Ticket ticket);
 
     @Mapping(source = "projectName", target = "project.name")
@@ -58,6 +61,28 @@ public interface TicketMapper {
                              return label;
                          })
                          .collect(Collectors.toList());
+    }
+    
+    // Map AcceptanceCriteria model to AcceptanceCriteria DTO
+    default List<AcceptanceCriteriaResponse> mapAcceptanceCriteriaToResponse(List<AcceptanceCriteria> criteria) {
+        if (criteria == null) {
+            return null;
+        }
+        return criteria.stream()
+                       .map(this::mapAcceptanceCriteriaToResponse)
+                       .collect(Collectors.toList());
+    }
+
+    // Single mapping of AcceptanceCriteria model to AcceptanceCriteria DTO
+    default AcceptanceCriteriaResponse mapAcceptanceCriteriaToResponse(AcceptanceCriteria criteria) {
+        if (criteria == null) {
+            return null;
+        }
+        AcceptanceCriteriaResponse response = new AcceptanceCriteriaResponse();
+        response.setId(criteria.getId());
+        response.setDescription(criteria.getDescription());
+        response.setCompleted(criteria.isCompleted());
+        return response;
     }
 }
 
