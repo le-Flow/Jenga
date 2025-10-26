@@ -24,4 +24,5 @@ public class TicketDTO {
     private String reporterName;
     private String assigneeName;
     private List<String> labels;
+    private List<AcceptanceCriteriaResponse> acceptanceCriteria;
 }

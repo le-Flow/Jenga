@@ -5,6 +5,8 @@ import org.jenga.dto.TicketDTO;
 import org.jenga.dto.CreateTicketDTO;
 import org.jenga.dto.CommentRequestDTO;
 import org.jenga.dto.CommentResponseDTO;
+import org.jenga.dto.AcceptanceCriteriaRequest;
+import org.jenga.dto.AcceptanceCriteriaResponse;
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -88,6 +90,46 @@ public class TicketResource {
     @Path("/{ticketId}/comments/{commentId}")
     public Response deleteComment(@PathParam("projectId") String projectId, @PathParam("ticketId") Long ticketId, @PathParam("commentId") Long commentId) {
         ticketService.deleteComment(projectId, ticketId, commentId);
+        return Response.noContent().build();
+    }
+
+    @POST
+    @Path("/{ticketId}/acceptance-criteria")
+    public AcceptanceCriteriaResponse addAcceptanceCriteria(
+            @PathParam("projectId") String projectId,
+            @PathParam("ticketId") Long ticketId,
+            AcceptanceCriteriaRequest request) {
+        AcceptanceCriteriaResponse response = ticketService.addAcceptanceCriteria(projectId, ticketId, request);
+        return response;
+    }
+
+    @GET
+    @Path("/{ticketId}/acceptance-criteria")
+    public List<AcceptanceCriteriaResponse> getAllAcceptanceCriteria(
+            @PathParam("projectId") String projectId,
+            @PathParam("ticketId") Long ticketId) {
+        List<AcceptanceCriteriaResponse> criteriaList = ticketService.getAllAcceptanceCriteria(projectId, ticketId);
+        return criteriaList;
+    }
+
+    @PUT
+    @Path("/{ticketId}/acceptance-criteria/{criteriaId}")
+    public Response updateAcceptanceCriteria(
+            @PathParam("projectId") String projectId,
+            @PathParam("ticketId") Long ticketId,
+            @PathParam("criteriaId") Long criteriaId,
+            AcceptanceCriteriaRequest request) {
+        ticketService.updateAcceptanceCriteria(projectId, ticketId, criteriaId, request);
+        return Response.ok().build();
+    }
+
+    @DELETE
+    @Path("/{ticketId}/acceptance-criteria/{criteriaId}")
+    public Response deleteAcceptanceCriteria(
+            @PathParam("projectId") String projectId,
+            @PathParam("ticketId") Long ticketId,
+            @PathParam("criteriaId") Long criteriaId) {
+        ticketService.deleteAcceptanceCriteria(projectId, ticketId, criteriaId);
         return Response.noContent().build();
     }
 }
