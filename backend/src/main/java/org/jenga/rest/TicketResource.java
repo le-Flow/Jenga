@@ -3,12 +3,10 @@ package org.jenga.rest;
 import org.jenga.service.TicketService;
 import org.jenga.dto.TicketDTO;
 import org.jenga.dto.CreateTicketDTO;
-
-import org.jenga.dto.ImportStatusDTO;
-import org.jenga.dto.GitHubIssueDTO;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.InputStream;
+import org.jenga.dto.CommentRequestDTO;
+import org.jenga.dto.CommentResponseDTO;
+import org.jenga.dto.AcceptanceCriteriaRequest;
+import org.jenga.dto.AcceptanceCriteriaResponse;
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -76,24 +74,62 @@ public class TicketResource {
     }
 
     @POST
-    @Path("/import/json")
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response importFromJsonFile(@PathParam("projectId") String projectId, InputStream jsonFileStream) {
-        
-        List<GitHubIssueDTO> issues;
-        try {
-            TypeReference<List<GitHubIssueDTO>> typeRef = new TypeReference<>() {};
-            issues = objectMapper.readValue(jsonFileStream, typeRef);
+    @Path("/{ticketId}/comments")
+    public Response createComment(@PathParam("projectId") String projectId, @PathParam("ticketId") Long ticketId, CommentRequestDTO commentDTO) {
+        ticketService.createComment(projectId, ticketId, commentDTO);
+        return Response.status(Response.Status.CREATED).build();
+    }
 
-        } catch (Exception e) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                           .entity(new ImportStatusDTO(false, "Failed to parse JSON file: " + e.getMessage()))
-                           .build();
-        }
+    @GET
+    @Path("/{ticketId}/comments")
+    public List<CommentResponseDTO> getAllComments(@PathParam("projectId") String projectId, @PathParam("ticketId") Long ticketId) {
+        return ticketService.getAllComments(projectId, ticketId);
+    }
 
-        ImportStatusDTO status = ticketService.importFromGitHub(projectId, issues);
+    @DELETE
+    @Path("/{ticketId}/comments/{commentId}")
+    public Response deleteComment(@PathParam("projectId") String projectId, @PathParam("ticketId") Long ticketId, @PathParam("commentId") Long commentId) {
+        ticketService.deleteComment(projectId, ticketId, commentId);
+        return Response.noContent().build();
+    }
 
-        return Response.ok(status).build();
+    @POST
+    @Path("/{ticketId}/acceptance-criteria")
+    public AcceptanceCriteriaResponse addAcceptanceCriteria(
+            @PathParam("projectId") String projectId,
+            @PathParam("ticketId") Long ticketId,
+            AcceptanceCriteriaRequest request) {
+        AcceptanceCriteriaResponse response = ticketService.addAcceptanceCriteria(projectId, ticketId, request);
+        return response;
+    }
+
+    @GET
+    @Path("/{ticketId}/acceptance-criteria")
+    public List<AcceptanceCriteriaResponse> getAllAcceptanceCriteria(
+            @PathParam("projectId") String projectId,
+            @PathParam("ticketId") Long ticketId) {
+        List<AcceptanceCriteriaResponse> criteriaList = ticketService.getAllAcceptanceCriteria(projectId, ticketId);
+        return criteriaList;
+    }
+
+    @PUT
+    @Path("/{ticketId}/acceptance-criteria/{criteriaId}")
+    public Response updateAcceptanceCriteria(
+            @PathParam("projectId") String projectId,
+            @PathParam("ticketId") Long ticketId,
+            @PathParam("criteriaId") Long criteriaId,
+            AcceptanceCriteriaRequest request) {
+        ticketService.updateAcceptanceCriteria(projectId, ticketId, criteriaId, request);
+        return Response.ok().build();
+    }
+
+    @DELETE
+    @Path("/{ticketId}/acceptance-criteria/{criteriaId}")
+    public Response deleteAcceptanceCriteria(
+            @PathParam("projectId") String projectId,
+            @PathParam("ticketId") Long ticketId,
+            @PathParam("criteriaId") Long criteriaId) {
+        ticketService.deleteAcceptanceCriteria(projectId, ticketId, criteriaId);
+        return Response.noContent().build();
     }
 }

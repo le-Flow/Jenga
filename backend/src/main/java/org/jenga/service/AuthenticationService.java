@@ -9,7 +9,10 @@ import org.jenga.dto.LoginResponseDTO;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.SecurityContext;
 import javax.security.auth.login.LoginException;
+import jakarta.ws.rs.BadRequestException;
 import io.quarkus.elytron.security.common.BcryptUtil;
 import io.smallrye.jwt.build.Jwt;
 
@@ -21,15 +24,30 @@ public class AuthenticationService {
     @Inject
     UserRepository userRepository;
 
+    @Context
+    SecurityContext securityContext;
+
     @Transactional
     public LoginResponseDTO register(RegisterRequestDTO registerRequest) {
-        User existingUser = userRepository.findByUsername(registerRequest.getUsername());
+        String username = registerRequest.getUsername().toLowerCase();
 
+        User existingUser = userRepository.findByUsername(username);
         if (existingUser != null) {
-            throw new RuntimeException("User already exists");
+            throw new BadRequestException("User already exists");
         }
 
-        String username = registerRequest.getUsername();
+        if (username == null || username.isEmpty()) {
+            throw new BadRequestException("Username cannot be empty");
+        }
+
+        if (username.contains(" ")) {
+            throw new BadRequestException("Username cannot contain spaces");
+        }
+
+        if (!username.matches("[a-zA-Z0-9]+")) {
+            throw new BadRequestException("Username must only contain letters and numbers");
+        }
+
         String email = registerRequest.getEmail();
         String hashedPassword = BcryptUtil.bcryptHash(registerRequest.getPassword());
         User user = new User(username, email, hashedPassword, null, null);
@@ -44,18 +62,18 @@ public class AuthenticationService {
     }
 
     public LoginResponseDTO login(LoginRequestDTO loginRequest) throws LoginException {
-        User user = userRepository.findByUsername(loginRequest.getUsername());
+        User user = userRepository.findByUsername(loginRequest.getUsername().toLowerCase());
 
         if (user == null) {
-            throw new RuntimeException("Invalid username or password");
+            throw new BadRequestException("Invalid username or password");
         }
 
         if (!BcryptUtil.matches(loginRequest.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid username or password");
+            throw new BadRequestException("Invalid username or password");
         }
 
         LoginResponseDTO loginResponse = new LoginResponseDTO();
-        loginResponse.setUsername(loginRequest.getUsername());
+        loginResponse.setUsername(user.getUsername());
         loginResponse.setToken(generateToken(user));
         loginResponse.setExpiresIn(EXPIRATION_TIME_SECONDS);
 
@@ -70,5 +88,17 @@ public class AuthenticationService {
                   .upn(user.getUsername())
                   .expiresAt(expirationTime)
                   .sign();
+    }
+
+    public User getCurrentUser() {
+        String username = securityContext.getUserPrincipal().getName();
+
+        User currentUser = userRepository.findByUsername(username);
+
+        if (currentUser == null) {
+            throw new RuntimeException("Failed to get user from security context: " + username);
+        }
+
+        return currentUser;
     }
 }

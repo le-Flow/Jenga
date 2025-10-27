@@ -1,61 +1,80 @@
-import { createContext, Resource, createResource, JSXElement, createEffect, Accessor, Setter, createSignal, useContext, on } from "solid-js"
-import { ProjectDTO, ProjectResourceService, TicketDTO, TicketResourceService } from "../api"
-import { UserContext } from "./UserProvider"
+import { Accessor, JSXElement, Resource, Setter, createContext, createResource, createSignal, useContext } from "solid-js";
+import { ProjectDTO, ProjectResourceService, TicketDTO, TicketResourceService } from "../api";
+import { AuthContext } from "./AuthProvider";
 
 type ProjectContextType = {
-    projects: Resource<ProjectDTO[]>
-    setProjects: Setter<ProjectDTO[]>
+    projects: Resource<ProjectDTO[] | undefined>;
+    setProjects: Setter<ProjectDTO[] | undefined>;
 
-    selectedProject: Accessor<ProjectDTO>
-    setSelectedProject: Setter<ProjectDTO>
+    selectedProject: Accessor<ProjectDTO | undefined>;
+    setSelectedProject: Setter<ProjectDTO | undefined>;
 
-    tickets: Resource<TicketDTO[]>
-    setTickets: Setter<TicketDTO[]>
+    tickets: Resource<TicketDTO[] | undefined>;
+    setTickets: Setter<TicketDTO[] | undefined>;
 
-    selectedTicket: Accessor<TicketDTO>
-    setSelectedTicket: Setter<TicketDTO>
-}
+    selectedTicket: Accessor<TicketDTO | undefined>;
+    setSelectedTicket: Setter<TicketDTO | undefined>;
+    deleteProject: (identifier: string) => Promise<void>;
+};
 
-export const ProjectContext = createContext<ProjectContextType>()
+export const ProjectContext = createContext<ProjectContextType>();
 
 interface ProviderProps {
-    children: JSXElement
+    children: JSXElement;
 }
 
 export const ProjectProvider = (props: ProviderProps) => {
 
-    const uCtx = useContext(UserContext)
+    const aCtx = useContext(AuthContext);
 
-    const [projects, { mutate: setProjects, refetch }] = createResource(async () => await ProjectResourceService.getApiProjects())
+    const [selectedProject, setSelectedProject] = createSignal<ProjectDTO>();
+    const [selectedTicket, setSelectedTicket] = createSignal<TicketDTO>();
 
-    const [selectedProject, setSelectedProject] = createSignal<ProjectDTO>()
+    const [projects, { mutate: setProjects }] = createResource(
+        () => (aCtx?.isLoggedIn() ? true : undefined),
+        async () => await ProjectResourceService.getApiProjects()
+    );
 
-    const [tickets, { mutate: setTickets }] = createResource(selectedProject, async (q) => await TicketResourceService.getApiProjectsTickets(q.identifier))
+    const [tickets, { mutate: setTickets }] = createResource(
+        () => {
+            const project = selectedProject();
+            return aCtx?.isLoggedIn() && project ? project.identifier : undefined;
+        },
+        async (projectId) => await TicketResourceService.getApiProjectsTickets(projectId)
+    );
 
-    const [selectedTicket, setSelectedTicket] = createSignal()
+    const deleteProject = async (identifier: string) => {
+        if (!identifier) return;
 
-    createEffect(() => console.log(tickets()))
-    createEffect(() => {
-        if (uCtx?.isLoggedIn()) {
-            console.log("refetch")
-            refetch()
+        try {
+            await ProjectResourceService.deleteApiProjects(identifier);
+            setProjects((prev) => prev?.filter((project) => project.identifier !== identifier));
+
+            if (selectedProject()?.identifier === identifier) {
+                setSelectedProject(undefined);
+                setTickets(undefined);
+            }
+        } catch (error) {
+            console.error("Failed to delete project", error);
+            throw error;
         }
-    })
+    };
 
     const value = {
-        projects: projects,
-        setProjects: setProjects,
-        selectedProject: selectedProject,
-        setSelectedProject: setSelectedProject,
-        tickets: tickets,
-        setTickets: setTickets,
-        selectedTicket: selectedTicket,
-        setSelectedTicket: setSelectedTicket
-    }
+        projects,
+        setProjects,
+        selectedProject,
+        setSelectedProject,
+        tickets,
+        setTickets,
+        selectedTicket,
+        setSelectedTicket,
+        deleteProject
+    };
 
     return (
         <ProjectContext.Provider value={value}>
             {props.children}
         </ProjectContext.Provider>
-    )
-}
+    );
+};

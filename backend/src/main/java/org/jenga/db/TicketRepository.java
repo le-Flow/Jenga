@@ -10,16 +10,16 @@ import java.util.List;
 
 @ApplicationScoped
 public class TicketRepository implements PanacheRepository<Ticket> {
-    public List<Ticket> findByProjectName(String projectName) {
-        return find("project.name", projectName).list();
+    public List<Ticket> findByProjectId(String projectId) {
+        return find("project.id", projectId).list();
     }
 
     public Ticket findByIdAndProjectId(Long ticketId, String projectId) {
         return find("id = ?1 and project.id = ?2", ticketId, projectId).firstResult();
     }
 
-    public Ticket findByTicketNumberAndProjectName(Long ticketNumber, String projectName) {
-        return find("ticketNumber = ?1 and project.name = ?2", ticketNumber, projectName).firstResult();
+    public Ticket findByTicketNumberAndProjectId(Long ticketNumber, String projectId) {
+        return find("ticketNumber = ?1 and project.id= ?2", ticketNumber, projectId).firstResult();
     }
 
     public Long findMaxTicketNumberByProject(Project project) {

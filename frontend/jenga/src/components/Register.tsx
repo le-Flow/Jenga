@@ -1,10 +1,10 @@
-import { Button, Card, CardHeader, Stack, TextField } from "@suid/material"
-import { createSignal, useContext } from "solid-js"
-import { RegisterRequestDTO } from "../api"
-import { UserContext } from "../provider/UserProvider"
+import { Button, Stack, TextField } from "@suid/material";
+import { createSignal, useContext } from "solid-js";
+import { RegisterRequestDTO } from "../api";
+import { AuthContext } from "../provider/AuthProvider";
 
 export const Register = () => {
-    const uCtx = useContext(UserContext)
+    const aCtx = useContext(AuthContext);
 
     const [username, setUsername] = createSignal("")
     const [password, setPassword] = createSignal("")
@@ -17,7 +17,7 @@ export const Register = () => {
             password: password()
         }
 
-        uCtx?.register(request)
+        aCtx?.register?.(request)
     }
 
     return (
