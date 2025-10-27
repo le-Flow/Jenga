@@ -18,4 +18,3 @@ public class CreateTicketDTO {
     private String assignee;
     private List<String> labels;
 }
-
