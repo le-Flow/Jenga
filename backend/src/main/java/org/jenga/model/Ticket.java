@@ -61,6 +61,14 @@ public class Ticket {
     @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AcceptanceCriteria> acceptanceCriteria;
 
+    @ManyToMany
+    @JoinTable(
+        name = "tickets_related",
+        joinColumns = @JoinColumn(name = "ticket_id"),
+        inverseJoinColumns = @JoinColumn(name = "related_ticket_id")
+    )
+    private List<Ticket> relatedTickets;
+
     @PrePersist
     public void onCreate() {
         createDate = LocalDateTime.now();

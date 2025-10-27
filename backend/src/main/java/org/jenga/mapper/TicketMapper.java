@@ -23,11 +23,13 @@ public interface TicketMapper {
     @Mapping(source = "assignee.username", target = "assigneeName")
     @Mapping(source = "labels", target = "labels")
     @Mapping(target = "acceptanceCriteria", source = "acceptanceCriteria")
+    @Mapping(target = "relatedTicketsIds", source = "relatedTickets")
     TicketDTO ticketToTicketDTO(Ticket ticket);
 
     @Mapping(source = "projectName", target = "project.name")
     @Mapping(source = "assigneeName", target = "assignee.username")
     @Mapping(source = "labels", target = "labels")
+    @Mapping(target = "relatedTickets", ignore = true)
     Ticket ticketDTOToTicket(TicketDTO ticketDTO);
 
     @Mapping(target = "id", ignore = true)
@@ -83,6 +85,16 @@ public interface TicketMapper {
         response.setDescription(criteria.getDescription());
         response.setCompleted(criteria.isCompleted());
         return response;
+    }
+
+    // Map the related tickets list to just their IDs
+    default List<Long> mapRelatedTicketsToIds(List<Ticket> relatedTickets) {
+        if (relatedTickets == null) {
+            return null;
+        }
+        return relatedTickets.stream()
+                             .map(Ticket::getId)
+                             .collect(Collectors.toList());
     }
 }
 
