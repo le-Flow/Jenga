@@ -12,6 +12,7 @@ import org.jenga.dto.AcceptanceCriteriaResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
+import org.mapstruct.Named;
 
 @Mapper(componentModel = "cdi")
 public interface TicketMapper {
@@ -23,11 +24,15 @@ public interface TicketMapper {
     @Mapping(source = "assignee.username", target = "assigneeName")
     @Mapping(source = "labels", target = "labels")
     @Mapping(target = "acceptanceCriteria", source = "acceptanceCriteria")
+    @Mapping(target = "relatedTicketsIds", source = "relatedTickets", qualifiedByName = "mapRelatedTicketsToIds")
+    @Mapping(target = "blockingTicketIds", source = "blockingTickets", qualifiedByName = "mapBlockingTicketsToIds")
+    @Mapping(target = "blockedTicketIds", source = "blockedTickets", qualifiedByName = "mapBlockedTicketsToIds")
     TicketDTO ticketToTicketDTO(Ticket ticket);
 
     @Mapping(source = "projectName", target = "project.name")
     @Mapping(source = "assigneeName", target = "assignee.username")
     @Mapping(source = "labels", target = "labels")
+    @Mapping(target = "relatedTickets", ignore = true)
     Ticket ticketDTOToTicket(TicketDTO ticketDTO);
 
     @Mapping(target = "id", ignore = true)
@@ -84,5 +89,37 @@ public interface TicketMapper {
         response.setCompleted(criteria.isCompleted());
         return response;
     }
-}
 
+    // Map the related tickets list to just their IDs
+    @Named("mapRelatedTicketsToIds")  // Explicitly needed, as MapStruct cannot find it otherwise
+    default List<Long> mapRelatedTicketsToIds(List<Ticket> relatedTickets) {
+        if (relatedTickets == null) {
+            return null;
+        }
+        return relatedTickets.stream()
+                             .map(Ticket::getId)
+                             .collect(Collectors.toList());
+    }
+
+    // Map blockingTickets list to a List<Long> of IDs
+    @Named("mapBlockingTicketsToIds")
+    default List<Long> mapBlockingTicketsToIds(List<Ticket> blockingTickets) {
+        if (blockingTickets == null) {
+            return null;
+        }
+        return blockingTickets.stream()
+                              .map(Ticket::getId)
+                              .collect(Collectors.toList());
+    }
+
+    // Map blockedTickets list to a List<Long> of IDs
+    @Named("mapBlockedTicketsToIds")
+    default List<Long> mapBlockedTicketsToIds(List<Ticket> blockedTickets) {
+        if (blockedTickets == null) {
+            return null;
+        }
+        return blockedTickets.stream()
+                             .map(Ticket::getId)
+                             .collect(Collectors.toList());
+    }
+}
