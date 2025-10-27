@@ -1,9 +1,10 @@
-import { Avatar, Dialog, DialogContent, DialogTitle, IconButton, Stack, ToggleButton, ToggleButtonGroup } from "@suid/material";
+import { Avatar, Card, CardContent, Dialog, DialogContent, DialogTitle, IconButton, Popper, Stack, ToggleButton, ToggleButtonGroup } from "@suid/material";
 import { Login, Logout } from "@suid/icons-material";
 import { Match, Switch, createSignal, useContext } from "solid-js";
 import { LogIn } from "./Login";
 import { Register } from "./Register";
 import { AuthContext } from "../provider/AuthProvider";
+import { UserInfo } from "./UserInfo";
 
 const enum AuthE {
     SignIn,
@@ -15,16 +16,38 @@ const LoggedIn = () => {
     const aCtx = useContext(AuthContext);
 
     const [showProfile, setShowProfile] = createSignal(false)
+    const [anchorEl, setAnchorEl] = createSignal<HTMLButtonElement>()
 
     const logout = () => {
-        console.log("logout", "todo")
+        aCtx?.logout?.()
     }
 
     return (
         <Stack direction="row">
-            <IconButton onClick={() => {setShowProfile(true); console.log("todo")}}>
+            <IconButton
+                onClick={() => { setShowProfile(true) }}
+                onMouseEnter={() => setShowProfile(true)}
+                onMouseLeave={() => setShowProfile(false)}
+                ref={(el) => setAnchorEl(el)}
+            >
                 <Avatar></Avatar>
             </IconButton>
+            <Popper
+                anchorEl={anchorEl()}
+                anchorOrigin={
+                    {
+                        vertical: 'bottom',
+                        horizontal: 'center',
+                    }
+                }
+                open={showProfile()}
+            >
+                <Card>
+                    <CardContent>
+                        <UserInfo user={aCtx?.jwt()}></UserInfo>
+                    </CardContent>
+                </Card>
+            </Popper>
             <IconButton onClick={logout}>
                 <Logout></Logout>
             </IconButton>
