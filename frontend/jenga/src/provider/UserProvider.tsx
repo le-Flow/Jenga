@@ -18,7 +18,7 @@ export const UserProvider = (props: ProviderProps) => {
     const auth = useContext(AuthContext);
 
     const [user, { mutate: setUser, refetch }] = createResource(
-        () => auth?.jwt()?.username ?? null,
+        () => (auth?.isLoggedIn() ? auth.jwt()?.username ?? null : null),
         async (username) => {
             if (!username) {
                 return undefined;

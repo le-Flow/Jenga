@@ -36,10 +36,18 @@ export const AuthProvider = (props: ProviderProps) => {
       return undefined;
     }
 
-    return await AuthenticationResourceService.postApiAuthLogin(payload);
+
+      return await AuthenticationResourceService.postApiAuthLogin(payload);
+
   });
 
   const loggedIn = createMemo(() => {
+    if (loginResult.error) {
+      OpenAPI.TOKEN = undefined;
+      OpenAPI.USERNAME = undefined;
+      return false;
+    }
+
     const jwt = loginResult();
     OpenAPI.TOKEN = jwt?.token;
     OpenAPI.USERNAME = jwt?.username;
