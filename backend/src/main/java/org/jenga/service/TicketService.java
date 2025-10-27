@@ -198,6 +198,12 @@ public class TicketService {
         if (ticket == null) {
             throw new NotFoundException("Ticket not found");
         }
+        
+        // Remove all relating ticktes
+        for (Ticket relatedTicket : ticket.getRelatedTickets()) {
+            relatedTicket.getRelatedTickets().remove(ticket);
+            ticketRepository.persist(relatedTicket);
+        }
 
         ticketRepository.delete(ticket);
     }
