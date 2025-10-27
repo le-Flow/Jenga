@@ -8,6 +8,7 @@ import { Route, Router } from '@solidjs/router';
 import { Sprint } from './pages/Sprint';
 import { Home } from './pages/Home';
 import { About } from './pages/About';
+import { Profile } from './pages/Profile';
 
 const root = document.getElementById('root');
 
@@ -22,6 +23,7 @@ render(
     <Router>
       <Route path="/" component={App}>
         <Route path={""} component={Home}></Route>
+        <Route path={"Profile"} component={Profile}></Route>
         <Route path={"Sprint"} component={Sprint}></Route>
         <Route path={"About"} component={About}></Route>
       </Route>

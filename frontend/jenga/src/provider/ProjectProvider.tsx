@@ -1,4 +1,4 @@
-import { Accessor, JSXElement, Resource, Setter, createContext, createResource, createSignal, useContext } from "solid-js";
+import { Accessor, JSXElement, Resource, Setter, createContext, createEffect, createResource, createSignal, useContext } from "solid-js";
 import { ProjectDTO, ProjectResourceService, TicketDTO, TicketResourceService } from "../api";
 import { AuthContext } from "./AuthProvider";
 
@@ -30,8 +30,8 @@ export const ProjectProvider = (props: ProviderProps) => {
     const [selectedProject, setSelectedProject] = createSignal<ProjectDTO>();
     const [selectedTicket, setSelectedTicket] = createSignal<TicketDTO>();
 
-    const [projects, { mutate: setProjects }] = createResource(
-        () => (aCtx?.isLoggedIn() ? true : undefined),
+    const [projects, { mutate: setProjects, refetch: refetchProjects }] = createResource(
+        () => (aCtx?.isLoggedIn?.() ? true : undefined),
         async () => await ProjectResourceService.getApiProjects()
     );
 
@@ -42,6 +42,15 @@ export const ProjectProvider = (props: ProviderProps) => {
         },
         async (projectId) => await TicketResourceService.getApiProjectsTickets(projectId)
     );
+
+    createEffect(() => {
+        if (!aCtx?.isLoggedIn?.()) {
+            setProjects(() => undefined);
+            setSelectedProject(undefined);
+            setTickets(() => undefined);
+            setSelectedTicket(undefined);
+        }
+    });
 
     const deleteProject = async (identifier: string) => {
         if (!identifier) return;

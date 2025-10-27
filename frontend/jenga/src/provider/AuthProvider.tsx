@@ -7,6 +7,7 @@ type AuthContextType = {
   register?: (request: RegisterRequestDTO) => void;
   jwt: Resource<LoginResponseDTO | undefined>;
   registerResult: Resource<LoginResponseDTO | undefined>;
+  logout?: () => void;
 };
 
 export const AuthContext = createContext<AuthContextType>();
@@ -30,19 +31,33 @@ export const AuthProvider = (props: ProviderProps) => {
   const [registerResult] = createResource(registerRequestDTO, (payload) =>
     payload ? AuthenticationResourceService.postApiAuthRegister(payload) : undefined
   );
-  const [loginResult] = createResource(loginRequestDTO, async (payload) => {
+  const [loginResult, { mutate: setLoginResult }] = createResource(loginRequestDTO, async (payload) => {
     if (!payload) {
       return undefined;
     }
 
-    const jwt = await AuthenticationResourceService.postApiAuthLogin(payload);
-    OpenAPI.TOKEN = jwt.token;
-    OpenAPI.USERNAME = jwt.username;
 
-    return jwt;
+      return await AuthenticationResourceService.postApiAuthLogin(payload);
+
   });
 
-  const loggedIn = createMemo(() => Boolean(loginResult()?.token));
+  const loggedIn = createMemo(() => {
+    if (loginResult.error) {
+      OpenAPI.TOKEN = undefined;
+      OpenAPI.USERNAME = undefined;
+      return false;
+    }
+
+    const jwt = loginResult();
+    OpenAPI.TOKEN = jwt?.token;
+    OpenAPI.USERNAME = jwt?.username;
+    return Boolean(jwt?.token);
+  });
+
+  const logout = () => {
+    setLoginRequestDTO(undefined);
+    setLoginResult(() => undefined);
+  };
 
   const value: AuthContextType = {
     login,
@@ -50,6 +65,7 @@ export const AuthProvider = (props: ProviderProps) => {
     register,
     jwt: loginResult,
     registerResult,
+    logout,
   };
 
   return <AuthContext.Provider value={value}>{props.children}</AuthContext.Provider>;
