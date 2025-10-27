@@ -6,7 +6,7 @@ type AuthContextType = {
   isLoggedIn: Accessor<boolean>;
   register?: (request: RegisterRequestDTO) => void;
   jwt: Resource<LoginResponseDTO | undefined>;
-  registerResult: Resource<unknown>;
+  registerResult: Resource<LoginResponseDTO | undefined>;
 };
 
 export const AuthContext = createContext<AuthContextType>();
