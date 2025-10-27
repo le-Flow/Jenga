@@ -69,6 +69,17 @@ public class Ticket {
     )
     private List<Ticket> relatedTickets;
 
+    @ManyToMany
+    @JoinTable(
+        name = "tickets_blocked",
+        joinColumns = @JoinColumn(name = "ticket_id"),
+        inverseJoinColumns = @JoinColumn(name = "blocked_ticket_id")
+    )
+    private List<Ticket> blockingTickets;
+
+    @ManyToMany(mappedBy = "blockingTickets")
+    private List<Ticket> blockedTickets;
+
     @PrePersist
     public void onCreate() {
         createDate = LocalDateTime.now();

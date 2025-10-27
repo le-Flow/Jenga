@@ -159,4 +159,24 @@ public class TicketResource {
         ticketService.removeRelatedTicket(projectId, ticketId, relatedTicketId);
         return Response.status(Response.Status.NO_CONTENT).build();
     }
+
+    @PUT
+    @Path("/{ticketId}/block/{blockedTicketId}")
+    public Response addBlockingTicket(
+            @PathParam("projectId") String projectId,
+            @PathParam("ticketId") Long ticketId,
+            @PathParam("blockedTicketId") Long blockedTicketId) {
+        ticketService.addBlockingTicket(projectId, ticketId, blockedTicketId);
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @DELETE
+    @Path("/{ticketId}/block/{blockedTicketId}")
+    public Response removeBlockingTicket(
+            @PathParam("projectId") String projectId,
+            @PathParam("ticketId") Long ticketId,
+            @PathParam("blockedTicketId") Long blockedTicketId) {
+        ticketService.removeBlockingTicket(projectId, ticketId, blockedTicketId);
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
 }
