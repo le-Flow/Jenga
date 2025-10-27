@@ -31,13 +31,13 @@ export const NewProjectDialog = (props: NewProjectDialogProps) => {
     }
 
     return (
-        <Dialog open={props.open}>
+        <Dialog open={props.open} fullWidth>
             <DialogTitle>New Project</DialogTitle>
             <DialogContent>
                 <Stack spacing={1}>
                     <TextField name="id" label="identifier" value={id()} onChange={(_, value) => { setId(value) }}></TextField>
                     <TextField name="name" label="name" value={name()} onChange={(_, value) => { setName(value) }}></TextField>
-                    <TextField name="description" label="description" value={desc()} onChange={(_, value) => { setDesc(value) }} multiline></TextField>
+                    <TextField name="description" label="description" value={desc()} onChange={(_, value) => { setDesc(value) }} rows={5} multiline></TextField>
                 </Stack>
             </DialogContent>
             <DialogActions>
