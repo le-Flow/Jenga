@@ -25,4 +25,5 @@ public class TicketDTO {
     private String assigneeName;
     private List<String> labels;
     private List<AcceptanceCriteriaResponse> acceptanceCriteria;
+    private List<Long> relatedTicketsIds;
 }

@@ -139,4 +139,24 @@ public class TicketResource {
         ticketService.deleteAcceptanceCriteria(projectId, ticketId, criteriaId);
         return Response.noContent().build();
     }
+
+    @PUT
+    @Path("/{ticketId}/related/{relatedTicketId}")
+    public Response AddRelatedTicket(
+            @PathParam("projectId") String projectId,
+            @PathParam("ticketId") Long ticketId,
+            @PathParam("relatedTicketId") Long relatedTicketId) {
+        ticketService.addRelatedTicket(projectId, ticketId, relatedTicketId);
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @DELETE
+    @Path("/{ticketId}/related/{relatedTicketId}")
+    public Response removeRelatedTicket(
+            @PathParam("projectId") String projectId,
+            @PathParam("ticketId") Long ticketId,
+            @PathParam("relatedTicketId") Long relatedTicketId) {
+        ticketService.removeRelatedTicket(projectId, ticketId, relatedTicketId);
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
 }
