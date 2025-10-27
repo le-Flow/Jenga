@@ -1,7 +1,8 @@
-import { Button, Card, CardActions, CardContent, CardHeader, Dialog, DialogActions, DialogContent, DialogTitle, List, ListItem, ListItemButton, ListItemText, Stack, TextField } from "@suid/material"
+import { Button, Card, CardActions, CardContent, CardHeader, Dialog, DialogActions, DialogContent, DialogTitle, List, ListItem, ListItemButton, ListItemSecondaryAction, ListItemText, Stack, TextField } from "@suid/material"
 import { ProjectContext } from "../provider/ProjectProvider"
 import { createMemo, createSignal, For, Setter, useContext } from "solid-js"
 import { ProjectResourceService, CreateProjectDTO, ProjectDTO } from "../api"
+import { Delete } from "@suid/icons-material"
 
 
 interface NewProjectDialogProps {
@@ -90,6 +91,11 @@ export const Projects = () => {
                                                     secondary={((p.createDate ?? "") + " | " + (p.modifyDate ?? ""))}
                                                 />
                                             </ListItemButton>
+                                            <ListItemSecondaryAction>
+                                                <ListItemButton onClick={() => { if (p.identifier) pCtx?.deleteProject(p.identifier) }}>
+                                                    <Delete></Delete>
+                                                </ListItemButton>
+                                            </ListItemSecondaryAction>
                                         </ListItem>
                                     )
                                 }

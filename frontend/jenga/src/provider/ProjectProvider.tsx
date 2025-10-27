@@ -14,6 +14,7 @@ type ProjectContextType = {
 
     selectedTicket: Accessor<TicketDTO | undefined>;
     setSelectedTicket: Setter<TicketDTO | undefined>;
+    deleteProject: (identifier: string) => Promise<void>;
 };
 
 export const ProjectContext = createContext<ProjectContextType>();
@@ -42,6 +43,23 @@ export const ProjectProvider = (props: ProviderProps) => {
         async (projectId) => await TicketResourceService.getApiProjectsTickets(projectId)
     );
 
+    const deleteProject = async (identifier: string) => {
+        if (!identifier) return;
+
+        try {
+            await ProjectResourceService.deleteApiProjects(identifier);
+            setProjects((prev) => prev?.filter((project) => project.identifier !== identifier));
+
+            if (selectedProject()?.identifier === identifier) {
+                setSelectedProject(undefined);
+                setTickets(undefined);
+            }
+        } catch (error) {
+            console.error("Failed to delete project", error);
+            throw error;
+        }
+    };
+
     const value = {
         projects,
         setProjects,
@@ -50,7 +68,8 @@ export const ProjectProvider = (props: ProviderProps) => {
         tickets,
         setTickets,
         selectedTicket,
-        setSelectedTicket
+        setSelectedTicket,
+        deleteProject
     };
 
     return (
