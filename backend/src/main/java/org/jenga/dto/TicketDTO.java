@@ -26,4 +26,6 @@ public class TicketDTO {
     private List<String> labels;
     private List<AcceptanceCriteriaResponse> acceptanceCriteria;
     private List<Long> relatedTicketsIds;
+    private List<Long> blockingTicketIds;
+    private List<Long> blockedTicketIds;
 }

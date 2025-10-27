@@ -183,6 +183,17 @@ public class TicketService {
             ticketRepository.persist(relatedTicket);
         }
 
+        // Remove blocking/blocked relationships
+        for (Ticket blockingTicket : ticket.getBlockingTickets()) {
+            blockingTicket.getBlockedTickets().remove(ticket);
+            ticketRepository.persist(blockingTicket);
+        }
+        
+        for (Ticket blockedTicket : ticket.getBlockedTickets()) {
+            blockedTicket.getBlockingTickets().remove(ticket);
+            ticketRepository.persist(blockedTicket);
+        }
+
         ticketRepository.delete(ticket);
     }
 
@@ -394,5 +405,37 @@ public class TicketService {
         // Persist changes to both tickets, so both are linking each other
         ticketRepository.persist(ticket);
         ticketRepository.persist(relatedTicket);
+    }
+
+    @Transactional
+    public void addBlockingTicket(String projectId, Long ticketId, Long blockingTicketId) {
+        Ticket ticket = ticketRepository.findByIdAndProjectId(ticketId, projectId);
+        if (ticket == null) {
+            throw new NotFoundException("Ticket not found");
+        }
+
+        Ticket blockingTicket = ticketRepository.findByIdAndProjectId(blockingTicketId, projectId);
+        if (blockingTicket == null) {
+            throw new NotFoundException("Blocking ticket not found");
+        }
+
+        ticket.getBlockingTickets().add(blockingTicket);
+        ticketRepository.persist(ticket);
+    }
+
+    @Transactional
+    public void removeBlockingTicket(String projectId, Long ticketId, Long blockingTicketId) {
+        Ticket ticket = ticketRepository.findByIdAndProjectId(ticketId, projectId);
+        if (ticket == null) {
+            throw new NotFoundException("Ticket not found");
+        }
+
+        Ticket blockingTicket = ticketRepository.findByIdAndProjectId(blockingTicketId, projectId);
+        if (blockingTicket == null) {
+            throw new NotFoundException("Blocking ticket not found");
+        }
+
+        ticket.getBlockingTickets().remove(blockingTicket);
+        ticketRepository.persist(ticket);
     }
 }
