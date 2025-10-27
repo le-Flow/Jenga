@@ -1,4 +1,4 @@
-import { Accessor, JSXElement, Resource, createContext, createEffect, createMemo, createResource, createSignal } from "solid-js";
+import { Accessor, JSXElement, Resource, createContext, createMemo, createResource, createSignal } from "solid-js";
 import { AuthenticationResourceService, LoginRequestDTO, LoginResponseDTO, OpenAPI, RegisterRequestDTO } from "../api";
 
 type AuthContextType = {
@@ -39,12 +39,11 @@ export const AuthProvider = (props: ProviderProps) => {
     return await AuthenticationResourceService.postApiAuthLogin(payload);
   });
 
-  const loggedIn = createMemo(() => Boolean(loginResult()?.token));
-
-  createEffect(() => {
+  const loggedIn = createMemo(() => {
     const jwt = loginResult();
     OpenAPI.TOKEN = jwt?.token;
     OpenAPI.USERNAME = jwt?.username;
+    return Boolean(jwt?.token);
   });
 
   const logout = () => {

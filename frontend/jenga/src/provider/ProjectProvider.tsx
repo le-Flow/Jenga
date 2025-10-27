@@ -30,8 +30,8 @@ export const ProjectProvider = (props: ProviderProps) => {
     const [selectedProject, setSelectedProject] = createSignal<ProjectDTO>();
     const [selectedTicket, setSelectedTicket] = createSignal<TicketDTO>();
 
-    const [projects, { mutate: setProjects }] = createResource(
-        () => (aCtx?.isLoggedIn() ? true : undefined),
+    const [projects, { mutate: setProjects, refetch: refetchProjects }] = createResource(
+        () => (aCtx?.isLoggedIn?.() ? true : undefined),
         async () => await ProjectResourceService.getApiProjects()
     );
 
