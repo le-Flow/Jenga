@@ -1,11 +1,11 @@
 import { JSXElement, Resource, createContext, createResource, useContext } from "solid-js";
-import { User, UserResourceService } from "../api";
+import { UserDTO, UserResourceService } from "../api";
 import { AuthContext } from "./AuthProvider";
 
 type UserContextType = {
-    user: Resource<User | undefined>;
-    setUser: (next: User | undefined) => void;
-    refetchUser: () => Promise<User | undefined>;
+    user: Resource<UserDTO | undefined>;
+    setUser: (next: UserDTO | undefined) => void;
+    refetchUser: () => Promise<UserDTO | undefined>;
 };
 
 export const UserContext = createContext<UserContextType>();
