@@ -27,6 +27,7 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -70,7 +71,7 @@ public class TicketService {
     }
 
     @Transactional
-    public void create(String projectId, CreateTicketDTO createTicketDTO) {
+    public TicketDTO create(String projectId, CreateTicketDTO createTicketDTO) {
         Project project = projectRepository.findById(projectId);
         if (project == null) {
             throw new NotFoundException("Project not found with name: " + projectId);
@@ -100,14 +101,15 @@ public class TicketService {
         if (createTicketDTO.getLabels() != null && !createTicketDTO.getLabels().isEmpty()) {
             List<Label> labels = labelRepository.findByProjectIdAndNames(projectId, createTicketDTO.getLabels());
             if (labels.size() != createTicketDTO.getLabels().size()) {
-                throw new BadRequestException("Label does not exist");
+                throw new BadRequestException("One or more labels do not exist for this project.");
             }
             ticket.setLabels(labels);
         }
 
         ticketRepository.persist(ticket);
+        return ticketMapper.ticketToTicketDTO(ticket);
     }
-
+    
     public List<TicketDTO> findAll(String projectId) {
         Project project = projectRepository.findById(projectId);
         if (project == null) {
