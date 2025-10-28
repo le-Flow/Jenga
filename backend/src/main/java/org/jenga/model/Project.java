@@ -25,11 +25,9 @@ public class Project {
     private LocalDateTime modifyDate;
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
     private List<Ticket> tickets = new ArrayList<>();
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
     private List<Label> labels = new ArrayList<>();
 
     @PrePersist

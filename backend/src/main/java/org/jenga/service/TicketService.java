@@ -28,10 +28,7 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
@@ -73,8 +70,8 @@ public class TicketService {
         this.authenticationService = authenticationService;
     }
 
- @Transactional
-    public Ticket create(String projectId, CreateTicketDTO createTicketDTO) {
+    @Transactional
+    public TicketDTO create(String projectId, CreateTicketDTO createTicketDTO) {
         Project project = projectRepository.findById(projectId);
         if (project == null) {
             throw new NotFoundException("Project not found with name: " + projectId);
@@ -97,31 +94,20 @@ public class TicketService {
             if (user != null) {
                 ticket.setAssignee(user);
             } else {
-                System.err.println("Warning: Assignee '" + createTicketDTO.getAssignee() + "' not found. Importing ticket without assignee.");
+                throw new BadRequestException("User not found with username: " + createTicketDTO.getAssignee());
             }
         }
 
         if (createTicketDTO.getLabels() != null && !createTicketDTO.getLabels().isEmpty()) {
-            Set<Label> labelsToAttach = new HashSet<>();
-            
-            for (String labelName : createTicketDTO.getLabels()) {
-                Label label = labelRepository.find("project.id = ?1 and name = ?2", projectId, labelName).firstResult();
-
-                if (label == null) {
-                    label = new Label();
-                    label.setName(labelName);
-                    label.setProject(project); 
-                    labelRepository.persist(label);
-                }
-                
-                labelsToAttach.add(label);
+            List<Label> labels = labelRepository.findByProjectIdAndNames(projectId, createTicketDTO.getLabels());
+            if (labels.size() != createTicketDTO.getLabels().size()) {
+                throw new BadRequestException("One or more labels do not exist for this project.");
             }
-            
-            ticket.setLabels(new ArrayList<>(labelsToAttach));
+            ticket.setLabels(labels);
         }
 
         ticketRepository.persist(ticket);
-        return ticket;
+        return ticketMapper.ticketToTicketDTO(ticket);
     }
     
     public List<TicketDTO> findAll(String projectId) {

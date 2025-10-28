@@ -29,6 +29,5 @@ public class Label {
     private Project project;
 
     @ManyToMany(mappedBy = "labels")
-    @JsonIgnore
     private List<Ticket> tickets = new ArrayList<>();
 }
