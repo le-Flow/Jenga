@@ -3,19 +3,14 @@ import { useContext, createMemo, For } from "solid-js"
 import { TicketDTO, TicketStatus } from "../api"
 import { ProjectContext } from "../provider/ProjectProvider"
 
-interface RowProps {
-    dev: string
-    tickets?: TicketDTO[]
-}
-
 interface KanbanItemProps {
     ticket: TicketDTO
 }
 
 const KanbanItem = (props: KanbanItemProps) => {
-
+    
     const pCtx = useContext(ProjectContext)
-
+    
     return (
         <ListItem draggable>
             <ListItemButton onClick={()=> pCtx?.setSelectedTicket(props.ticket)}>
@@ -25,76 +20,40 @@ const KanbanItem = (props: KanbanItemProps) => {
     )
 }
 
+
+interface KanbanCellProps {
+    tickets?: TicketDTO[]
+    status: TicketStatus
+}
+
+const StatusCell = (props: KanbanCellProps) => {
+    return (
+        <TableCell>
+            <List>
+                <For each={props.tickets?.filter(t => t.status === props.status)}>
+                    {(ticket) => (
+                        <KanbanItem ticket={ticket} />
+                    )}
+                </For>
+            </List>
+        </TableCell>
+    )
+}
+
+interface RowProps {
+    dev: string
+    tickets?: TicketDTO[]
+}
+
 const Row = (props: RowProps) => {
     return (
         <TableRow>
             <TableCell>{props.dev}</TableCell>
-            <TableCell>
-                <List>
-                    <For each={props.tickets?.filter(t => t.status === TicketStatus.OPEN)}>
-
-                        {
-                            (t) => {
-                                return (
-                                    <KanbanItem ticket={t} />
-                                )
-                            }
-                        }
-                    </For>
-                </List>
-            </TableCell>
-            <TableCell>
-                <List>
-                    <For each={props.tickets?.filter(t => t.status === TicketStatus.IN_PROGRESS)}>
-                        {
-                            (t) => {
-                                return (
-                                    <KanbanItem ticket={t} />
-                                )
-                            }
-                        }
-                    </For>
-                </List>
-            </TableCell>
-            <TableCell>
-                <List>
-                    <For each={props.tickets?.filter(t => t.status === TicketStatus.IN_REVIEW)}>
-                        {
-                            (t) => {
-                                return (
-                                    <KanbanItem ticket={t} />
-                                )
-                            }
-                        }
-                    </For>
-                </List>
-            </TableCell>
-            <TableCell>
-                <List>
-                    <For each={props.tickets?.filter(t => t.status === TicketStatus.RESOLVED)}>
-                        {
-                            (t) => {
-                                return (
-                                    <KanbanItem ticket={t} />
-                                )
-                            }
-                        }
-                    </For>
-                </List>
-            </TableCell>
-            <TableCell>
-                <List>
-                    <For each={props.tickets?.filter(t => t.status === TicketStatus.CLOSED)}>
-                        {
-                            (t) => {
-                                return (
-                                    <KanbanItem ticket={t} />
-                                )
-                            }
-                        }
-                    </For>
-                </List>
-            </TableCell>
+            <StatusCell tickets={props.tickets} status={TicketStatus.OPEN} />
+            <StatusCell tickets={props.tickets} status={TicketStatus.IN_PROGRESS} />
+            <StatusCell tickets={props.tickets} status={TicketStatus.IN_REVIEW} />
+            <StatusCell tickets={props.tickets} status={TicketStatus.RESOLVED} />
+            <StatusCell tickets={props.tickets} status={TicketStatus.CLOSED} />
         </TableRow>
     )
 }
