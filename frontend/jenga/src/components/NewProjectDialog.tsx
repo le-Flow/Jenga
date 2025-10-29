@@ -1,7 +1,8 @@
-import { Dialog, DialogTitle, DialogContent, Stack, TextField, DialogActions, Button } from "@suid/material"
-import { Setter, useContext, createSignal } from "solid-js"
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@suid/material"
+import { Setter, useContext, createSignal, createEffect } from "solid-js"
 import { CreateProjectDTO, ProjectDTO, ProjectResourceService } from "../api"
 import { ProjectContext } from "../provider/ProjectProvider"
+import { ProjectInfo } from "./ProjectInfo"
 
 interface NewProjectDialogProps {
     open: boolean
@@ -12,18 +13,20 @@ export const NewProjectDialog = (props: NewProjectDialogProps) => {
 
     const pCtx = useContext(ProjectContext)
 
-    const [id, setId] = createSignal("")
-    const [name, setName] = createSignal("")
-    const [desc, setDesc] = createSignal("")
+    const EMPTY_PROJECT: ProjectDTO = { identifier: "", name: "", description: "" }
+    const formId = "new-project-form"
+    const [project, setProject] = createSignal<ProjectDTO>({ ...EMPTY_PROJECT })
 
-    const onCreate = () => {
+    createEffect(() => {
+        if (props.open) setProject(() => ({ ...EMPTY_PROJECT }))
+    })
+
+    const onCreate = (draft?: ProjectDTO) => {
+        const source = draft ?? project()
         const request: CreateProjectDTO = {
-            identifier: id(),
-            name: name(),
-            description: desc()
-        }
-        const newProject: ProjectDTO = {
-            ...request
+            identifier: source.identifier ?? "",
+            name: source.name ?? "",
+            description: source.description ?? ""
         }
         ProjectResourceService.postApiProjects(request)
         pCtx?.setProjects(prev => [...(prev ?? []), { ...request }])
@@ -34,19 +37,18 @@ export const NewProjectDialog = (props: NewProjectDialogProps) => {
         <Dialog open={props.open} fullWidth>
             <DialogTitle>New Project</DialogTitle>
             <DialogContent>
-                <Stack spacing={1}>
-                    <TextField name="id" label="identifier" value={id()} onChange={(_, value) => { setId(value) }}></TextField>
-                    <TextField name="name" label="name" value={name()} onChange={(_, value) => { setName(value) }}></TextField>
-                    <TextField name="description" label="description" value={desc()} onChange={(_, value) => { setDesc(value) }} rows={5} multiline></TextField>
-                </Stack>
+                <ProjectInfo
+                    formId={formId}
+                    project={project()}
+                    onProjectChange={setProject}
+                    onSubmit={onCreate}
+                />
             </DialogContent>
             <DialogActions>
-                <Button onClick={() => { props.setOpen(false) }}>
+                <Button type="button" onClick={() => { props.setOpen(false) }}>
                     cancel
                 </Button>
-                <Button onClick={() => {
-                    onCreate()
-                }}>
+                <Button type="submit" form={formId}>
                     create
                 </Button>
             </DialogActions>
