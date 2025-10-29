@@ -27,7 +27,7 @@ const BacklogItem = (props: BacklogItemProps) => {
 }
 
 interface BacklogProps {
-    tickets: TicketDTO[]
+    tickets?: TicketDTO[]
 }
 
 export const Backlog = (props: BacklogProps) => {
