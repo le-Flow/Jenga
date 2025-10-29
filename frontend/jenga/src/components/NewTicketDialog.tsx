@@ -1,7 +1,8 @@
-import { Dialog, DialogTitle, DialogContent, Stack, TextField, FormControl, InputLabel, Select, MenuItem, DialogActions, Button } from "@suid/material"
-import { Setter, useContext, createSignal, For } from "solid-js"
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@suid/material"
+import { Setter, useContext, createSignal, createEffect } from "solid-js"
 import { TicketPriority, TicketSize, TicketStatus, CreateTicketDTO, TicketDTO, TicketResourceService } from "../api"
 import { ProjectContext } from "../provider/ProjectProvider"
+import { TicketInfo } from "./TicketInfo"
 
 interface NewTicketDialogProps {
     open: boolean
@@ -11,89 +12,64 @@ interface NewTicketDialogProps {
 export const NewTicketDialog = (props: NewTicketDialogProps) => {
     const pCtx = useContext(ProjectContext)
 
-    const [title, setTitle] = createSignal("")
-    const [desc, setDesc] = createSignal("")
-    const [prio, setPrio] = createSignal(TicketPriority.MEDIUM)
-    const [size, setSize] = createSignal(TicketSize.MEDIUM)
-    const [status, setStatus] = createSignal(TicketStatus.OPEN)
-    const [assignee, setAssignee] = createSignal("")
+    const EMPTY_TICKET: TicketDTO = {
+        title: "",
+        description: "",
+        priority: TicketPriority.MEDIUM,
+        size: TicketSize.MEDIUM,
+        status: TicketStatus.OPEN,
+        assigneeName: "",
+    }
+
+    const formId = "new-ticket-form"
+    const [ticket, setTicket] = createSignal<TicketDTO>({ ...EMPTY_TICKET })
+
+    createEffect(() => {
+        if (props.open) {
+            setTicket(() => ({
+                ...EMPTY_TICKET,
+                projectName: pCtx?.selectedProject().name,
+            }))
+        }
+    })
+
+    const onCreate = (draft?: TicketDTO) => {
+        const source = draft ?? ticket()
+        const request: CreateTicketDTO = {
+            projectName: pCtx?.selectedProject().name,
+            title: source.title ?? "",
+            description: source.description ?? "",
+            priority: source.priority ?? TicketPriority.MEDIUM,
+            size: source.size ?? TicketSize.MEDIUM,
+            status: source.status ?? TicketStatus.OPEN,
+            assignee: source.assigneeName ?? "",
+        }
+
+        const { assignee, ...rest } = request
+        const ticketEntry: TicketDTO = {
+            ...rest,
+            assigneeName: assignee,
+        }
+
+        TicketResourceService.postApiProjectsTickets(pCtx?.selectedProject().identifier ?? "", request)
+        pCtx?.setTickets(prev => [...prev, ticketEntry])
+        props.setOpen(false)
+    }
 
     return (
         <Dialog open={props.open} fullWidth>
             <DialogTitle title="New Ticket">New Ticket</DialogTitle>
             <DialogContent>
-                <Stack spacing={1}>
-                    <TextField name="title" label="title" value={title()} onChange={(event) => { setTitle(event.target.value) }}></TextField>
-                    <TextField name="description" label="description" value={desc()} onChange={(event) => { setDesc(event.target.value) }} multiline></TextField>
-                    <TextField name="assignee" label="assignee" value={assignee()} onChange={(event) => { setAssignee(event.target.value) }}></TextField>
-                    <FormControl fullWidth>
-                        <InputLabel id="prio-label">Priority</InputLabel>
-                        <Select
-                            labelId="prio-label"
-                            value={prio()}
-                            label="Priority"
-                            onChange={(e) => setPrio(e.target.value as TicketPriority)}
-                        >
-                            <For each={Object.values(TicketPriority)}>
-                                {(p) => <MenuItem value={p}>{p}</MenuItem>}
-                            </For>
-                        </Select>
-                    </FormControl>
-
-                    <FormControl fullWidth>
-                        <InputLabel id="size-label">Size</InputLabel>
-                        <Select
-                            labelId="size-label"
-                            value={size()}
-                            label="Size"
-                            onChange={(e) => setSize(e.target.value as TicketSize)}
-                        >
-                            <For each={Object.values(TicketSize)}>
-                                {(p) => <MenuItem value={p}>{p}</MenuItem>}
-                            </For>
-                        </Select>
-                    </FormControl>
-
-                    <FormControl fullWidth>
-                        <InputLabel id="status-label">Status</InputLabel>
-                        <Select
-                            labelId="status-label"
-                            value={status()}
-                            label="Status"
-                            onChange={(e) => setStatus(e.target.value as TicketStatus)}
-                        >
-                            <For each={Object.values(TicketStatus)}>
-                                {(p) => <MenuItem value={p}>{p}</MenuItem>}
-                            </For>
-                        </Select>
-                    </FormControl>
-                </Stack>
-
+                <TicketInfo
+                    formId={formId}
+                    ticket={ticket()}
+                    onTicketChange={setTicket}
+                    onSubmit={onCreate}
+                />
             </DialogContent>
             <DialogActions>
-                <Button onClick={() => { props.setOpen(false) }}>cancel</Button>
-                <Button onClick={() => {
-                    const createTicketDTO: CreateTicketDTO = {
-                        projectName: pCtx?.selectedProject().name,
-                        title: title(),
-                        description: desc(),
-                        priority: prio(),
-                        size: size(),
-                        status: status(),
-                        assignee: assignee(),
-                    }
-
-                    const { assignee: name, ...rest } = createTicketDTO;
-                    const ticket: TicketDTO = {
-                        ...rest,
-                        assigneeName: name,
-                    };
-
-                    TicketResourceService.postApiProjectsTickets(pCtx?.selectedProject().identifier ?? "", createTicketDTO)
-                    pCtx?.setTickets(prev => [...prev, ticket])
-                    props.setOpen(false)
-
-                }}>create</Button>
+                <Button type="button" onClick={() => { props.setOpen(false) }}>cancel</Button>
+                <Button type="submit" form={formId}>create</Button>
             </DialogActions>
         </Dialog>
     )
