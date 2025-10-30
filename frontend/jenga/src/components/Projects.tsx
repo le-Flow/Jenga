@@ -34,7 +34,7 @@ export const Projects = () => {
                                 (p) => {
                                     return (
                                         <ListItem>
-                                            <ListItemButton onClick={() => { pCtx?.setSelectedProject(p) }}>
+                                            <ListItemButton onClick={() => { pCtx?.setSelectedProject(p) }} selected={p === pCtx?.selectedProject()}>
                                                 <ListItemText
                                                     primary={p.name}
                                                     secondary={((p.createDate ?? "") + " | " + (p.modifyDate ?? ""))}
