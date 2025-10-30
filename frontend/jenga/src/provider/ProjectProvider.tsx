@@ -36,7 +36,7 @@ export const ProjectProvider = (props: ProviderProps) => {
         async () => await ProjectResourceService.getApiProjects()
     );
 
-    const [tickets, { mutate: setTickets }] = createResource(
+    const [tickets, { mutate: setTickets, refetch: refetchTickets }] = createResource(
         () => {
             const project = selectedProject();
             return aCtx?.isLoggedIn() && project ? project.identifier : undefined;
@@ -77,7 +77,7 @@ export const ProjectProvider = (props: ProviderProps) => {
         }
 
         try {
-            await TicketResourceService.putApiProjectsTickets(projectId, ticket.id, ticket);
+            await TicketResourceService.putApiProjectsTickets(projectId, ticket.id, {...ticket, assignee: ticket.assigneeName});
 
             setTickets((prev) =>
                 prev?.map((existing) => (existing.id === ticket.id ? { ...existing, ...ticket } : existing)) ?? prev
