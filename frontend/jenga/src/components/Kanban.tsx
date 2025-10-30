@@ -31,6 +31,7 @@ const KanbanItem = (props: KanbanItemProps) => {
 interface KanbanCellProps {
     tickets?: TicketDTO[]
     status: TicketStatus
+    username: string
 }
 
 const StatusCell = (props: KanbanCellProps) => {
@@ -77,11 +78,11 @@ const Row = (props: RowProps) => {
     return (
         <TableRow>
             <TableCell>{props.dev}</TableCell>
-            <StatusCell tickets={props.tickets} status={TicketStatus.OPEN} />
-            <StatusCell tickets={props.tickets} status={TicketStatus.IN_PROGRESS} />
-            <StatusCell tickets={props.tickets} status={TicketStatus.IN_REVIEW} />
-            <StatusCell tickets={props.tickets} status={TicketStatus.RESOLVED} />
-            <StatusCell tickets={props.tickets} status={TicketStatus.CLOSED} />
+            <StatusCell tickets={props.tickets} status={TicketStatus.OPEN} username={props.dev} />
+            <StatusCell tickets={props.tickets} status={TicketStatus.IN_PROGRESS} username={props.dev} />
+            <StatusCell tickets={props.tickets} status={TicketStatus.IN_REVIEW} username={props.dev} />
+            <StatusCell tickets={props.tickets} status={TicketStatus.RESOLVED} username={props.dev} />
+            <StatusCell tickets={props.tickets} status={TicketStatus.CLOSED} username={props.dev} />
         </TableRow>
     )
 }
