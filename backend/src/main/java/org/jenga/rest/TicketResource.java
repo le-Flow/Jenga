@@ -59,6 +59,13 @@ public class TicketResource {
         return Response.noContent().build();
     }
 
+    @POST
+    @Path("/{ticketId}/duplicate")
+    public Response duplicateTicket(@PathParam("projectId") String projectId, @PathParam("ticketId") Long ticketId) {
+        TicketDTO duplicatedTicketDTO = ticketService.duplicateTicket(projectId, ticketId);
+        return Response.ok(duplicatedTicketDTO).build();
+    }
+
     @PUT
     @Path("/{ticketId}/assign")
     public Response assignTicket(@PathParam("projectId") String projectId, @PathParam("ticketId") Long ticketId, @QueryParam("username") String username) {
@@ -131,5 +138,45 @@ public class TicketResource {
             @PathParam("criteriaId") Long criteriaId) {
         ticketService.deleteAcceptanceCriteria(projectId, ticketId, criteriaId);
         return Response.noContent().build();
+    }
+
+    @PUT
+    @Path("/{ticketId}/related/{relatedTicketId}")
+    public Response AddRelatedTicket(
+            @PathParam("projectId") String projectId,
+            @PathParam("ticketId") Long ticketId,
+            @PathParam("relatedTicketId") Long relatedTicketId) {
+        ticketService.addRelatedTicket(projectId, ticketId, relatedTicketId);
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @DELETE
+    @Path("/{ticketId}/related/{relatedTicketId}")
+    public Response removeRelatedTicket(
+            @PathParam("projectId") String projectId,
+            @PathParam("ticketId") Long ticketId,
+            @PathParam("relatedTicketId") Long relatedTicketId) {
+        ticketService.removeRelatedTicket(projectId, ticketId, relatedTicketId);
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @PUT
+    @Path("/{ticketId}/block/{blockedTicketId}")
+    public Response addBlockingTicket(
+            @PathParam("projectId") String projectId,
+            @PathParam("ticketId") Long ticketId,
+            @PathParam("blockedTicketId") Long blockedTicketId) {
+        ticketService.addBlockingTicket(projectId, ticketId, blockedTicketId);
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @DELETE
+    @Path("/{ticketId}/block/{blockedTicketId}")
+    public Response removeBlockingTicket(
+            @PathParam("projectId") String projectId,
+            @PathParam("ticketId") Long ticketId,
+            @PathParam("blockedTicketId") Long blockedTicketId) {
+        ticketService.removeBlockingTicket(projectId, ticketId, blockedTicketId);
+        return Response.status(Response.Status.NO_CONTENT).build();
     }
 }
