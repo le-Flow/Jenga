@@ -386,4 +386,78 @@ public class TicketService {
 
         acceptanceCriteriaRepository.deleteByIdAndTicketId(criteriaId, ticketId);
     }
+
+    @Transactional
+    public void addRelatedTicket(String projectId, Long ticketId, Long relatedTicketId) {
+        Ticket ticket = ticketRepository.findByIdAndProjectId(ticketId, projectId);
+        if (ticket == null) {
+            throw new NotFoundException("Ticket not found");
+        }
+
+        Ticket relatedTicket = ticketRepository.findByIdAndProjectId(relatedTicketId, projectId);
+        if (relatedTicket == null) {
+            throw new NotFoundException("Related ticket not found");
+        }
+
+        ticket.getRelatedTickets().add(relatedTicket);
+
+        relatedTicket.getRelatedTickets().add(ticket);
+
+        // Persist changes to both tickets, so both are linking each other
+        ticketRepository.persist(ticket);
+        ticketRepository.persist(relatedTicket);
+    }
+
+    @Transactional
+    public void removeRelatedTicket(String projectId, Long ticketId, Long relatedTicketId) {
+        Ticket ticket = ticketRepository.findByIdAndProjectId(ticketId, projectId);
+        if (ticket == null) {
+            throw new NotFoundException("Ticket not found");
+        }
+
+        Ticket relatedTicket = ticketRepository.findByIdAndProjectId(relatedTicketId, projectId);
+        if (relatedTicket == null) {
+            throw new NotFoundException("Related ticket not found");
+        }
+
+        ticket.getRelatedTickets().remove(relatedTicket);
+
+        relatedTicket.getRelatedTickets().remove(ticket);
+
+        // Persist changes to both tickets, so both are linking each other
+        ticketRepository.persist(ticket);
+        ticketRepository.persist(relatedTicket);
+    }
+
+    @Transactional
+    public void addBlockingTicket(String projectId, Long ticketId, Long blockingTicketId) {
+        Ticket ticket = ticketRepository.findByIdAndProjectId(ticketId, projectId);
+        if (ticket == null) {
+            throw new NotFoundException("Ticket not found");
+        }
+
+        Ticket blockingTicket = ticketRepository.findByIdAndProjectId(blockingTicketId, projectId);
+        if (blockingTicket == null) {
+            throw new NotFoundException("Blocking ticket not found");
+        }
+
+        ticket.getBlockingTickets().add(blockingTicket);
+        ticketRepository.persist(ticket);
+    }
+
+    @Transactional
+    public void removeBlockingTicket(String projectId, Long ticketId, Long blockingTicketId) {
+        Ticket ticket = ticketRepository.findByIdAndProjectId(ticketId, projectId);
+        if (ticket == null) {
+            throw new NotFoundException("Ticket not found");
+        }
+
+        Ticket blockingTicket = ticketRepository.findByIdAndProjectId(blockingTicketId, projectId);
+        if (blockingTicket == null) {
+            throw new NotFoundException("Blocking ticket not found");
+        }
+
+        ticket.getBlockingTickets().remove(blockingTicket);
+        ticketRepository.persist(ticket);
+    }
 }
