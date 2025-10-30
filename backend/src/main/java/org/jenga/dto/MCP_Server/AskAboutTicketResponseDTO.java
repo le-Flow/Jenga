@@ -4,8 +4,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor // Adds the default constructor
-@AllArgsConstructor // Adds the constructor with (String message, String ticketId)
+@NoArgsConstructor 
+@AllArgsConstructor 
 public class AskAboutTicketResponseDTO {
     private String message;
     private String ticketId;

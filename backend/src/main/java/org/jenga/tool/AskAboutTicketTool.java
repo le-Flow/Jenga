@@ -5,25 +5,17 @@ import dev.langchain4j.agent.tool.P;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.jenga.dto.TicketDTO;
-// This import is correct
 import org.jenga.dto.MCP_Server.AskAboutTicketResponseDTO;
 import org.jenga.service.TicketService;
 
-@ApplicationScoped // Make it a CDI bean
+@ApplicationScoped 
 public class AskAboutTicketTool {
 
     @Inject
-    TicketService ticketService; // Inject the service
+    TicketService ticketService; 
 
-    /**
-     * Gets information about a specific ticket using its project ID and numerical ticket ID.
-     *
-     * @param projectId The project's identifier (e.g., "PROJ", "ZEN").
-     * @param ticketId  The numerical ID of the ticket (e.g., 101, 42).
-     * @return A TicketToolResponseDTO containing a summary message and the ticket ID.
-     */
     @Tool("Get information about a specific ticket by its project ID and ticket ID")
-    // This return type is correct
+    
     public AskAboutTicketResponseDTO getTicketInfo(
             @P("The project ID or key, e.g., 'PROJ' or 'ZEN'") String projectId,
             @P("The numerical ID of the ticket") Long ticketId) {
@@ -31,15 +23,12 @@ public class AskAboutTicketTool {
         TicketDTO ticket = ticketService.findById(projectId, ticketId);
 
         if (ticket == null) {
-            // FIX: Changed to use the correct DTO class
             return new AskAboutTicketResponseDTO(
                 "Sorry, I couldn't find a ticket with ID " + projectId + "-" + ticketId,
                 ticketId.toString()
             );
         }
 
-        // Format the full TicketDTO into a concise message for the LLM/user
-        // Assuming TicketDTO is a record with accessors like .projectId(), .id() etc.
         String message = String.format(
             "Ticket %s-%d: '%s' (%s). Assigned to: %s. Description: %s",
             ticket.getProjectName(),
@@ -67,7 +56,6 @@ public class AskAboutTicketTool {
             ticket.getAcceptanceCriteria()
          */
 
-        // FIX: Changed to use the correct DTO class
         return new AskAboutTicketResponseDTO(message, ticket.getId().toString());
     }
 }
