@@ -13,7 +13,15 @@ const BacklogItem = (props: BacklogItemProps) => {
     const pCtx = useContext(ProjectContext)
 
     return (
-        <ListItem draggable>
+        <ListItem
+            draggable
+            onDragStart={(event) => {
+                const id = props.ticket.id
+                if (id == null) return
+                event.dataTransfer?.setData("text/plain", String(id))
+                pCtx?.setSelectedTicket(() => props.ticket)
+            }}
+        >
             <ListItemButton onClick={() => pCtx?.setSelectedTicket(props.ticket)}>
                 <ListItemAvatar>
                     <Avatar></Avatar>
