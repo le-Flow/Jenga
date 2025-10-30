@@ -12,6 +12,7 @@ const KanbanItem = (props: KanbanItemProps) => {
 
     return (
         <ListItem
+            sx={{ "border": "1px solid black" }}
             draggable
             onDragStart={(event) => {
                 const id = props.ticket.id
@@ -39,6 +40,7 @@ const StatusCell = (props: KanbanCellProps) => {
 
     return (
         <TableCell
+            sx={{ "border": "1px solid black" }}
             onDragOver={(event) => event.preventDefault()}
             onDrop={(event) => {
                 event.preventDefault()
