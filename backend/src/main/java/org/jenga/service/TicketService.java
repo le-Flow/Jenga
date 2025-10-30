@@ -150,7 +150,7 @@ public class TicketService {
     }
 
     @Transactional
-    public void update(String projectId, Long ticketId, TicketDTO ticketDTO) {
+    public void update(String projectId, Long ticketId, CreateTicketDTO ticketDTO) {
         Project project = projectRepository.findById(projectId);
         if (project == null) {
             throw new NotFoundException("Project not found with name: " + projectId);
@@ -163,6 +163,26 @@ public class TicketService {
 
         existing.setTitle(ticketDTO.getTitle());
         existing.setDescription(ticketDTO.getDescription());
+        existing.setPriority(ticketDTO.getPriority());
+        existing.setSize(ticketDTO.getSize());
+        existing.setStatus(ticketDTO.getStatus());
+
+        if (ticketDTO.getAssignee() != null) {
+            User assignee = userRepository.findByUsername(ticketDTO.getAssignee());
+            existing.setAssignee(assignee);
+        } else {
+            existing.setAssignee(null);
+        }
+
+        if (ticketDTO.getLabels() != null && !ticketDTO.getLabels().isEmpty()) {
+            List<Label> labels = labelRepository.findByProjectIdAndNames(projectId, ticketDTO.getLabels());
+            if (labels.size() != ticketDTO.getLabels().size()) {
+                throw new BadRequestException("One or more labels do not exist");
+            }
+            existing.setLabels(labels);
+        } else {
+            existing.setLabels(null);
+        }
 
         ticketRepository.persist(existing);
     }
