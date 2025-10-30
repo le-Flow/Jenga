@@ -1,11 +1,15 @@
-import { Card, CardContent, CardHeader, Stack } from "@suid/material"
-import { TicketDTO } from "../api"
+import { Button, Card, CardContent, CardHeader, Stack } from "@suid/material"
 import { Backlog } from "../components/Backlog"
 import { Kanban } from "../components/Kanban"
+import { Show, useContext } from "solid-js"
+import { ProjectContext } from "../provider/ProjectProvider"
+import { TicketInfo } from "../components/TicketInfo"
 
 
 export const Sprint = () => {
-    const tickets: TicketDTO[] = []
+
+    const pCtx = useContext(ProjectContext)
+    const formId = "selected-ticket-form"
 
     return (
         <Card sx={{}}>
@@ -13,9 +17,29 @@ export const Sprint = () => {
             <CardContent>
                 <Stack spacing={2}>
                     <Kanban></Kanban>
-                    <Backlog tickets={tickets}></Backlog>
+                    <Backlog></Backlog>
                 </Stack>
             </CardContent>
+            <Show when={pCtx?.selectedTicket()}>
+                {(ticket) => (
+                    <>
+                        <TicketInfo
+                            formId={formId}
+                            ticket={ticket()}
+                            onTicketChange={(next) => pCtx?.setSelectedTicket(() => next)}
+                            onSubmit={(next) => {
+                                const projectId = pCtx?.selectedProject()?.identifier
+                                if (projectId) {
+                                    void pCtx?.updateTicket(projectId, next)
+                                }
+                            }}
+                        />
+                        <Button type="submit" form={formId}>
+                            save
+                        </Button>
+                    </>
+                )}
+            </Show>
         </Card>
     )
 }

@@ -3,98 +3,92 @@ import { useContext, createMemo, For } from "solid-js"
 import { TicketDTO, TicketStatus } from "../api"
 import { ProjectContext } from "../provider/ProjectProvider"
 
-interface RowProps {
-    dev: string
-    tickets?: TicketDTO[]
-}
-
 interface KanbanItemProps {
     ticket: TicketDTO
 }
 
 const KanbanItem = (props: KanbanItemProps) => {
-
     const pCtx = useContext(ProjectContext)
 
     return (
-        <ListItem draggable>
-            <ListItemButton onClick={()=> pCtx?.setSelectedTicket(props.ticket)}>
+        <ListItem
+            sx={{ "border": "1px solid black" }}
+            draggable
+            onDragStart={(event) => {
+                const id = props.ticket.id
+                if (id == null) return
+                event.dataTransfer?.setData("text/plain", String(id))
+                pCtx?.setSelectedTicket(() => props.ticket)
+            }}
+        >
+            <ListItemButton onClick={() => pCtx?.setSelectedTicket(props.ticket)}>
                 {props.ticket.title}
             </ListItemButton>
         </ListItem>
     )
 }
 
+
+interface KanbanCellProps {
+    tickets?: TicketDTO[]
+    status: TicketStatus
+    username: string
+}
+
+const StatusCell = (props: KanbanCellProps) => {
+    const pCtx = useContext(ProjectContext)
+
+    return (
+        <TableCell
+            sx={{ "border": "1px solid black" }}
+            onDragOver={(event) => event.preventDefault()}
+            onDrop={(event) => {
+                event.preventDefault()
+                const raw = event.dataTransfer?.getData("text/plain")
+                const ticketId = raw ? Number(raw) : NaN
+                if (Number.isNaN(ticketId)) return
+
+                const ticket = pCtx?.tickets()?.find((item) => item.id === ticketId)
+                if (!ticket) return
+
+                const statusUnchanged = ticket.status === props.status
+                const assigneeUnchanged = ticket.assigneeName === props.username
+                if (statusUnchanged && assigneeUnchanged) return
+
+                const projectId = pCtx?.selectedProject()?.identifier
+                if (!projectId) return
+
+                const updated: TicketDTO = { ...ticket, status: props.status, assigneeName: props.username }
+                pCtx?.setTickets((prev) => prev?.map((entry) => (entry.id === ticketId ? updated : entry)) ?? prev)
+                if (pCtx?.selectedTicket()?.id === ticketId) pCtx?.setSelectedTicket(() => updated)
+                void pCtx?.updateTicket(projectId, updated)
+            }}
+        >
+            <List>
+                <For each={props.tickets?.filter(t => t.status === props.status)}>
+                    {(ticket) => (
+                        <KanbanItem ticket={ticket} />
+                    )}
+                </For>
+            </List>
+        </TableCell>
+    )
+}
+
+interface RowProps {
+    dev: string
+    tickets?: TicketDTO[]
+}
+
 const Row = (props: RowProps) => {
     return (
         <TableRow>
             <TableCell>{props.dev}</TableCell>
-            <TableCell>
-                <List>
-                    <For each={props.tickets?.filter(t => t.status === TicketStatus.OPEN)}>
-
-                        {
-                            (t) => {
-                                return (
-                                    <KanbanItem ticket={t} />
-                                )
-                            }
-                        }
-                    </For>
-                </List>
-            </TableCell>
-            <TableCell>
-                <List>
-                    <For each={props.tickets?.filter(t => t.status === TicketStatus.IN_PROGRESS)}>
-                        {
-                            (t) => {
-                                return (
-                                    <KanbanItem ticket={t} />
-                                )
-                            }
-                        }
-                    </For>
-                </List>
-            </TableCell>
-            <TableCell>
-                <List>
-                    <For each={props.tickets?.filter(t => t.status === TicketStatus.IN_REVIEW)}>
-                        {
-                            (t) => {
-                                return (
-                                    <KanbanItem ticket={t} />
-                                )
-                            }
-                        }
-                    </For>
-                </List>
-            </TableCell>
-            <TableCell>
-                <List>
-                    <For each={props.tickets?.filter(t => t.status === TicketStatus.RESOLVED)}>
-                        {
-                            (t) => {
-                                return (
-                                    <KanbanItem ticket={t} />
-                                )
-                            }
-                        }
-                    </For>
-                </List>
-            </TableCell>
-            <TableCell>
-                <List>
-                    <For each={props.tickets?.filter(t => t.status === TicketStatus.CLOSED)}>
-                        {
-                            (t) => {
-                                return (
-                                    <KanbanItem ticket={t} />
-                                )
-                            }
-                        }
-                    </For>
-                </List>
-            </TableCell>
+            <StatusCell tickets={props.tickets} status={TicketStatus.OPEN} username={props.dev} />
+            <StatusCell tickets={props.tickets} status={TicketStatus.IN_PROGRESS} username={props.dev} />
+            <StatusCell tickets={props.tickets} status={TicketStatus.IN_REVIEW} username={props.dev} />
+            <StatusCell tickets={props.tickets} status={TicketStatus.RESOLVED} username={props.dev} />
+            <StatusCell tickets={props.tickets} status={TicketStatus.CLOSED} username={props.dev} />
         </TableRow>
     )
 }

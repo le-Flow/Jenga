@@ -15,6 +15,7 @@ type ProjectContextType = {
     selectedTicket: Accessor<TicketDTO | undefined>;
     setSelectedTicket: Setter<TicketDTO | undefined>;
     deleteProject: (identifier: string) => Promise<void>;
+    updateTicket: (projectId: string, ticket: TicketDTO) => Promise<void>;
 };
 
 export const ProjectContext = createContext<ProjectContextType>();
@@ -35,7 +36,7 @@ export const ProjectProvider = (props: ProviderProps) => {
         async () => await ProjectResourceService.getApiProjects()
     );
 
-    const [tickets, { mutate: setTickets }] = createResource(
+    const [tickets, { mutate: setTickets, refetch: refetchTickets }] = createResource(
         () => {
             const project = selectedProject();
             return aCtx?.isLoggedIn() && project ? project.identifier : undefined;
@@ -69,6 +70,26 @@ export const ProjectProvider = (props: ProviderProps) => {
         }
     };
 
+    const updateTicket = async (projectId: string, ticket: TicketDTO) => {
+        if (!projectId || ticket.id == null) {
+            console.warn("Missing project or ticket id for update", { projectId, ticketId: ticket.id });
+            return;
+        }
+
+        try {
+            await TicketResourceService.putApiProjectsTickets(projectId, ticket.id, {...ticket, assignee: ticket.assigneeName});
+
+            setTickets((prev) =>
+                prev?.map((existing) => (existing.id === ticket.id ? { ...existing, ...ticket } : existing)) ?? prev
+            );
+
+            setSelectedTicket((prev) => (prev?.id === ticket.id ? { ...prev, ...ticket } : prev));
+        } catch (error) {
+            console.error("Failed to update ticket", error);
+            throw error;
+        }
+    };
+
     const value = {
         projects,
         setProjects,
@@ -78,7 +99,8 @@ export const ProjectProvider = (props: ProviderProps) => {
         setTickets,
         selectedTicket,
         setSelectedTicket,
-        deleteProject
+        deleteProject,
+        updateTicket
     };
 
     return (

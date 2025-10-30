@@ -21,13 +21,20 @@ export const Register = () => {
     }
 
     return (
-        <Stack spacing={1}>
-            <TextField label="username" value={username()} onChange={(e) => setUsername(e.currentTarget.value)}></TextField>
-            <TextField label="e-mail" value={email()} onChange={(e) => setEmail(e.currentTarget.value)} type="email"></TextField>
-            <TextField label="password" value={password()} onChange={(e) => setPassword(e.currentTarget.value)} type="password"></TextField>
-            <Button onClick={onClick}>
-                Register
-            </Button>
-        </Stack>
+        <form
+            onSubmit={(event) => {
+                event.preventDefault()
+                onClick()
+            }}
+        >
+            <Stack spacing={1}>
+                <TextField label="username" value={username()} onChange={(e) => setUsername(e.currentTarget.value)} required></TextField>
+                <TextField label="e-mail" value={email()} onChange={(e) => setEmail(e.currentTarget.value)} type="email" required></TextField>
+                <TextField label="password" value={password()} onChange={(e) => setPassword(e.currentTarget.value)} type="password" required></TextField>
+                <Button type="submit">
+                    Register
+                </Button>
+            </Stack>
+        </form>
     )
 }
