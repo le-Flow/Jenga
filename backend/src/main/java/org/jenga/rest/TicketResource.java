@@ -47,7 +47,7 @@ public class TicketResource {
 
     @PUT
     @Path("/{ticketId}")
-    public Response updateTicket(@PathParam("projectId") String projectId, @PathParam("ticketId") Long ticketId, TicketDTO ticketDTO) {
+    public Response updateTicket(@PathParam("projectId") String projectId, @PathParam("ticketId") Long ticketId, CreateTicketDTO ticketDTO) {
         ticketService.update(projectId, ticketId, ticketDTO);
         return Response.ok().build();
     }
