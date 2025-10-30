@@ -47,12 +47,16 @@ const StatusCell = (props: KanbanCellProps) => {
                 if (Number.isNaN(ticketId)) return
 
                 const ticket = pCtx?.tickets()?.find((item) => item.id === ticketId)
-                if (!ticket || ticket.status === props.status) return
+                if (!ticket) return
+
+                const statusUnchanged = ticket.status === props.status
+                const assigneeUnchanged = ticket.assigneeName === props.username
+                if (statusUnchanged && assigneeUnchanged) return
 
                 const projectId = pCtx?.selectedProject()?.identifier
                 if (!projectId) return
 
-                const updated: TicketDTO = { ...ticket, status: props.status }
+                const updated: TicketDTO = { ...ticket, status: props.status, assigneeName: props.username }
                 pCtx?.setTickets((prev) => prev?.map((entry) => (entry.id === ticketId ? updated : entry)) ?? prev)
                 if (pCtx?.selectedTicket()?.id === ticketId) pCtx?.setSelectedTicket(() => updated)
                 void pCtx?.updateTicket(projectId, updated)
