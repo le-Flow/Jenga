@@ -8,12 +8,19 @@ interface KanbanItemProps {
 }
 
 const KanbanItem = (props: KanbanItemProps) => {
-    
     const pCtx = useContext(ProjectContext)
-    
+
     return (
-        <ListItem draggable>
-            <ListItemButton onClick={()=> pCtx?.setSelectedTicket(props.ticket)}>
+        <ListItem
+            draggable
+            onDragStart={(event) => {
+                const id = props.ticket.id
+                if (id == null) return
+                event.dataTransfer?.setData("text/plain", String(id))
+                pCtx?.setSelectedTicket(() => props.ticket)
+            }}
+        >
+            <ListItemButton onClick={() => pCtx?.setSelectedTicket(props.ticket)}>
                 {props.ticket.title}
             </ListItemButton>
         </ListItem>
@@ -27,8 +34,29 @@ interface KanbanCellProps {
 }
 
 const StatusCell = (props: KanbanCellProps) => {
+    const pCtx = useContext(ProjectContext)
+
     return (
-        <TableCell>
+        <TableCell
+            onDragOver={(event) => event.preventDefault()}
+            onDrop={(event) => {
+                event.preventDefault()
+                const raw = event.dataTransfer?.getData("text/plain")
+                const ticketId = raw ? Number(raw) : NaN
+                if (Number.isNaN(ticketId)) return
+
+                const ticket = pCtx?.tickets()?.find((item) => item.id === ticketId)
+                if (!ticket || ticket.status === props.status) return
+
+                const projectId = pCtx?.selectedProject()?.identifier
+                if (!projectId) return
+
+                const updated: TicketDTO = { ...ticket, status: props.status }
+                pCtx?.setTickets((prev) => prev?.map((entry) => (entry.id === ticketId ? updated : entry)) ?? prev)
+                if (pCtx?.selectedTicket()?.id === ticketId) pCtx?.setSelectedTicket(() => updated)
+                void pCtx?.updateTicket(projectId, updated)
+            }}
+        >
             <List>
                 <For each={props.tickets?.filter(t => t.status === props.status)}>
                     {(ticket) => (
