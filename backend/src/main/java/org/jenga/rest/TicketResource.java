@@ -23,9 +23,8 @@ public class TicketResource {
     TicketService ticketService;
 
     @POST
-    public Response createTicket(@PathParam("projectId") String projectId, CreateTicketDTO createTicketDTO) {
-        ticketService.create(projectId, createTicketDTO);
-        return Response.status(Response.Status.CREATED).build();
+    public TicketDTO createTicket(@PathParam("projectId") String projectId, CreateTicketDTO createTicketDTO) {
+        return ticketService.create(projectId, createTicketDTO);
     }
 
     @GET
@@ -61,9 +60,8 @@ public class TicketResource {
 
     @POST
     @Path("/{ticketId}/duplicate")
-    public Response duplicateTicket(@PathParam("projectId") String projectId, @PathParam("ticketId") Long ticketId) {
-        TicketDTO duplicatedTicketDTO = ticketService.duplicateTicket(projectId, ticketId);
-        return Response.ok(duplicatedTicketDTO).build();
+    public TicketDTO duplicateTicket(@PathParam("projectId") String projectId, @PathParam("ticketId") Long ticketId) {
+        return ticketService.duplicateTicket(projectId, ticketId);
     }
 
     @PUT
@@ -82,9 +80,8 @@ public class TicketResource {
 
     @POST
     @Path("/{ticketId}/comments")
-    public Response createComment(@PathParam("projectId") String projectId, @PathParam("ticketId") Long ticketId, CommentRequestDTO commentDTO) {
-        ticketService.createComment(projectId, ticketId, commentDTO);
-        return Response.status(Response.Status.CREATED).build();
+    public CommentResponseDTO createComment(@PathParam("projectId") String projectId, @PathParam("ticketId") Long ticketId, CommentRequestDTO commentDTO) {
+        return ticketService.createComment(projectId, ticketId, commentDTO);
     }
 
     @GET
