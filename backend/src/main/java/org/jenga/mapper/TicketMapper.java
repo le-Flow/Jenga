@@ -6,9 +6,9 @@ import java.util.stream.Collectors;
 import org.jenga.model.Ticket;
 import org.jenga.model.Label;
 import org.jenga.model.AcceptanceCriteria;
-import org.jenga.dto.TicketDTO;
-import org.jenga.dto.CreateTicketDTO;
-import org.jenga.dto.AcceptanceCriteriaResponse;
+import org.jenga.dto.TicketRequestDTO;
+import org.jenga.dto.TicketResponseDTO;
+import org.jenga.dto.AcceptanceCriteriaResponseDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -27,13 +27,13 @@ public interface TicketMapper {
     @Mapping(target = "relatedTicketsIds", source = "relatedTickets", qualifiedByName = "mapRelatedTicketsToIds")
     @Mapping(target = "blockingTicketIds", source = "blockingTickets", qualifiedByName = "mapBlockingTicketsToIds")
     @Mapping(target = "blockedTicketIds", source = "blockedTickets", qualifiedByName = "mapBlockedTicketsToIds")
-    TicketDTO ticketToTicketDTO(Ticket ticket);
+    TicketResponseDTO ticketToTicketResponseDTO(Ticket ticket);
 
     @Mapping(source = "projectName", target = "project.name")
     @Mapping(source = "assigneeName", target = "assignee.username")
     @Mapping(source = "labels", target = "labels")
     @Mapping(target = "relatedTickets", ignore = true)
-    Ticket ticketDTOToTicket(TicketDTO ticketDTO);
+    Ticket ticketResponseDTOToTicket(TicketResponseDTO ticketResponseDTO);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createDate", ignore = true)
@@ -41,7 +41,7 @@ public interface TicketMapper {
     @Mapping(target = "reporter", ignore = true)
     @Mapping(target = "assignee", ignore = true)
     @Mapping(source = "labels", target = "labels")
-    Ticket createTicketDTOToTicket(CreateTicketDTO createTicketDTO);
+    Ticket ticketRequestDTOToTicket(TicketRequestDTO ticketRequestDTO);
 
     // Map List<Label> labels to List<String> labels
     default List<String> mapLabelsToLabelNames(List<Label> labels) {
@@ -69,7 +69,7 @@ public interface TicketMapper {
     }
     
     // Map AcceptanceCriteria model to AcceptanceCriteria DTO
-    default List<AcceptanceCriteriaResponse> mapAcceptanceCriteriaToResponse(List<AcceptanceCriteria> criteria) {
+    default List<AcceptanceCriteriaResponseDTO> mapAcceptanceCriteriaToResponse(List<AcceptanceCriteria> criteria) {
         if (criteria == null) {
             return null;
         }
@@ -79,11 +79,11 @@ public interface TicketMapper {
     }
 
     // Single mapping of AcceptanceCriteria model to AcceptanceCriteria DTO
-    default AcceptanceCriteriaResponse mapAcceptanceCriteriaToResponse(AcceptanceCriteria criteria) {
+    default AcceptanceCriteriaResponseDTO mapAcceptanceCriteriaToResponse(AcceptanceCriteria criteria) {
         if (criteria == null) {
             return null;
         }
-        AcceptanceCriteriaResponse response = new AcceptanceCriteriaResponse();
+        AcceptanceCriteriaResponseDTO response = new AcceptanceCriteriaResponseDTO();
         response.setId(criteria.getId());
         response.setDescription(criteria.getDescription());
         response.setCompleted(criteria.isCompleted());

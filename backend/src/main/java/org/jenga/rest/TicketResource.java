@@ -1,12 +1,12 @@
 package org.jenga.rest;
 
 import org.jenga.service.TicketService;
-import org.jenga.dto.TicketDTO;
-import org.jenga.dto.CreateTicketDTO;
+import org.jenga.dto.TicketResponseDTO;
+import org.jenga.dto.TicketRequestDTO;
 import org.jenga.dto.CommentRequestDTO;
 import org.jenga.dto.CommentResponseDTO;
-import org.jenga.dto.AcceptanceCriteriaRequest;
-import org.jenga.dto.AcceptanceCriteriaResponse;
+import org.jenga.dto.AcceptanceCriteriaRequestDTO;
+import org.jenga.dto.AcceptanceCriteriaResponseDTO;
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -23,30 +23,30 @@ public class TicketResource {
     TicketService ticketService;
 
     @POST
-    public TicketDTO createTicket(@PathParam("projectId") String projectId, CreateTicketDTO createTicketDTO) {
-        return ticketService.create(projectId, createTicketDTO);
+    public TicketResponseDTO createTicket(@PathParam("projectId") String projectId, TicketRequestDTO ticketRequestDTO) {
+        return ticketService.create(projectId, ticketRequestDTO);
     }
 
     @GET
-    public List<TicketDTO> getAllTickets(@PathParam("projectId") String projectId) {
+    public List<TicketResponseDTO> getAllTickets(@PathParam("projectId") String projectId) {
         return ticketService.findAll(projectId);
     }
 
     @GET
     @Path("/{ticketId}")
-    public TicketDTO getTicketById(@PathParam("projectId") String projectId, @PathParam("ticketId") Long ticketId) {
+    public TicketResponseDTO getTicketById(@PathParam("projectId") String projectId, @PathParam("ticketId") Long ticketId) {
         return ticketService.findById(projectId, ticketId);
     }
 
     @GET
     @Path("/nr/{ticketNumber}")
-    public TicketDTO getTicketByNumber(@PathParam("projectId") String projectId, @PathParam("ticketNumber") Long ticketNumber) {
+    public TicketResponseDTO getTicketByNumber(@PathParam("projectId") String projectId, @PathParam("ticketNumber") Long ticketNumber) {
         return ticketService.findByTicketNumber(projectId, ticketNumber);
     }
 
     @PUT
     @Path("/{ticketId}")
-    public Response updateTicket(@PathParam("projectId") String projectId, @PathParam("ticketId") Long ticketId, CreateTicketDTO ticketDTO) {
+    public Response updateTicket(@PathParam("projectId") String projectId, @PathParam("ticketId") Long ticketId, TicketRequestDTO ticketDTO) {
         ticketService.update(projectId, ticketId, ticketDTO);
         return Response.ok().build();
     }
@@ -60,7 +60,7 @@ public class TicketResource {
 
     @POST
     @Path("/{ticketId}/duplicate")
-    public TicketDTO duplicateTicket(@PathParam("projectId") String projectId, @PathParam("ticketId") Long ticketId) {
+    public TicketResponseDTO duplicateTicket(@PathParam("projectId") String projectId, @PathParam("ticketId") Long ticketId) {
         return ticketService.duplicateTicket(projectId, ticketId);
     }
 
@@ -99,20 +99,20 @@ public class TicketResource {
 
     @POST
     @Path("/{ticketId}/acceptance-criteria")
-    public AcceptanceCriteriaResponse addAcceptanceCriteria(
+    public AcceptanceCriteriaResponseDTO addAcceptanceCriteria(
             @PathParam("projectId") String projectId,
             @PathParam("ticketId") Long ticketId,
-            AcceptanceCriteriaRequest request) {
-        AcceptanceCriteriaResponse response = ticketService.addAcceptanceCriteria(projectId, ticketId, request);
+            AcceptanceCriteriaRequestDTO request) {
+        AcceptanceCriteriaResponseDTO response = ticketService.addAcceptanceCriteria(projectId, ticketId, request);
         return response;
     }
 
     @GET
     @Path("/{ticketId}/acceptance-criteria")
-    public List<AcceptanceCriteriaResponse> getAllAcceptanceCriteria(
+    public List<AcceptanceCriteriaResponseDTO> getAllAcceptanceCriteria(
             @PathParam("projectId") String projectId,
             @PathParam("ticketId") Long ticketId) {
-        List<AcceptanceCriteriaResponse> criteriaList = ticketService.getAllAcceptanceCriteria(projectId, ticketId);
+        List<AcceptanceCriteriaResponseDTO> criteriaList = ticketService.getAllAcceptanceCriteria(projectId, ticketId);
         return criteriaList;
     }
 
@@ -122,7 +122,7 @@ public class TicketResource {
             @PathParam("projectId") String projectId,
             @PathParam("ticketId") Long ticketId,
             @PathParam("criteriaId") Long criteriaId,
-            AcceptanceCriteriaRequest request) {
+            AcceptanceCriteriaRequestDTO request) {
         ticketService.updateAcceptanceCriteria(projectId, ticketId, criteriaId, request);
         return Response.ok().build();
     }
