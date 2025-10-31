@@ -9,7 +9,11 @@ import org.jenga.db.UserRepository;
 import org.jenga.db.LabelRepository;
 import org.jenga.dto.GitHubIssueDTO;
 import org.jenga.dto.ImportReportDTO;
+<<<<<<< HEAD
 import org.jenga.model.AcceptanceCriteria;
+=======
+import org.jenga.dto.TicketResponseDTO;
+>>>>>>> 452f9a0 (implemented first steps)
 import org.jenga.model.Label;
 import org.jenga.model.Project;
 import org.jenga.model.Ticket;
@@ -162,5 +166,24 @@ public class ImportService {
                 System.err.println("Warning: Unrecognized status '" + githubStatusName + "'. Defaulting to OPEN.");
                 return TicketStatus.OPEN; 
         }
+    }
+
+    private ImportReportDTO importFromJenga(String projectId, List<TicketResponseDTO> jengaTickets) {
+        for (TicketResponseDTO jengaTicket : jengaTickets) {
+            Ticket ticket = new Ticket();
+            ticket.setTitle(jengaTicket.getTitle());
+            ticket.setDescription(jengaTicket.getDescription());
+            ticket.setPriority(jengaTicket.getPriority());
+            ticket.setSize(jengaTicket.getSize());
+            ticket.setStatus(jengaTicket.getStatus());
+            ticket.setProject(projectRepository.findById(projectId));
+            ticket.setReporter(userRepository.findByUsername(jengaTicket.getReporter()));
+            ticket.setAssignee(userRepository.findByUsername(jengaTicket.getAssignee()));
+            ticket.setStatus(TicketStatus.valueOf(jengaTicket.getStatus().name()));
+            ticket.setLabels(jengaTicket.getLabels());
+            ticket.setRelatedTickets(jengaTicket.getRelatedTicketsIds());
+            ticketRepository.persist(ticket);
+        }
+        return new ImportReportDTO(tickets.size(), new ArrayList<>());
     }
 }
