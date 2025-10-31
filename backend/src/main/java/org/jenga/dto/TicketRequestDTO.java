@@ -8,7 +8,7 @@ import org.jenga.model.TicketStatus;
 import lombok.Data;
 
 @Data
-public class CreateTicketDTO {
+public class TicketRequestDTO {
     private String title;
     private String description;
     private TicketPriority priority;
@@ -17,4 +17,5 @@ public class CreateTicketDTO {
     private String projectName;
     private String assignee;
     private List<String> labels;
+    private List<AcceptanceCriteriaRequestDTO> acceptanceCriteria;
 }

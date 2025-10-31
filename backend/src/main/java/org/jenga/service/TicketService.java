@@ -12,12 +12,12 @@ import org.jenga.model.User;
 import org.jenga.model.Comment;
 import org.jenga.model.Label;
 import org.jenga.model.AcceptanceCriteria;
-import org.jenga.dto.TicketDTO;
-import org.jenga.dto.CreateTicketDTO;
+import org.jenga.dto.TicketResponseDTO;
+import org.jenga.dto.TicketRequestDTO;
 import org.jenga.dto.CommentRequestDTO;
 import org.jenga.dto.CommentResponseDTO;
-import org.jenga.dto.AcceptanceCriteriaRequest;
-import org.jenga.dto.AcceptanceCriteriaResponse;
+import org.jenga.dto.AcceptanceCriteriaRequestDTO;
+import org.jenga.dto.AcceptanceCriteriaResponseDTO;
 import org.jenga.mapper.TicketMapper;
 import org.jenga.mapper.CommentMapper;
 import org.jenga.mapper.AcceptanceCriteriaMapper;
@@ -71,17 +71,17 @@ public class TicketService {
     }
 
     @Transactional
-    public TicketDTO create(String projectId, CreateTicketDTO createTicketDTO) {
+    public TicketResponseDTO create(String projectId, TicketRequestDTO ticketRequestDTO) {
         Project project = projectRepository.findById(projectId);
         if (project == null) {
             throw new NotFoundException("Project not found with name: " + projectId);
         }
 
-        if (createTicketDTO.getTitle() == null || createTicketDTO.getTitle().isBlank()) {
+        if (ticketRequestDTO.getTitle() == null || ticketRequestDTO.getTitle().isBlank()) {
             throw new IllegalArgumentException("Ticket title cannot be null or empty");
         }
 
-        Ticket ticket = ticketMapper.createTicketDTOToTicket(createTicketDTO);
+        Ticket ticket = ticketMapper.ticketRequestDTOToTicket(ticketRequestDTO);
         ticket.setProject(project);
 
         ticket.setTicketNumber(ticketRepository.findMaxTicketNumberByProject(project) + 1);
@@ -89,39 +89,47 @@ public class TicketService {
         User currentUser = authenticationService.getCurrentUser();
         ticket.setReporter(currentUser);
 
-        if (createTicketDTO.getAssignee() != null && !createTicketDTO.getAssignee().isBlank()) {
-            User user = userRepository.findByUsername(createTicketDTO.getAssignee());
+        if (ticketRequestDTO.getAssignee() != null && !ticketRequestDTO.getAssignee().isBlank()) {
+            User user = userRepository.findByUsername(ticketRequestDTO.getAssignee());
             if (user != null) {
                 ticket.setAssignee(user);
             } else {
-                throw new BadRequestException("User not found with username: " + createTicketDTO.getAssignee());
+                throw new BadRequestException("User not found with username: " + ticketRequestDTO.getAssignee());
             }
         }
 
-        if (createTicketDTO.getLabels() != null && !createTicketDTO.getLabels().isEmpty()) {
-            List<Label> labels = labelRepository.findByProjectIdAndNames(projectId, createTicketDTO.getLabels());
-            if (labels.size() != createTicketDTO.getLabels().size()) {
+        if (ticketRequestDTO.getLabels() != null && !ticketRequestDTO.getLabels().isEmpty()) {
+            List<Label> labels = labelRepository.findByProjectIdAndNames(projectId, ticketRequestDTO.getLabels());
+            if (labels.size() != ticketRequestDTO.getLabels().size()) {
                 throw new BadRequestException("One or more labels do not exist for this project.");
             }
             ticket.setLabels(labels);
         }
 
+        if (ticketRequestDTO.getAcceptanceCriteria() != null && !ticketRequestDTO.getAcceptanceCriteria().isEmpty()) {
+            for (AcceptanceCriteriaRequestDTO criteriaRequest : ticketRequestDTO.getAcceptanceCriteria()) {
+                AcceptanceCriteria acceptanceCriteria = acceptanceCriteriaMapper.toEntity(criteriaRequest);
+                acceptanceCriteria.setTicket(ticket);
+                acceptanceCriteriaRepository.persist(acceptanceCriteria);
+            }
+        }
+
         ticketRepository.persist(ticket);
-        return ticketMapper.ticketToTicketDTO(ticket);
+        return ticketMapper.ticketToTicketResponseDTO(ticket);
     }
     
-    public List<TicketDTO> findAll(String projectId) {
+    public List<TicketResponseDTO> findAll(String projectId) {
         Project project = projectRepository.findById(projectId);
         if (project == null) {
             throw new NotFoundException("Project not found with name: " + projectId);
         }
 
         return ticketRepository.findByProjectId(project.getId()).stream()
-                .map(ticketMapper::ticketToTicketDTO)
+                .map(ticketMapper::ticketToTicketResponseDTO)
                 .collect(Collectors.toList());
     }
 
-    public TicketDTO findById(String projectId, Long ticketId) {
+    public TicketResponseDTO findById(String projectId, Long ticketId) {
         Project project = projectRepository.findById(projectId);
         if (project == null) {
             throw new NotFoundException("Project not found with name: " + projectId);
@@ -132,10 +140,10 @@ public class TicketService {
             throw new NotFoundException("Ticket not found");
         }
 
-        return ticketMapper.ticketToTicketDTO(ticket);
+        return ticketMapper.ticketToTicketResponseDTO(ticket);
     }
 
-    public TicketDTO findByTicketNumber(String projectId, Long ticketNumber) {
+    public TicketResponseDTO findByTicketNumber(String projectId, Long ticketNumber) {
         Project project = projectRepository.findById(projectId);
         if (project == null) {
             throw new NotFoundException("Project not found with name: " + projectId);
@@ -146,11 +154,11 @@ public class TicketService {
             throw new NotFoundException("Ticket not found");
         }
 
-        return ticketMapper.ticketToTicketDTO(ticket);
+        return ticketMapper.ticketToTicketResponseDTO(ticket);
     }
 
     @Transactional
-    public void update(String projectId, Long ticketId, CreateTicketDTO ticketDTO) {
+    public TicketResponseDTO update(String projectId, Long ticketId, TicketRequestDTO ticketDTO) {
         Project project = projectRepository.findById(projectId);
         if (project == null) {
             throw new NotFoundException("Project not found with name: " + projectId);
@@ -185,6 +193,7 @@ public class TicketService {
         }
 
         ticketRepository.persist(existing);
+        return ticketMapper.ticketToTicketResponseDTO(existing);
     }
 
     @Transactional
@@ -220,7 +229,7 @@ public class TicketService {
     }
 
     @Transactional
-    public TicketDTO duplicateTicket(String projectId, Long ticketId) {
+    public TicketResponseDTO duplicateTicket(String projectId, Long ticketId) {
         Ticket originalTicket = ticketRepository.findByIdAndProjectId(ticketId, projectId);
 
         if (originalTicket == null) {
@@ -265,7 +274,7 @@ public class TicketService {
 
         ticketRepository.persist(duplicatedTicket);
 
-        return ticketMapper.ticketToTicketDTO(duplicatedTicket);
+        return ticketMapper.ticketToTicketResponseDTO(duplicatedTicket);
     }
 
     @Transactional
@@ -294,7 +303,7 @@ public class TicketService {
     }
 
     @Transactional
-    public void createComment(String projectId, Long ticketId, CommentRequestDTO commentDTO) {
+    public CommentResponseDTO createComment(String projectId, Long ticketId, CommentRequestDTO commentDTO) {
         Ticket ticket = ticketRepository.findById(ticketId);
         if (ticket == null) {
             throw new RuntimeException("Ticket not found");
@@ -308,6 +317,8 @@ public class TicketService {
         comment.setTicket(ticket);
 
         commentRepository.persist(comment);
+
+        return commentMapper.commentToCommentResponseDTO(comment);
     }
 
     public List<CommentResponseDTO> getAllComments(String projectId, Long ticketId) {
@@ -329,7 +340,7 @@ public class TicketService {
     }
 
     @Transactional
-    public AcceptanceCriteriaResponse addAcceptanceCriteria(String projectId, Long ticketId, AcceptanceCriteriaRequest request) {
+    public AcceptanceCriteriaResponseDTO addAcceptanceCriteria(String projectId, Long ticketId, AcceptanceCriteriaRequestDTO request) {
         Ticket ticket = ticketRepository.findByIdAndProjectId(ticketId, projectId);
         if (ticket == null) {
             throw new NotFoundException("Ticket not found");
@@ -342,7 +353,7 @@ public class TicketService {
         return acceptanceCriteriaMapper.toResponse(criteria);
     }
 
-    public List<AcceptanceCriteriaResponse> getAllAcceptanceCriteria(String projectId, Long ticketId) {
+    public List<AcceptanceCriteriaResponseDTO> getAllAcceptanceCriteria(String projectId, Long ticketId) {
         Ticket ticket = ticketRepository.findByIdAndProjectId(ticketId, projectId);
         if (ticket == null) {
             throw new NotFoundException("Ticket not found");
@@ -355,7 +366,7 @@ public class TicketService {
     }
 
     @Transactional
-    public void updateAcceptanceCriteria(String projectId, Long ticketId, Long criteriaId, AcceptanceCriteriaRequest request) {
+    public AcceptanceCriteriaResponseDTO updateAcceptanceCriteria(String projectId, Long ticketId, Long criteriaId, AcceptanceCriteriaRequestDTO request) {
         Ticket ticket = ticketRepository.findByIdAndProjectId(ticketId, projectId);
         if (ticket == null) {
             throw new NotFoundException("Ticket not found");
@@ -370,6 +381,7 @@ public class TicketService {
         criteria.setCompleted(request.isCompleted());
 
         acceptanceCriteriaRepository.persist(criteria);
+        return acceptanceCriteriaMapper.toResponse(criteria);
     }
 
     @Transactional
