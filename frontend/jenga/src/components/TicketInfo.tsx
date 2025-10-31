@@ -1,18 +1,18 @@
 import { FormControl, InputLabel, MenuItem, Select, Stack, TextField } from "@suid/material"
 import { For } from "solid-js"
-import { TicketDTO, TicketPriority, TicketSize, TicketStatus } from "../api"
+import { TicketResponseDTO, TicketPriority, TicketSize, TicketStatus } from "../api"
 
 interface TicketInfoProps {
-    ticket: TicketDTO
-    onTicketChange: (next: TicketDTO) => void
-    onSubmit?: (next: TicketDTO) => void
+    ticket: TicketResponseDTO
+    onTicketChange: (next: TicketResponseDTO) => void
+    onSubmit?: (next: TicketResponseDTO) => void
     formId?: string
 }
 
 export const TicketInfo = (props: TicketInfoProps) => {
     const formId = props.formId ?? "ticket-info-form"
 
-    const updateTicket = <K extends keyof TicketDTO>(key: K, value: TicketDTO[K]) => {
+    const updateTicket = <K extends keyof TicketResponseDTO>(key: K, value: TicketResponseDTO[K]) => {
         const updatedTicket = { ...props.ticket, [key]: value }
         props.onTicketChange(updatedTicket)
     }
@@ -44,8 +44,8 @@ export const TicketInfo = (props: TicketInfoProps) => {
                 <TextField
                     name="assignee"
                     label="assignee"
-                    value={props.ticket.assigneeName ?? ""}
-                    onChange={(_, value) => updateTicket("assigneeName", value)}
+                    value={props.ticket.assignee ?? ""}
+                    onChange={(_, value) => updateTicket("assignee", value)}
                 />
                 <FormControl fullWidth>
                     <InputLabel id={`${formId}-priority-label`}>Priority</InputLabel>
