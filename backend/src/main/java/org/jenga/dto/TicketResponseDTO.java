@@ -21,8 +21,8 @@ public class TicketResponseDTO {
     private TicketStatus status;
     private LocalDateTime createDate;
     private LocalDateTime modifyDate;
-    private String reporterName;
-    private String assigneeName;
+    private String reporter;
+    private String assignee;
     private List<String> labels;
     private List<AcceptanceCriteriaResponseDTO> acceptanceCriteria;
     private List<Long> relatedTicketsIds;

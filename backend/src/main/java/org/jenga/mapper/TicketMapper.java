@@ -20,20 +20,14 @@ public interface TicketMapper {
     TicketMapper INSTANCE = Mappers.getMapper(TicketMapper.class);
 
     @Mapping(source = "project.name", target = "projectName")
-    @Mapping(source = "reporter.username", target = "reporterName")
-    @Mapping(source = "assignee.username", target = "assigneeName")
+    @Mapping(source = "reporter.username", target = "reporter")
+    @Mapping(source = "assignee.username", target = "assignee")
     @Mapping(source = "labels", target = "labels")
     @Mapping(target = "acceptanceCriteria", source = "acceptanceCriteria")
     @Mapping(target = "relatedTicketsIds", source = "relatedTickets", qualifiedByName = "mapRelatedTicketsToIds")
     @Mapping(target = "blockingTicketIds", source = "blockingTickets", qualifiedByName = "mapBlockingTicketsToIds")
     @Mapping(target = "blockedTicketIds", source = "blockedTickets", qualifiedByName = "mapBlockedTicketsToIds")
     TicketResponseDTO ticketToTicketResponseDTO(Ticket ticket);
-
-    @Mapping(source = "projectName", target = "project.name")
-    @Mapping(source = "assigneeName", target = "assignee.username")
-    @Mapping(source = "labels", target = "labels")
-    @Mapping(target = "relatedTickets", ignore = true)
-    Ticket ticketResponseDTOToTicket(TicketResponseDTO ticketResponseDTO);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createDate", ignore = true)
