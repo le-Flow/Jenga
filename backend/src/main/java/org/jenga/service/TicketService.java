@@ -106,6 +106,14 @@ public class TicketService {
             ticket.setLabels(labels);
         }
 
+        if (ticketRequestDTO.getAcceptanceCriteria() != null && !ticketRequestDTO.getAcceptanceCriteria().isEmpty()) {
+            for (AcceptanceCriteriaRequestDTO criteriaRequest : ticketRequestDTO.getAcceptanceCriteria()) {
+                AcceptanceCriteria acceptanceCriteria = acceptanceCriteriaMapper.toEntity(criteriaRequest);
+                acceptanceCriteria.setTicket(ticket);
+                acceptanceCriteriaRepository.persist(acceptanceCriteria);
+            }
+        }
+
         ticketRepository.persist(ticket);
         return ticketMapper.ticketToTicketResponseDTO(ticket);
     }
