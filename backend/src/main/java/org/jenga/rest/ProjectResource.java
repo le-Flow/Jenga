@@ -38,9 +38,8 @@ public class ProjectResource {
 
     @PUT
     @Path("/{projectId}")
-    public Response updateProject(@PathParam("projectId") String projectId, ProjectRequestDTO projectRequestDTO) {
-        projectService.update(projectId, projectRequestDTO);
-        return Response.ok().build();
+    public ProjectResponseDTO updateProject(@PathParam("projectId") String projectId, ProjectRequestDTO projectRequestDTO) {
+        return projectService.update(projectId, projectRequestDTO);
     }
 
     @DELETE

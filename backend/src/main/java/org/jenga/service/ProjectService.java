@@ -91,7 +91,7 @@ public class ProjectService {
     }
 
     @Transactional
-    public void update(String projectId, ProjectRequestDTO projectRequestDTO) {
+    public ProjectResponseDTO update(String projectId, ProjectRequestDTO projectRequestDTO) {
         Project existing = projectRepository.findById(projectId);
         if (existing == null) {
             throw new NotFoundException("Project not found with ID: " + projectId);
@@ -102,6 +102,7 @@ public class ProjectService {
         existing.setDescription(projectRequestDTO.getDescription());
 
         projectRepository.persist(existing);
+        return projectMapper.projectToProjectDTO(existing);
     }
 
     @Transactional
@@ -160,5 +161,5 @@ public class ProjectService {
         } else {
             throw new NotFoundException("Label not found");
         }
-}
+    }
 }
