@@ -150,7 +150,7 @@ public class TicketService {
     }
 
     @Transactional
-    public void update(String projectId, Long ticketId, TicketRequestDTO ticketDTO) {
+    public TicketResponseDTO update(String projectId, Long ticketId, TicketRequestDTO ticketDTO) {
         Project project = projectRepository.findById(projectId);
         if (project == null) {
             throw new NotFoundException("Project not found with name: " + projectId);
@@ -185,6 +185,7 @@ public class TicketService {
         }
 
         ticketRepository.persist(existing);
+        return ticketMapper.ticketToTicketResponseDTO(existing);
     }
 
     @Transactional
@@ -357,7 +358,7 @@ public class TicketService {
     }
 
     @Transactional
-    public void updateAcceptanceCriteria(String projectId, Long ticketId, Long criteriaId, AcceptanceCriteriaRequestDTO request) {
+    public AcceptanceCriteriaResponseDTO updateAcceptanceCriteria(String projectId, Long ticketId, Long criteriaId, AcceptanceCriteriaRequestDTO request) {
         Ticket ticket = ticketRepository.findByIdAndProjectId(ticketId, projectId);
         if (ticket == null) {
             throw new NotFoundException("Ticket not found");
@@ -372,6 +373,7 @@ public class TicketService {
         criteria.setCompleted(request.isCompleted());
 
         acceptanceCriteriaRepository.persist(criteria);
+        return acceptanceCriteriaMapper.toResponse(criteria);
     }
 
     @Transactional

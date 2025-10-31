@@ -46,9 +46,8 @@ public class TicketResource {
 
     @PUT
     @Path("/{ticketId}")
-    public Response updateTicket(@PathParam("projectId") String projectId, @PathParam("ticketId") Long ticketId, TicketRequestDTO ticketDTO) {
-        ticketService.update(projectId, ticketId, ticketDTO);
-        return Response.ok().build();
+    public TicketResponseDTO updateTicket(@PathParam("projectId") String projectId, @PathParam("ticketId") Long ticketId, TicketRequestDTO ticketDTO) {
+        return ticketService.update(projectId, ticketId, ticketDTO);
     }
 
     @DELETE
@@ -118,13 +117,12 @@ public class TicketResource {
 
     @PUT
     @Path("/{ticketId}/acceptance-criteria/{criteriaId}")
-    public Response updateAcceptanceCriteria(
+    public AcceptanceCriteriaResponseDTO updateAcceptanceCriteria(
             @PathParam("projectId") String projectId,
             @PathParam("ticketId") Long ticketId,
             @PathParam("criteriaId") Long criteriaId,
             AcceptanceCriteriaRequestDTO request) {
-        ticketService.updateAcceptanceCriteria(projectId, ticketId, criteriaId, request);
-        return Response.ok().build();
+        return ticketService.updateAcceptanceCriteria(projectId, ticketId, criteriaId, request);
     }
 
     @DELETE
