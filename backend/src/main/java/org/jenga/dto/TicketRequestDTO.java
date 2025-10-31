@@ -18,4 +18,7 @@ public class TicketRequestDTO {
     private String assignee;
     private List<String> labels;
     private List<AcceptanceCriteriaRequestDTO> acceptanceCriteria;
+    private List<Long> relatedTicketsIds;
+    private List<Long> blockingTicketIds;
+    private List<Long> blockedTicketIds;
 }

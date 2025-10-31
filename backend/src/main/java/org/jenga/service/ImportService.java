@@ -9,6 +9,7 @@ import org.jenga.db.UserRepository;
 import org.jenga.db.LabelRepository;
 import org.jenga.dto.GitHubIssueDTO;
 import org.jenga.dto.ImportReportDTO;
+import org.jenga.model.AcceptanceCriteria;
 import org.jenga.model.Label;
 import org.jenga.model.Project;
 import org.jenga.model.Ticket;
@@ -53,7 +54,43 @@ public class ImportService {
                 Ticket ticket = new Ticket();
                 ticket.setProject(project);
                 ticket.setTitle(githubDto.getTitle());
-                ticket.setDescription(githubDto.getBody()); // TODO: Parse individual parameters (Body = Specification + Acceptance Criteria + Relationships), blocked by implementation in Ticket
+
+                String body = githubDto.getBody();
+                List<AcceptanceCriteria> acceptanceCriteria = new ArrayList<>();
+                List<String> descriptionLines = new ArrayList<>(); 
+
+                if (body != null && !body.isEmpty()) {
+                    String[] lines = body.split("\\r?\\n");
+
+                    for (String line : lines) {
+                        String trimmedLine = line.trim();
+
+                        if (trimmedLine.startsWith("- [ ] ") || trimmedLine.startsWith("- [x] ")) {
+                            boolean isCompleted = trimmedLine.startsWith("- [x] ");
+                            
+                            if (trimmedLine.length() > 6) {
+                                String criteriaText = trimmedLine.substring(6).trim();
+                                
+                                if (!criteriaText.isEmpty()) {
+                                    AcceptanceCriteria ac = new AcceptanceCriteria();
+                                    
+                                    ac.setDescription(criteriaText); 
+                                    ac.setCompleted(isCompleted);
+                                    ac.setTicket(ticket);
+                                    
+                                    acceptanceCriteria.add(ac);
+                                }
+                            }
+                        } else {
+                            descriptionLines.add(line);
+                        }
+                    }
+
+                    String finalDescription = String.join("\n", descriptionLines).trim();
+                    ticket.setDescription(finalDescription);
+                    ticket.setAcceptanceCriteria(acceptanceCriteria);
+                }
+
                 ticket.setReporter(reporter);
 
                 if (githubDto.getAssignees() != null && githubDto.getAssignees().length > 0) {
