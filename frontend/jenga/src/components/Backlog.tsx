@@ -58,7 +58,7 @@ export const Backlog = (props: BacklogProps) => {
                     </List>
                 </CardContent>
                 <CardActions>
-                    <IconButton onClick={() => setOpen(true)}>
+                    <IconButton onClick={() => setOpen(true)} disabled={!pCtx?.selectedProject()}>
                         <Add></Add>
                     </IconButton>
                 </CardActions>
