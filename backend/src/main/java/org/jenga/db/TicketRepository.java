@@ -14,10 +14,6 @@ public class TicketRepository implements PanacheRepository<Ticket> {
         return find("project.id", projectId).list();
     }
 
-    public Ticket findByIdAndProjectId(Long ticketId, String projectId) {
-        return find("id = ?1 and project.id = ?2", ticketId, projectId).firstResult();
-    }
-
     public Ticket findByTicketNumberAndProjectId(Long ticketNumber, String projectId) {
         return find("ticketNumber = ?1 and project.id= ?2", ticketNumber, projectId).firstResult();
     }

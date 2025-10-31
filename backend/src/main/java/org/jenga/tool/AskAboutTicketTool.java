@@ -20,7 +20,7 @@ public class AskAboutTicketTool {
             @P("The project ID or key, e.g., 'PROJ' or 'ZEN'") String projectId,
             @P("The numerical ID of the ticket") Long ticketId) {
 
-        TicketResponseDTO ticket = ticketService.findById(projectId, ticketId);
+        TicketResponseDTO ticket = ticketService.findById(ticketId);
 
         if (ticket == null) {
             return new AskAboutTicketResponseDTO(

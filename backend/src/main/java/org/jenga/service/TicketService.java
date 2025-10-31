@@ -129,13 +129,8 @@ public class TicketService {
                 .collect(Collectors.toList());
     }
 
-    public TicketResponseDTO findById(String projectId, Long ticketId) {
-        Project project = projectRepository.findById(projectId);
-        if (project == null) {
-            throw new NotFoundException("Project not found with name: " + projectId);
-        }
-
-        Ticket ticket = ticketRepository.findByIdAndProjectId(ticketId, project.getId());
+    public TicketResponseDTO findById(Long ticketId) {
+        Ticket ticket = ticketRepository.findById(ticketId);
         if (ticket == null) {
             throw new NotFoundException("Ticket not found");
         }
@@ -158,13 +153,8 @@ public class TicketService {
     }
 
     @Transactional
-    public TicketResponseDTO update(String projectId, Long ticketId, TicketRequestDTO ticketDTO) {
-        Project project = projectRepository.findById(projectId);
-        if (project == null) {
-            throw new NotFoundException("Project not found with name: " + projectId);
-        }
-
-        Ticket existing = ticketRepository.findByIdAndProjectId(ticketId, project.getId());
+    public TicketResponseDTO update(Long ticketId, TicketRequestDTO ticketDTO) {
+        Ticket existing = ticketRepository.findById(ticketId);
         if (existing == null) {
             throw new NotFoundException("Ticket not found");
         }
@@ -183,7 +173,7 @@ public class TicketService {
         }
 
         if (ticketDTO.getLabels() != null && !ticketDTO.getLabels().isEmpty()) {
-            List<Label> labels = labelRepository.findByProjectIdAndNames(projectId, ticketDTO.getLabels());
+            List<Label> labels = labelRepository.findByProjectIdAndNames(existing.getProject().getId(), ticketDTO.getLabels());
             if (labels.size() != ticketDTO.getLabels().size()) {
                 throw new BadRequestException("One or more labels do not exist");
             }
@@ -197,13 +187,8 @@ public class TicketService {
     }
 
     @Transactional
-    public void delete(String projectId, Long ticketId) {
-        Project project = projectRepository.findById(projectId);
-        if (project == null) {
-            throw new NotFoundException("Project not found with name: " + projectId);
-        }
-
-        Ticket ticket = ticketRepository.findByIdAndProjectId(ticketId, project.getId());
+    public void delete(Long ticketId) {
+        Ticket ticket = ticketRepository.findById(ticketId);
         if (ticket == null) {
             throw new NotFoundException("Ticket not found");
         }
@@ -229,14 +214,14 @@ public class TicketService {
     }
 
     @Transactional
-    public TicketResponseDTO duplicateTicket(String projectId, Long ticketId) {
-        Ticket originalTicket = ticketRepository.findByIdAndProjectId(ticketId, projectId);
+    public TicketResponseDTO duplicateTicket(Long ticketId) {
+        Ticket originalTicket = ticketRepository.findById(ticketId);
 
         if (originalTicket == null) {
             throw new NotFoundException("Ticket not found");
         }
 
-        Project project = projectRepository.findById(projectId);
+        Project project = projectRepository.findById(originalTicket.getProject().getId());
 
         Ticket duplicatedTicket = new Ticket();
         duplicatedTicket.setTicketNumber(ticketRepository.findMaxTicketNumberByProject(project) + 1);
@@ -278,8 +263,8 @@ public class TicketService {
     }
 
     @Transactional
-    public void assignTicket(String projectId, Long ticketId, String username) {
-        Ticket ticket = ticketRepository.findByIdAndProjectId(ticketId, projectId);
+    public void assignTicket(Long ticketId, String username) {
+        Ticket ticket = ticketRepository.findById(ticketId);
         if (ticket == null) {
             throw new BadRequestException("Ticket not found");
         }
@@ -293,8 +278,8 @@ public class TicketService {
     }
 
     @Transactional
-    public void unassignTicket(String projectId, Long ticketId) {
-        Ticket ticket = ticketRepository.findByIdAndProjectId(ticketId, projectId);
+    public void unassignTicket(Long ticketId) {
+        Ticket ticket = ticketRepository.findById(ticketId);
         if (ticket == null) {
             throw new BadRequestException("Ticket not found");
         }
@@ -303,7 +288,7 @@ public class TicketService {
     }
 
     @Transactional
-    public CommentResponseDTO createComment(String projectId, Long ticketId, CommentRequestDTO commentDTO) {
+    public CommentResponseDTO createComment(Long ticketId, CommentRequestDTO commentDTO) {
         Ticket ticket = ticketRepository.findById(ticketId);
         if (ticket == null) {
             throw new RuntimeException("Ticket not found");
@@ -321,7 +306,7 @@ public class TicketService {
         return commentMapper.commentToCommentResponseDTO(comment);
     }
 
-    public List<CommentResponseDTO> getAllComments(String projectId, Long ticketId) {
+    public List<CommentResponseDTO> getAllComments(Long ticketId) {
         List<Comment> comments = commentRepository.findByTicketId(ticketId);
 
         return comments.stream()
@@ -330,7 +315,7 @@ public class TicketService {
     }
 
     @Transactional
-    public void deleteComment(String projectId, Long ticketId, Long commentId) {
+    public void deleteComment(Long ticketId, Long commentId) {
         Comment comment = commentRepository.findByIdAndTicketId(commentId, ticketId);
         if (comment == null) {
             throw new NotFoundException("Comment not found");
@@ -340,8 +325,8 @@ public class TicketService {
     }
 
     @Transactional
-    public AcceptanceCriteriaResponseDTO addAcceptanceCriteria(String projectId, Long ticketId, AcceptanceCriteriaRequestDTO request) {
-        Ticket ticket = ticketRepository.findByIdAndProjectId(ticketId, projectId);
+    public AcceptanceCriteriaResponseDTO addAcceptanceCriteria(Long ticketId, AcceptanceCriteriaRequestDTO request) {
+        Ticket ticket = ticketRepository.findById(ticketId);
         if (ticket == null) {
             throw new NotFoundException("Ticket not found");
         }
@@ -353,8 +338,8 @@ public class TicketService {
         return acceptanceCriteriaMapper.toResponse(criteria);
     }
 
-    public List<AcceptanceCriteriaResponseDTO> getAllAcceptanceCriteria(String projectId, Long ticketId) {
-        Ticket ticket = ticketRepository.findByIdAndProjectId(ticketId, projectId);
+    public List<AcceptanceCriteriaResponseDTO> getAllAcceptanceCriteria(Long ticketId) {
+        Ticket ticket = ticketRepository.findById(ticketId);
         if (ticket == null) {
             throw new NotFoundException("Ticket not found");
         }
@@ -366,8 +351,8 @@ public class TicketService {
     }
 
     @Transactional
-    public AcceptanceCriteriaResponseDTO updateAcceptanceCriteria(String projectId, Long ticketId, Long criteriaId, AcceptanceCriteriaRequestDTO request) {
-        Ticket ticket = ticketRepository.findByIdAndProjectId(ticketId, projectId);
+    public AcceptanceCriteriaResponseDTO updateAcceptanceCriteria(Long ticketId, Long criteriaId, AcceptanceCriteriaRequestDTO request) {
+        Ticket ticket = ticketRepository.findById(ticketId);
         if (ticket == null) {
             throw new NotFoundException("Ticket not found");
         }
@@ -385,8 +370,8 @@ public class TicketService {
     }
 
     @Transactional
-    public void deleteAcceptanceCriteria(String projectId, Long ticketId, Long criteriaId) {
-        Ticket ticket = ticketRepository.findByIdAndProjectId(ticketId, projectId);
+    public void deleteAcceptanceCriteria(Long ticketId, Long criteriaId) {
+        Ticket ticket = ticketRepository.findById(ticketId);
         if (ticket == null) {
             throw new NotFoundException("Ticket not found");
         }
@@ -400,13 +385,13 @@ public class TicketService {
     }
 
     @Transactional
-    public void addRelatedTicket(String projectId, Long ticketId, Long relatedTicketId) {
-        Ticket ticket = ticketRepository.findByIdAndProjectId(ticketId, projectId);
+    public void addRelatedTicket(Long ticketId, Long relatedTicketId) {
+        Ticket ticket = ticketRepository.findById(ticketId);
         if (ticket == null) {
             throw new NotFoundException("Ticket not found");
         }
 
-        Ticket relatedTicket = ticketRepository.findByIdAndProjectId(relatedTicketId, projectId);
+        Ticket relatedTicket = ticketRepository.findById(relatedTicketId);
         if (relatedTicket == null) {
             throw new NotFoundException("Related ticket not found");
         }
@@ -421,13 +406,13 @@ public class TicketService {
     }
 
     @Transactional
-    public void removeRelatedTicket(String projectId, Long ticketId, Long relatedTicketId) {
-        Ticket ticket = ticketRepository.findByIdAndProjectId(ticketId, projectId);
+    public void removeRelatedTicket(Long ticketId, Long relatedTicketId) {
+        Ticket ticket = ticketRepository.findById(ticketId);
         if (ticket == null) {
             throw new NotFoundException("Ticket not found");
         }
 
-        Ticket relatedTicket = ticketRepository.findByIdAndProjectId(relatedTicketId, projectId);
+        Ticket relatedTicket = ticketRepository.findById(relatedTicketId);
         if (relatedTicket == null) {
             throw new NotFoundException("Related ticket not found");
         }
@@ -442,13 +427,13 @@ public class TicketService {
     }
 
     @Transactional
-    public void addBlockingTicket(String projectId, Long ticketId, Long blockingTicketId) {
-        Ticket ticket = ticketRepository.findByIdAndProjectId(ticketId, projectId);
+    public void addBlockingTicket(Long ticketId, Long blockingTicketId) {
+        Ticket ticket = ticketRepository.findById(ticketId);
         if (ticket == null) {
             throw new NotFoundException("Ticket not found");
         }
 
-        Ticket blockingTicket = ticketRepository.findByIdAndProjectId(blockingTicketId, projectId);
+        Ticket blockingTicket = ticketRepository.findById(blockingTicketId);
         if (blockingTicket == null) {
             throw new NotFoundException("Blocking ticket not found");
         }
@@ -458,13 +443,13 @@ public class TicketService {
     }
 
     @Transactional
-    public void removeBlockingTicket(String projectId, Long ticketId, Long blockingTicketId) {
-        Ticket ticket = ticketRepository.findByIdAndProjectId(ticketId, projectId);
+    public void removeBlockingTicket(Long ticketId, Long blockingTicketId) {
+        Ticket ticket = ticketRepository.findById(ticketId);
         if (ticket == null) {
             throw new NotFoundException("Ticket not found");
         }
 
-        Ticket blockingTicket = ticketRepository.findByIdAndProjectId(blockingTicketId, projectId);
+        Ticket blockingTicket = ticketRepository.findById(blockingTicketId);
         if (blockingTicket == null) {
             throw new NotFoundException("Blocking ticket not found");
         }
