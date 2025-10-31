@@ -10,7 +10,7 @@ import org.jenga.model.TicketStatus;
 import lombok.Data;
 
 @Data
-public class TicketDTO {
+public class TicketResponseDTO {
     private Long id;
     private Long ticketNumber;
     private String title;
@@ -24,7 +24,7 @@ public class TicketDTO {
     private String reporterName;
     private String assigneeName;
     private List<String> labels;
-    private List<AcceptanceCriteriaResponse> acceptanceCriteria;
+    private List<AcceptanceCriteriaResponseDTO> acceptanceCriteria;
     private List<Long> relatedTicketsIds;
     private List<Long> blockingTicketIds;
     private List<Long> blockedTicketIds;

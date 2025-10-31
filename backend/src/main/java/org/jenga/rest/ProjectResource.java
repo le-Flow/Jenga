@@ -1,8 +1,8 @@
 package org.jenga.rest;
 
 import org.jenga.service.ProjectService;
-import org.jenga.dto.ProjectDTO;
-import org.jenga.dto.CreateProjectDTO;
+import org.jenga.dto.ProjectRequestDTO;
+import org.jenga.dto.ProjectResponseDTO;
 import org.jenga.dto.LabelDTO;
 
 
@@ -21,25 +21,25 @@ public class ProjectResource {
     ProjectService projectService;
 
     @POST
-    public ProjectDTO createProject(CreateProjectDTO createProjectDTO) {
-        return projectService.create(createProjectDTO);
+    public ProjectResponseDTO createProject(ProjectRequestDTO projectRequestDTO) {
+        return projectService.create(projectRequestDTO);
     }
 
     @GET
-    public List<ProjectDTO> getAllProjects() {
+    public List<ProjectResponseDTO> getAllProjects() {
         return projectService.findAll();
     }
 
     @GET
     @Path("/{projectId}")
-    public ProjectDTO getProjectByIdentifier(@PathParam("projectId") String projectId) {
+    public ProjectResponseDTO getProjectByIdentifier(@PathParam("projectId") String projectId) {
         return projectService.findById(projectId);
     }
 
     @PUT
     @Path("/{projectId}")
-    public Response updateProject(@PathParam("projectId") String projectId, ProjectDTO projectDTO) {
-        projectService.update(projectId, projectDTO);
+    public Response updateProject(@PathParam("projectId") String projectId, ProjectRequestDTO projectRequestDTO) {
+        projectService.update(projectId, projectRequestDTO);
         return Response.ok().build();
     }
 
