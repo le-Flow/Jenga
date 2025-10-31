@@ -41,7 +41,7 @@ public class ProjectService {
     }
 
     @Transactional
-    public void create(CreateProjectDTO createProjectDTO) {
+    public ProjectDTO create(CreateProjectDTO createProjectDTO) {
         String identifier = createProjectDTO.getIdentifier();
 
         if (identifier == null || identifier.trim().isEmpty()) {
@@ -72,6 +72,8 @@ public class ProjectService {
         Project project = projectMapper.createProjectDTOToProject(createProjectDTO);
 
         projectRepository.persist(project);
+
+        return projectMapper.projectToProjectDTO(project);
     }
 
     public List<ProjectDTO> findAll() {
@@ -113,7 +115,7 @@ public class ProjectService {
     }
 
     @Transactional
-    public void createLabel(String projectId, LabelDTO labelDTO) {
+    public LabelDTO createLabel(String projectId, LabelDTO labelDTO) {
         Project project = projectRepository.findById(projectId);
         if (project == null) {
             throw new NotFoundException("Project not found with ID: " + projectId);
@@ -131,6 +133,7 @@ public class ProjectService {
         Label label = labelMapper.labelDTOToLabel(labelDTO);
         label.setProject(project);
         labelRepository.persist(label);
+        return labelMapper.labelToLabelDTO(label);
     }
 
     private boolean isValidHexColor(String color) {

@@ -21,9 +21,8 @@ public class ProjectResource {
     ProjectService projectService;
 
     @POST
-    public Response createProject(CreateProjectDTO createProjectDTO) {
-        projectService.create(createProjectDTO);
-        return Response.status(Response.Status.CREATED).build();
+    public ProjectDTO createProject(CreateProjectDTO createProjectDTO) {
+        return projectService.create(createProjectDTO);
     }
 
     @GET
@@ -53,9 +52,8 @@ public class ProjectResource {
 
     @POST
     @Path("/{projectId}/labels")
-    public Response createLabel(@PathParam("projectId") String projectId, LabelDTO labelDTO) {
-        projectService.createLabel(projectId, labelDTO);
-        return Response.status(Response.Status.CREATED).build();
+    public LabelDTO createLabel(@PathParam("projectId") String projectId, LabelDTO labelDTO) {
+        return projectService.createLabel(projectId, labelDTO);
     }
 
     @GET

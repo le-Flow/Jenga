@@ -294,7 +294,7 @@ public class TicketService {
     }
 
     @Transactional
-    public void createComment(String projectId, Long ticketId, CommentRequestDTO commentDTO) {
+    public CommentResponseDTO createComment(String projectId, Long ticketId, CommentRequestDTO commentDTO) {
         Ticket ticket = ticketRepository.findById(ticketId);
         if (ticket == null) {
             throw new RuntimeException("Ticket not found");
@@ -308,6 +308,8 @@ public class TicketService {
         comment.setTicket(ticket);
 
         commentRepository.persist(comment);
+
+        return commentMapper.commentToCommentResponseDTO(comment);
     }
 
     public List<CommentResponseDTO> getAllComments(String projectId, Long ticketId) {
