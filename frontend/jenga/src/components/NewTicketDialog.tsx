@@ -1,6 +1,6 @@
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@suid/material"
 import { Setter, useContext, createSignal, createEffect } from "solid-js"
-import { TicketPriority, TicketSize, TicketStatus, CreateTicketDTO, TicketDTO, TicketResourceService } from "../api"
+import { TicketPriority, TicketSize, TicketStatus, TicketRequestDTO, TicketResponseDTO, TicketResourceService } from "../api"
 import { ProjectContext } from "../provider/ProjectProvider"
 import { TicketInfo } from "./TicketInfo"
 
@@ -12,17 +12,17 @@ interface NewTicketDialogProps {
 export const NewTicketDialog = (props: NewTicketDialogProps) => {
     const pCtx = useContext(ProjectContext)
 
-    const EMPTY_TICKET: TicketDTO = {
+    const EMPTY_TICKET: TicketResponseDTO = {
         title: "",
         description: "",
         priority: TicketPriority.MEDIUM,
         size: TicketSize.MEDIUM,
         status: TicketStatus.OPEN,
-        assigneeName: "",
+        assignee: "",
     }
 
     const formId = "new-ticket-form"
-    const [ticket, setTicket] = createSignal<TicketDTO>({ ...EMPTY_TICKET })
+    const [ticket, setTicket] = createSignal<TicketResponseDTO>({ ...EMPTY_TICKET })
 
     createEffect(() => {
         if (props.open) {
@@ -33,26 +33,20 @@ export const NewTicketDialog = (props: NewTicketDialogProps) => {
         }
     })
 
-    const onCreate = (draft?: TicketDTO) => {
+    const onCreate = async (draft?: TicketResponseDTO) => {
         const source = draft ?? ticket()
-        const request: CreateTicketDTO = {
+        const request: TicketRequestDTO = {
             projectName: pCtx?.selectedProject().name,
             title: source.title ?? "",
             description: source.description ?? "",
             priority: source.priority ?? TicketPriority.MEDIUM,
             size: source.size ?? TicketSize.MEDIUM,
             status: source.status ?? TicketStatus.OPEN,
-            assignee: source.assigneeName ?? "",
+            assignee: source.assignee ?? "",
         }
 
-        const { assignee, ...rest } = request
-        const ticketEntry: TicketDTO = {
-            ...rest,
-            assigneeName: assignee,
-        }
-
-        TicketResourceService.postApiProjectsTickets(pCtx?.selectedProject().identifier ?? "", request)
-        pCtx?.setTickets(prev => [...prev, ticketEntry])
+        const newTicket = await TicketResourceService.postApiProjectsTickets(pCtx?.selectedProject().identifier ?? "", request)
+        pCtx?.setTickets(prev => [...prev ?? [], newTicket])
         props.setOpen(false)
     }
 

@@ -1,21 +1,21 @@
 import { Accessor, JSXElement, Resource, Setter, createContext, createEffect, createResource, createSignal, useContext } from "solid-js";
-import { ProjectDTO, ProjectResourceService, TicketDTO, TicketResourceService } from "../api";
+import { ProjectResponseDTO, ProjectResourceService, TicketResponseDTO, TicketResourceService } from "../api";
 import { AuthContext } from "./AuthProvider";
 
 type ProjectContextType = {
-    projects: Resource<ProjectDTO[] | undefined>;
-    setProjects: Setter<ProjectDTO[] | undefined>;
+    projects: Resource<ProjectResponseDTO[] | undefined>;
+    setProjects: Setter<ProjectResponseDTO[] | undefined>;
 
-    selectedProject: Accessor<ProjectDTO | undefined>;
-    setSelectedProject: Setter<ProjectDTO | undefined>;
+    selectedProject: Accessor<ProjectResponseDTO | undefined>;
+    setSelectedProject: Setter<ProjectResponseDTO | undefined>;
 
-    tickets: Resource<TicketDTO[] | undefined>;
-    setTickets: Setter<TicketDTO[] | undefined>;
+    tickets: Resource<TicketResponseDTO[] | undefined>;
+    setTickets: Setter<TicketResponseDTO[] | undefined>;
 
-    selectedTicket: Accessor<TicketDTO | undefined>;
-    setSelectedTicket: Setter<TicketDTO | undefined>;
+    selectedTicket: Accessor<TicketResponseDTO | undefined>;
+    setSelectedTicket: Setter<TicketResponseDTO | undefined>;
     deleteProject: (identifier: string) => Promise<void>;
-    updateTicket: (projectId: string, ticket: TicketDTO) => Promise<void>;
+    updateTicket: (projectId: string, ticket: TicketResponseDTO) => Promise<void>;
 };
 
 export const ProjectContext = createContext<ProjectContextType>();
@@ -28,8 +28,8 @@ export const ProjectProvider = (props: ProviderProps) => {
 
     const aCtx = useContext(AuthContext);
 
-    const [selectedProject, setSelectedProject] = createSignal<ProjectDTO>();
-    const [selectedTicket, setSelectedTicket] = createSignal<TicketDTO>();
+    const [selectedProject, setSelectedProject] = createSignal<ProjectResponseDTO>();
+    const [selectedTicket, setSelectedTicket] = createSignal<TicketResponseDTO>();
 
     const [projects, { mutate: setProjects, refetch: refetchProjects }] = createResource(
         () => (aCtx?.isLoggedIn?.() ? true : undefined),
@@ -70,20 +70,20 @@ export const ProjectProvider = (props: ProviderProps) => {
         }
     };
 
-    const updateTicket = async (projectId: string, ticket: TicketDTO) => {
+    const updateTicket = async (projectId: string, ticket: TicketResponseDTO) => {
         if (!projectId || ticket.id == null) {
             console.warn("Missing project or ticket id for update", { projectId, ticketId: ticket.id });
             return;
         }
 
         try {
-            await TicketResourceService.putApiProjectsTickets(projectId, ticket.id, {...ticket, assignee: ticket.assigneeName});
+            const newTicket = await TicketResourceService.putApiProjectsTickets(projectId, ticket.id, {...ticket});
 
             setTickets((prev) =>
-                prev?.map((existing) => (existing.id === ticket.id ? { ...existing, ...ticket } : existing)) ?? prev
+                prev?.map((existing) => (existing.id === ticket.id ? { ...existing, ...newTicket } : existing)) ?? prev
             );
 
-            setSelectedTicket((prev) => (prev?.id === ticket.id ? { ...prev, ...ticket } : prev));
+            setSelectedTicket((prev: TicketResponseDTO) => (prev?.id === ticket.id ? { ...prev, ...newTicket } : prev));
         } catch (error) {
             console.error("Failed to update ticket", error);
             throw error;

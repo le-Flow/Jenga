@@ -1,18 +1,18 @@
 import { Stack, TextField } from "@suid/material"
 import { Setter } from "solid-js"
-import { ProjectDTO } from "../api"
+import { ProjectResponseDTO } from "../api"
 
 interface ProjectInfoProps {
-    project: ProjectDTO
-    onProjectChange: Setter<ProjectDTO>
-    onSubmit?: (project: ProjectDTO) => void
+    project: ProjectResponseDTO
+    onProjectChange: Setter<ProjectResponseDTO>
+    onSubmit?: (project: ProjectResponseDTO) => void
     formId?: string
 }
 
 export const ProjectInfo = (props: ProjectInfoProps) => {
     const formId = props.formId ?? "project-info-form"
 
-    const updateProject = (key: keyof ProjectDTO, value: string) => {
+    const updateProject = (key: keyof ProjectResponseDTO, value: string) => {
         const updatedProject = { ...props.project, [key]: value }
         props.onProjectChange(updatedProject)
     }
