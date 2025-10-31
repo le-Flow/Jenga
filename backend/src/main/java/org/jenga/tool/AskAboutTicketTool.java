@@ -4,7 +4,7 @@ import dev.langchain4j.agent.tool.Tool;
 import dev.langchain4j.agent.tool.P;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import org.jenga.dto.TicketDTO;
+import org.jenga.dto.TicketResponseDTO;
 import org.jenga.dto.MCP_Server.AskAboutTicketResponseDTO;
 import org.jenga.service.TicketService;
 
@@ -20,7 +20,7 @@ public class AskAboutTicketTool {
             @P("The project ID or key, e.g., 'PROJ' or 'ZEN'") String projectId,
             @P("The numerical ID of the ticket") Long ticketId) {
 
-        TicketDTO ticket = ticketService.findById(projectId, ticketId);
+        TicketResponseDTO ticket = ticketService.findById(projectId, ticketId);
 
         if (ticket == null) {
             return new AskAboutTicketResponseDTO(
@@ -35,7 +35,7 @@ public class AskAboutTicketTool {
             ticket.getId(),
             ticket.getTitle(),
             ticket.getStatus(),
-            ticket.getAssigneeName(),
+            ticket.getAssignee(),
             ticket.getDescription()
         );
 
