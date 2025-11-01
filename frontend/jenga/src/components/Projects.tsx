@@ -6,6 +6,7 @@ import { NewProjectDialog } from "./NewProjectDialog"
 import { ProjectResourceService } from "../api"
 import { ProjectInfo } from "./ProjectInfo"
 import { AuthContext } from "../provider/AuthProvider"
+import { InfoMode } from "../utils/utils"
 
 
 export const Projects = () => {
@@ -70,6 +71,7 @@ export const Projects = () => {
                             <CardHeader title="ProjectInfo" />
                             <CardContent>
                                     <ProjectInfo
+                                        mode={InfoMode.Edit}
                                         formId={formId}
                                         project={project()}
                                         onProjectChange={(next) => pCtx?.setSelectedProject(() => next)}

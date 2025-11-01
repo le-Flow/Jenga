@@ -3,6 +3,7 @@ import { Setter, useContext, createSignal, createEffect } from "solid-js"
 import { ProjectRequestDTO, ProjectResponseDTO, ProjectResourceService } from "../api"
 import { ProjectContext } from "../provider/ProjectProvider"
 import { ProjectInfo } from "./ProjectInfo"
+import { InfoMode } from "../utils/utils"
 
 interface NewProjectDialogProps {
     open: boolean
@@ -38,6 +39,7 @@ export const NewProjectDialog = (props: NewProjectDialogProps) => {
             <DialogTitle>New Project</DialogTitle>
             <DialogContent>
                 <ProjectInfo
+                    mode={InfoMode.Create}
                     formId={formId}
                     project={project()}
                     onProjectChange={setProject}
