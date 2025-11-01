@@ -41,7 +41,7 @@ export const ProjectProvider = (props: ProviderProps) => {
             const project = selectedProject();
             return aCtx?.isLoggedIn() && project ? project.identifier : undefined;
         },
-        async (projectId) => await TicketResourceService.getApiProjectsTickets(projectId)
+        async (projectId) => await TicketResourceService.getApiTicketsAll(projectId)
     );
 
     createEffect(() => {
@@ -77,7 +77,7 @@ export const ProjectProvider = (props: ProviderProps) => {
         }
 
         try {
-            const newTicket = await TicketResourceService.putApiProjectsTickets(projectId, ticket.id, {...ticket});
+            const newTicket = await TicketResourceService.putApiTickets(ticket.id, ticket)
 
             setTickets((prev) =>
                 prev?.map((existing) => (existing.id === ticket.id ? { ...existing, ...newTicket } : existing)) ?? prev
