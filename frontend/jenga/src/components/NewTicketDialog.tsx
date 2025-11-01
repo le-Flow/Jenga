@@ -45,7 +45,7 @@ export const NewTicketDialog = (props: NewTicketDialogProps) => {
             assignee: source.assignee ?? "",
         }
 
-        const newTicket = await TicketResourceService.postApiProjectsTickets(pCtx?.selectedProject().identifier ?? "", request)
+        const newTicket = await TicketResourceService.postApiTickets(pCtx?.selectedProject().identifier ?? "", request)
         pCtx?.setTickets(prev => [...prev ?? [], newTicket])
         props.setOpen(false)
     }
