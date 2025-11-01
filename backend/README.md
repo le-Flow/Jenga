@@ -37,6 +37,25 @@ If you want to build an _über-jar_, execute the following command:
 
 The application, packaged as an _über-jar_, is now runnable using `java -jar target/*-runner.jar`.
 
+### JWT Keypair Setup
+
+For JWT authentication, a **keypair** (private and public keys) must be generated and stored under the following locations, when not running in dev mode:
+
+* `src/main/resources/privateKey.pem`
+* `src/main/resources/publicKey.pem`
+
+You can generate the keypair using the following commands:
+
+```shell script
+# Generate the private key
+openssl genrsa -out privateKey.pem 2048 
+
+# Generate the public key from the private key
+openssl rsa -in privateKey.pem -pubout -out publicKey.pem
+```
+
+Ensure that these files are correctly placed in the `src/main/resources` directory before running or packaging the application.
+
 ## Creating a native executable
 
 You can create a native executable using:
