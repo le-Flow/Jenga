@@ -1,6 +1,8 @@
 package org.jenga.service;
 
+import dev.langchain4j.service.MemoryId;
 import dev.langchain4j.service.SystemMessage;
+import dev.langchain4j.service.UserMessage; 
 import io.quarkiverse.langchain4j.RegisterAiService;
 import org.jenga.tool.AskAboutTicketTool;
 
@@ -31,5 +33,6 @@ public interface AiService {
         3.  For all other general conversation or coding questions not related to a
             specific ticket, answer helpfully from your own knowledge.
     """)
-    String chat(String userMessage);
+
+    String chat(@MemoryId String conversationId, @UserMessage String message);
 }
