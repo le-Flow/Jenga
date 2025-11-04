@@ -5,8 +5,8 @@ import org.jenga.dto.MCP_Server.WebSearchResponseDTO;
 
 import jakarta.ws.rs.*;
 
-@RegisterRestClient(configKey = "google.api")
-@Path("/v1")
+@RegisterRestClient(configKey = "google-search-api")
+@Path("/customsearch/v1")
 public interface GoogleSearchApi {
 
     @GET
