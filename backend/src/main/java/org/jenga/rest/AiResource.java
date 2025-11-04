@@ -9,8 +9,8 @@ import jakarta.ws.rs.core.MediaType;
 
 import org.jenga.dto.MCP_Server.ChatRequestDTO;
 import org.jenga.dto.MCP_Server.ChatResponseDTO;
-import org.jenga.service.AiService;
-import org.jenga.service.ChatSession;
+import org.jenga.service.MCP_Server.AiService;
+import org.jenga.service.MCP_Server.ChatSession;
 
 @Path("/api/ai")
 @Produces(MediaType.APPLICATION_JSON)
