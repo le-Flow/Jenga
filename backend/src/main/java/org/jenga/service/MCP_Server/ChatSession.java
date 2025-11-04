@@ -1,4 +1,4 @@
-package org.jenga.service;
+package org.jenga.service.MCP_Server;
 
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import jakarta.enterprise.context.SessionScoped;

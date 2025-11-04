@@ -11,7 +11,6 @@ import jakarta.ws.rs.core.Response;
 import org.jenga.dto.GitHubIssueDTO;
 import org.jenga.dto.ImportReportDTO;
 import org.jenga.dto.TicketRequestDTO;
-import org.jenga.dto.TicketResponseDTO;
 import org.jenga.service.ImportService; 
 
 import java.util.List;
