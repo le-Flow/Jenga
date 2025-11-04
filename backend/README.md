@@ -143,7 +143,7 @@ Finally, add the following to your `application.properties` file. This tells the
 **`src/main/resources/application.properties`**
 
 ```properties
-org.jenga.service.GoogleSearchApi.url=https://www.googleapis.com/customsearch
+quarkus.rest-client.google-search-api.url=https://www.googleapis.com
 
 google.api.key=${GOOGLE_API_KEY}
 google.cse.id=${GOOGLE_CSE_ID}
