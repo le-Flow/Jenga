@@ -60,6 +60,15 @@ public class TicketResource {
         return Response.noContent().build();
     }
 
+    /*
+    @GET
+    @Path("/search")
+    public Response searchTicketsGet(@BeanParam TicketSearchDTO request) {
+        List<TicketResponseDTO> results = ticketService.searchTickets(request);
+        return Response.ok(results).build();
+    }
+    */
+
     @POST
     @Path("/search")
     public Response searchTicketsPost(TicketSearchDTO request) {

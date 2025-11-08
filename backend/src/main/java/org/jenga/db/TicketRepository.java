@@ -33,40 +33,53 @@ public class TicketRepository implements PanacheRepository<Ticket> {
     }
 
     public List<Ticket> searchTickets(TicketSearchDTO request) {
-        StringBuilder jpql = new StringBuilder("1 = 1");
+        StringBuilder jpql = new StringBuilder("SELECT t FROM Ticket t JOIN t.labels l WHERE 1 = 1");
         Map<String, Object> params = new HashMap<>();
 
         if (request.getProjectId() != null && !request.getProjectId().isBlank()) {
-            jpql.append(" AND project.id = :projectId");
-            params.put("projectId", request.getProjectId());
+           jpql.append(" AND t.project.id = :projectId");
+           params.put("projectId", request.getProjectId());
         }
 
         if (request.getQuery() != null && !request.getQuery().isBlank()) {
-            String like = "%" + request.getQuery().toLowerCase() + "%";
-            jpql.append(" AND (LOWER(title) LIKE :query OR LOWER(description) LIKE :query)");
-            params.put("query", like);
+           String like = "%" + request.getQuery().toLowerCase() + "%";
+           jpql.append(" AND (LOWER(t.title) LIKE :query OR LOWER(t.description) LIKE :query)");
+           params.put("query", like);
         }
 
         if (request.getPriority() != null && !request.getPriority().isEmpty()) {
-            jpql.append(" AND priority IN :priority");
-            params.put("priority", request.getPriority());
+           jpql.append(" AND t.priority IN :priority");
+           params.put("priority", request.getPriority());
         }
 
         if (request.getSize() != null && !request.getSize().isEmpty()) {
-            jpql.append(" AND size IN :size");
-            params.put("size", request.getSize());
+           jpql.append(" AND t.size IN :size");
+           params.put("size", request.getSize());
+        }
+
+        if (request.getStatus() != null && !request.getStatus().isEmpty()) {
+           jpql.append(" AND t.status IN :status");
+           params.put("status", request.getStatus());
         }
 
         if (request.getReporter() != null && !request.getReporter().isEmpty()) {
-            jpql.append(" AND reporter.username IN :reporter");
-            params.put("reporter", request.getReporter());
+           jpql.append(" AND t.reporter.username IN :reporter");
+           params.put("reporter", request.getReporter());
         }
 
         if (request.getAssignee() != null && !request.getAssignee().isEmpty()) {
-            jpql.append(" AND assignee.username IN :assignee");
-            params.put("assignee", request.getAssignee());
+           jpql.append(" AND t.assignee.username IN :assignee");
+           params.put("assignee", request.getAssignee());
         }
 
-        return find(jpql.toString(), Sort.by("id"), params).list();
+        if (request.getLabels() != null && !request.getLabels().isEmpty()) {
+            jpql.append(" AND SIZE(t.labels) = :labelCount");
+            params.put("labelCount", request.getLabels().size());
+
+            jpql.append(" AND NOT EXISTS (SELECT 1 FROM Ticket t2 JOIN t2.labels l2 WHERE t2.id = t.id AND l2.name NOT IN :labels)");
+            params.put("labels", request.getLabels());
+        }
+
+        return find(jpql.toString(), Sort.by("t.id"), params).list();
     }
 }
