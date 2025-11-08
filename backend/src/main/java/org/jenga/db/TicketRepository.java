@@ -75,8 +75,10 @@ public class TicketRepository implements PanacheRepository<Ticket> {
                params.put("assignee", filter.getAssignee());
             }
 
+            // TODO: All labels of the filter need to be present in the ticket for it not get filtered out
             if (filter.getLabels() != null && !filter.getLabels().isEmpty()) {
-                // TODO labels
+                jpql.append(" AND EXISTS (SELECT 1 FROM t.labels l WHERE l.name IN :labels)");
+                params.put("labels", filter.getLabels());
             }
         }
 
