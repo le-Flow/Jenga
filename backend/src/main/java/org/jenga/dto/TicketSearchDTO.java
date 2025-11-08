@@ -13,6 +13,7 @@ public class TicketSearchDTO{
     private String projectId;
     private String query;
     private Filter filter;
+    private Integer limit;
 
     @Data
     public static class Filter {
