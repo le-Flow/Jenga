@@ -5,6 +5,7 @@ import org.jenga.model.Project;
 import org.jenga.dto.TicketSearchDTO;
 
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
+import io.quarkus.panache.common.Page;
 import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
@@ -33,7 +34,7 @@ public class TicketRepository implements PanacheRepository<Ticket> {
     }
 
     public List<Ticket> searchTickets(TicketSearchDTO request) {
-        StringBuilder jpql = new StringBuilder("SELECT t FROM Ticket t JOIN t.labels l WHERE 1 = 1");
+        StringBuilder jpql = new StringBuilder("SELECT t FROM Ticket t WHERE 1 = 1");
         Map<String, Object> params = new HashMap<>();
 
         if (request.getProjectId() != null && !request.getProjectId().isBlank()) {
@@ -75,15 +76,19 @@ public class TicketRepository implements PanacheRepository<Ticket> {
                params.put("assignee", filter.getAssignee());
             }
 
-            if (filter.getLabels() != null && !filter.getLabels().isEmpty()) {
-                jpql.append(" AND SIZE(t.labels) = :labelCount");
-                params.put("labelCount", filter.getLabels().size());
-
+            if (filter != null && filter.getLabels() != null && !filter.getLabels().isEmpty()) {
                 jpql.append(" AND NOT EXISTS (SELECT 1 FROM Ticket t2 JOIN t2.labels l2 WHERE t2.id = t.id AND l2.name NOT IN :labels)");
                 params.put("labels", filter.getLabels());
             }
         }
 
-        return find(jpql.toString(), Sort.by("t.id"), params).list();
+    if (request.getLimit() != null && request.getLimit() > 0) {
+        return find(jpql.toString(), params)
+                .page(Page.of(0, request.getLimit()))
+                .list();
+    }
+
+    return find(jpql.toString(), params).list();
+
     }
 }
