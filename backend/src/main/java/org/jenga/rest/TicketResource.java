@@ -3,6 +3,7 @@ package org.jenga.rest;
 import org.jenga.service.TicketService;
 import org.jenga.dto.TicketResponseDTO;
 import org.jenga.dto.TicketRequestDTO;
+import org.jenga.dto.TicketSearchDTO;
 import org.jenga.dto.CommentRequestDTO;
 import org.jenga.dto.CommentResponseDTO;
 import org.jenga.dto.AcceptanceCriteriaRequestDTO;
@@ -57,6 +58,15 @@ public class TicketResource {
     public Response deleteTicket(@PathParam("ticketId") Long ticketId) {
         ticketService.delete(ticketId);
         return Response.noContent().build();
+    }
+
+    @POST
+    @Path("/search")
+    public Response searchTicketsPost(TicketSearchDTO request) {
+            System.out.println("POST /search/");
+    System.out.println("Body: " + request);
+        List<TicketResponseDTO> results = ticketService.searchTickets(request);
+        return Response.ok(results).build();
     }
 
     @POST
