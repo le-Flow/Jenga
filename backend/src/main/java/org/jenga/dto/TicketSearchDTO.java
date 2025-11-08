@@ -17,4 +17,5 @@ public class TicketSearchDTO{
     private List<TicketStatus> status;
     private List<String> reporter;
     private List<String> assignee;
+    private List<String> labels;
 }
