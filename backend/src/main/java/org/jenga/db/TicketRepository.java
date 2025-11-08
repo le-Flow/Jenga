@@ -82,13 +82,8 @@ public class TicketRepository implements PanacheRepository<Ticket> {
             }
         }
 
-    if (request.getLimit() != null && request.getLimit() > 0) {
-        return find(jpql.toString(), params)
-                .page(Page.of(0, request.getLimit()))
-                .list();
-    }
+        int limit = (request.getLimit() != null && request.getLimit() > 0) ? request.getLimit() : 25;
 
-    return find(jpql.toString(), params).list();
-
+        return find(jpql.toString(), params).page(Page.of(0, limit)).list();
     }
 }
