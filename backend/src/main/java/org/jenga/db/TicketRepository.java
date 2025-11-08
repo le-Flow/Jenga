@@ -47,37 +47,41 @@ public class TicketRepository implements PanacheRepository<Ticket> {
            params.put("query", like);
         }
 
-        if (request.getPriority() != null && !request.getPriority().isEmpty()) {
-           jpql.append(" AND t.priority IN :priority");
-           params.put("priority", request.getPriority());
-        }
+        TicketSearchDTO.Filter filter = request.getFilter();
+        if (filter != null) {
 
-        if (request.getSize() != null && !request.getSize().isEmpty()) {
-           jpql.append(" AND t.size IN :size");
-           params.put("size", request.getSize());
-        }
+            if (filter.getPriority() != null && !filter.getPriority().isEmpty()) {
+               jpql.append(" AND t.priority IN :priority");
+               params.put("priority", filter.getPriority());
+            }
 
-        if (request.getStatus() != null && !request.getStatus().isEmpty()) {
-           jpql.append(" AND t.status IN :status");
-           params.put("status", request.getStatus());
-        }
+            if (filter.getSize() != null && !filter.getSize().isEmpty()) {
+               jpql.append(" AND t.size IN :size");
+               params.put("size", filter.getSize());
+            }
 
-        if (request.getReporter() != null && !request.getReporter().isEmpty()) {
-           jpql.append(" AND t.reporter.username IN :reporter");
-           params.put("reporter", request.getReporter());
-        }
+            if (filter.getStatus() != null && !filter.getStatus().isEmpty()) {
+               jpql.append(" AND t.status IN :status");
+               params.put("status", filter.getStatus());
+            }
 
-        if (request.getAssignee() != null && !request.getAssignee().isEmpty()) {
-           jpql.append(" AND t.assignee.username IN :assignee");
-           params.put("assignee", request.getAssignee());
-        }
+            if (filter.getReporter() != null && !filter.getReporter().isEmpty()) {
+               jpql.append(" AND t.reporter.username IN :reporter");
+               params.put("reporter", filter.getReporter());
+            }
 
-        if (request.getLabels() != null && !request.getLabels().isEmpty()) {
-            jpql.append(" AND SIZE(t.labels) = :labelCount");
-            params.put("labelCount", request.getLabels().size());
+            if (filter.getAssignee() != null && !filter.getAssignee().isEmpty()) {
+               jpql.append(" AND t.assignee.username IN :assignee");
+               params.put("assignee", filter.getAssignee());
+            }
 
-            jpql.append(" AND NOT EXISTS (SELECT 1 FROM Ticket t2 JOIN t2.labels l2 WHERE t2.id = t.id AND l2.name NOT IN :labels)");
-            params.put("labels", request.getLabels());
+            if (filter.getLabels() != null && !filter.getLabels().isEmpty()) {
+                jpql.append(" AND SIZE(t.labels) = :labelCount");
+                params.put("labelCount", filter.getLabels().size());
+
+                jpql.append(" AND NOT EXISTS (SELECT 1 FROM Ticket t2 JOIN t2.labels l2 WHERE t2.id = t.id AND l2.name NOT IN :labels)");
+                params.put("labels", filter.getLabels());
+            }
         }
 
         return find(jpql.toString(), Sort.by("t.id"), params).list();
