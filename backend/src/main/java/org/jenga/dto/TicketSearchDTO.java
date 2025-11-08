@@ -15,4 +15,6 @@ public class TicketSearchDTO{
     private List<TicketPriority> priority;
     private List<TicketSize> size;
     private List<TicketStatus> status;
+    private List<String> reporter;
+    private List<String> assignee;
 }
