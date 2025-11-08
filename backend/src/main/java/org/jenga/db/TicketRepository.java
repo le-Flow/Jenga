@@ -36,8 +36,6 @@ public class TicketRepository implements PanacheRepository<Ticket> {
         StringBuilder jpql = new StringBuilder("1 = 1");
         Map<String, Object> params = new HashMap<>();
 
-        System.out.println("Search Request: " + request);
-
         if (request.getProjectId() != null && !request.getProjectId().isBlank()) {
             jpql.append(" AND project.id = :projectId");
             params.put("projectId", request.getProjectId());
@@ -57,6 +55,16 @@ public class TicketRepository implements PanacheRepository<Ticket> {
         if (request.getSize() != null && !request.getSize().isEmpty()) {
             jpql.append(" AND size IN :size");
             params.put("size", request.getSize());
+        }
+
+        if (request.getReporter() != null && !request.getReporter().isEmpty()) {
+            jpql.append(" AND reporter.username IN :reporter");
+            params.put("reporter", request.getReporter());
+        }
+
+        if (request.getAssignee() != null && !request.getAssignee().isEmpty()) {
+            jpql.append(" AND assignee.username IN :assignee");
+            params.put("assignee", request.getAssignee());
         }
 
         return find(jpql.toString(), Sort.by("id"), params).list();
