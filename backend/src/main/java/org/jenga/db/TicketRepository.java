@@ -50,7 +50,6 @@ public class TicketRepository implements PanacheRepository<Ticket> {
 
         TicketSearchDTO.Filter filter = request.getFilter();
         if (filter != null) {
-
             if (filter.getPriority() != null && !filter.getPriority().isEmpty()) {
                jpql.append(" AND t.priority IN :priority");
                params.put("priority", filter.getPriority());
@@ -76,9 +75,8 @@ public class TicketRepository implements PanacheRepository<Ticket> {
                params.put("assignee", filter.getAssignee());
             }
 
-            if (filter != null && filter.getLabels() != null && !filter.getLabels().isEmpty()) {
-                jpql.append(" AND NOT EXISTS (SELECT 1 FROM Ticket t2 JOIN t2.labels l2 WHERE t2.id = t.id AND l2.name NOT IN :labels)");
-                params.put("labels", filter.getLabels());
+            if (filter.getLabels() != null && !filter.getLabels().isEmpty()) {
+                // TODO labels
             }
         }
 
