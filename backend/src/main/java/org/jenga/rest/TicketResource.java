@@ -71,11 +71,11 @@ public class TicketResource {
 
     @POST
     @Path("/search")
-    public Response searchTicketsPost(TicketSearchDTO request) {
+    public List<TicketResponseDTO> searchTickets(TicketSearchDTO request) {
             System.out.println("POST /search/");
     System.out.println("Body: " + request);
         List<TicketResponseDTO> results = ticketService.searchTickets(request);
-        return Response.ok(results).build();
+        return results;
     }
 
     @POST
