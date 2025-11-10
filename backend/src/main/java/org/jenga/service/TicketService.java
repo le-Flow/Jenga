@@ -14,6 +14,7 @@ import org.jenga.model.Label;
 import org.jenga.model.AcceptanceCriteria;
 import org.jenga.dto.TicketResponseDTO;
 import org.jenga.dto.TicketRequestDTO;
+import org.jenga.dto.TicketSearchDTO;
 import org.jenga.dto.CommentRequestDTO;
 import org.jenga.dto.CommentResponseDTO;
 import org.jenga.dto.AcceptanceCriteriaRequestDTO;
@@ -211,6 +212,13 @@ public class TicketService {
         }
 
         ticketRepository.delete(ticket);
+    }
+
+    public List<TicketResponseDTO> searchTickets(TicketSearchDTO request) {
+        List<Ticket> tickets = ticketRepository.searchTickets(request);
+        return tickets.stream()
+                .map(ticketMapper::ticketToTicketResponseDTO)
+                .collect(Collectors.toList());
     }
 
     @Transactional
