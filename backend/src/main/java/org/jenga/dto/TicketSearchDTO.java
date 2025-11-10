@@ -12,6 +12,8 @@ import lombok.Data;
 public class TicketSearchDTO{
     private String projectId;
     private String query;
+    private String title;
+    private String description;
     private Filter filter;
     private Integer limit;
 

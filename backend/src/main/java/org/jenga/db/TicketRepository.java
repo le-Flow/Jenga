@@ -48,6 +48,18 @@ public class TicketRepository implements PanacheRepository<Ticket> {
            params.put("query", like);
         }
 
+        if (request.getTitle() != null && !request.getTitle().isBlank()) {
+            String likeTitle = "%" + request.getTitle().toLowerCase() + "%";
+            jpql.append(" AND LOWER(t.title) LIKE :title");
+            params.put("title", likeTitle);
+        }
+
+        if (request.getDescription() != null && !request.getDescription().isBlank()) {
+            String likeDescription = "%" + request.getDescription().toLowerCase() + "%";
+            jpql.append(" AND LOWER(t.description) LIKE :description");
+            params.put("description", likeDescription);
+        }
+
         TicketSearchDTO.Filter filter = request.getFilter();
         if (filter != null) {
             if (filter.getPriority() != null && !filter.getPriority().isEmpty()) {
