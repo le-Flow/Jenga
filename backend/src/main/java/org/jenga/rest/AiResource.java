@@ -24,15 +24,21 @@ public class AiResource {
     @POST
     @Path("/chat")
     public ChatResponseDTO chat(ChatRequestDTO request) {
-        
         String conversationId = request.getConversationId();
-
+        
         if (conversationId == null || conversationId.isBlank()) {
             conversationId = UUID.randomUUID().toString();
         }
 
-        String aiResponse = assistant.chat(conversationId, request.getMessage());
-
-        return new ChatResponseDTO(aiResponse, conversationId);
+        try {
+            String aiResponse = assistant.chat(conversationId, request.getMessage());
+            return new ChatResponseDTO(aiResponse, conversationId);
+        } catch (NullPointerException e) {
+            String errorMsg = "I encountered an error processing that request. This is usually due to a tool execution issue. Please try rephrasing your request or try again.";
+            return new ChatResponseDTO(errorMsg, conversationId);
+        } catch (Exception e) {
+            String errorMsg = "An unexpected error occurred: " + e.getMessage();
+            return new ChatResponseDTO(errorMsg, conversationId);
+        }
     }
 }

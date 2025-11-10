@@ -26,6 +26,6 @@ public class InMemoryChatMemoryStore implements ChatMemoryStore {
 
     @Override
     public void deleteMessages(Object memoryId) {
-        // Ignore delete calls - they're being called inappropriately after each request
+        // Not deleting anything as of now, i think qarkus dev is reloading the backend and clearing the chat
     }
 }

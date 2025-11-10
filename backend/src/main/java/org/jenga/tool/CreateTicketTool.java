@@ -10,6 +10,7 @@ import org.jenga.db.LabelRepository;
 import org.jenga.db.ProjectRepository;
 import org.jenga.db.TicketRepository;
 import org.jenga.db.UserRepository;
+import org.jenga.model.AcceptanceCriteria;
 import org.jenga.model.Label;
 import org.jenga.model.Project;
 import org.jenga.model.Ticket;
@@ -19,6 +20,7 @@ import org.jenga.model.TicketStatus;
 import org.jenga.model.User;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -53,14 +55,17 @@ public class CreateTicketTool {
             @P("The username of the person to assign the ticket to. Can be null or 'unassigned'.")
             String assigneeUsername, 
 
-            @P("The priority of the ticket. Valid values are LOW, MEDIUM, HIGH, CRITICAL.")
+            @P("The priority of the ticket. Valid values are LOW, MEDIUM, HIGH, CRITICAL. Can be null.")
             TicketPriority priority,
 
-            @P("The estimated size or effort. Valid values are SMALL, MEDIUM, LARGE, EXTRA_LARGE.")
+            @P("The estimated size or effort. Valid values are SMALL, MEDIUM, LARGE, EXTRA_LARGE. Can be null.")
             TicketSize size,
 
-            @P("A list of label names to add to the ticket, e.g., ['bug', 'ui', 'backend'].")
-            List<String> labels
+            @P("A comma-separated string of label names to add to the ticket, e.g., 'bug,ui,backend'. Can be null or empty.")
+            String labels,
+
+            @P("A semicolon-separated list of acceptance criteria, e.g., 'User can login; Password is validated; Error message shows'. Can be null or empty.")
+            String acceptanceCriteria
     ) {
         try {
             Project project = projectRepository.findById(projectId);
@@ -78,8 +83,6 @@ public class CreateTicketTool {
                 User reporter = userRepository.findByUsername(reporterUsername);
                 if (reporter != null) {
                     newTicket.setReporter(reporter);
-                } else {
-                    System.err.println("Warning: Reporter not found, ticket will have no reporter: " + reporterUsername);
                 }
             }
 
@@ -94,14 +97,18 @@ public class CreateTicketTool {
                 User assignee = userRepository.findByUsername(assigneeUsername);
                 if (assignee != null) {
                     newTicket.setAssignee(assignee);
-                } else {
-                    System.err.println("Warning: Assignee not found, ticket will be unassigned: " + assigneeUsername);
                 }
             }
 
-            if (labels != null && !labels.isEmpty()) {
+            // Handle labels as comma-separated string instead of List
+            if (labels != null && !labels.trim().isEmpty()) {
                 Set<Label> labelsToAttach = new HashSet<>();
-                for (String labelName : labels) {
+                String[] labelNames = labels.split(",");
+                
+                for (String labelName : labelNames) {
+                    labelName = labelName.trim();
+                    if (labelName.isEmpty()) continue;
+                    
                     Label label = labelRepository.find("project = ?1 and name = ?2", project, labelName).firstResult();
 
                     if (label == null) {
@@ -113,10 +120,31 @@ public class CreateTicketTool {
                     labelsToAttach.add(label);
                 }
                 newTicket.setLabels(new ArrayList<>(labelsToAttach));
+            } else {
+                newTicket.setLabels(Collections.emptyList());
+            }
+
+            // Handle acceptance criteria as semicolon-separated string
+            if (acceptanceCriteria != null && !acceptanceCriteria.trim().isEmpty()) {
+                List<AcceptanceCriteria> criteriaList = new ArrayList<>();
+                String[] criteriaItems = acceptanceCriteria.split(";");
+                
+                for (String criteriaText : criteriaItems) {
+                    criteriaText = criteriaText.trim();
+                    if (criteriaText.isEmpty()) continue;
+                    
+                    AcceptanceCriteria criteria = new AcceptanceCriteria();
+                    criteria.setDescription(criteriaText);
+                    criteria.setCompleted(false);
+                    criteria.setTicket(newTicket);
+                    criteriaList.add(criteria);
+                }
+                newTicket.setAcceptanceCriteria(criteriaList);
+            } else {
+                newTicket.setAcceptanceCriteria(Collections.emptyList());
             }
 
             newTicket.setTicketNumber(ticketRepository.findMaxTicketNumberByProject(project) + 1);
-
             ticketRepository.persist(newTicket);
 
             return "SUCCESS: Created new ticket " +
