@@ -5,12 +5,14 @@ import { AuthContext } from "./AuthProvider";
 type ProjectContextType = {
     projects: Resource<ProjectResponseDTO[] | undefined>;
     setProjects: Setter<ProjectResponseDTO[] | undefined>;
+    refetchProjects: () => void;
 
     selectedProject: Accessor<ProjectResponseDTO | undefined>;
     setSelectedProject: Setter<ProjectResponseDTO | undefined>;
 
     tickets: Resource<TicketResponseDTO[] | undefined>;
     setTickets: Setter<TicketResponseDTO[] | undefined>;
+    refetchTickets: () => void;
 
     selectedTicket: Accessor<TicketResponseDTO | undefined>;
     setSelectedTicket: Setter<TicketResponseDTO | undefined>;
@@ -95,8 +97,10 @@ export const ProjectProvider = (props: ProviderProps) => {
         setProjects,
         selectedProject,
         setSelectedProject,
+        refetchProjects,
         tickets,
         setTickets,
+        refetchTickets,
         selectedTicket,
         setSelectedTicket,
         deleteProject,
