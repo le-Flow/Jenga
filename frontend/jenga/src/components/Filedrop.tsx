@@ -1,6 +1,6 @@
 import { Box, Button } from "@suid/material"
 import { createEffect, createSignal, useContext } from "solid-js"
-import { GitHubIssueDTO, ImportResourceService, TicketResourceService } from "../api"
+import { GitHubIssueDTO, ImportResourceService } from "../api"
 import { ProjectContext } from "../provider/ProjectProvider"
 
 export const Filedrop = () => {
@@ -15,6 +15,7 @@ export const Filedrop = () => {
                 const obj: GitHubIssueDTO[] = JSON.parse(text)
                 await ImportResourceService.postApiImportGithub(pCtx?.selectedProject()?.identifier, obj)
             }
+            if (files().length > 0) pCtx?.refetchTickets?.()
         }
     )
 
