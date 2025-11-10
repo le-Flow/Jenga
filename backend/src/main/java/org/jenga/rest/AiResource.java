@@ -7,10 +7,11 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 
+import java.util.UUID;
+
 import org.jenga.dto.MCP_Server.ChatRequestDTO;
 import org.jenga.dto.MCP_Server.ChatResponseDTO;
 import org.jenga.service.MCP_Server.AiService;
-import org.jenga.service.MCP_Server.ChatSession;
 
 @Path("/api/ai")
 @Produces(MediaType.APPLICATION_JSON)
@@ -19,17 +20,19 @@ public class AiResource {
 
     @Inject
     AiService assistant; 
-    
-    @Inject
-    ChatSession chatSession; 
 
     @POST
     @Path("/chat")
     public ChatResponseDTO chat(ChatRequestDTO request) {
         
-        String conversationId = chatSession.getConversationId();
+        String conversationId = request.getConversationId();
+
+        if (conversationId == null || conversationId.isBlank()) {
+            conversationId = UUID.randomUUID().toString();
+        }
+
         String aiResponse = assistant.chat(conversationId, request.getMessage());
 
-        return new ChatResponseDTO(aiResponse);
+        return new ChatResponseDTO(aiResponse, conversationId);
     }
 }

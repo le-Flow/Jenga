@@ -4,7 +4,9 @@ import dev.langchain4j.service.*;
 import io.quarkiverse.langchain4j.RegisterAiService;
 import org.jenga.tool.*;
 
-@RegisterAiService(tools = {
+@RegisterAiService(
+  chatMemoryProviderSupplier = RegisterAiService.BeanChatMemoryProviderSupplier.class,
+  tools = {
     AskAboutTicketTool.class, 
     WebSearchTool.class, 
     CreateTicketTool.class,
