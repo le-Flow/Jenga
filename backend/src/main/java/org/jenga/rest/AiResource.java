@@ -7,10 +7,11 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 
+import java.util.UUID;
+
 import org.jenga.dto.MCP_Server.ChatRequestDTO;
 import org.jenga.dto.MCP_Server.ChatResponseDTO;
 import org.jenga.service.MCP_Server.AiService;
-import org.jenga.service.MCP_Server.ChatSession;
 
 @Path("/api/ai")
 @Produces(MediaType.APPLICATION_JSON)
@@ -19,17 +20,25 @@ public class AiResource {
 
     @Inject
     AiService assistant; 
-    
-    @Inject
-    ChatSession chatSession; 
 
     @POST
     @Path("/chat")
     public ChatResponseDTO chat(ChatRequestDTO request) {
+        String conversationId = request.getConversationId();
         
-        String conversationId = chatSession.getConversationId();
-        String aiResponse = assistant.chat(conversationId, request.getMessage());
+        if (conversationId == null || conversationId.isBlank()) {
+            conversationId = UUID.randomUUID().toString();
+        }
 
-        return new ChatResponseDTO(aiResponse);
+        try {
+            String aiResponse = assistant.chat(conversationId, request.getMessage());
+            return new ChatResponseDTO(aiResponse, conversationId);
+        } catch (NullPointerException e) {
+            String errorMsg = "I encountered an error processing that request. This is usually due to a tool execution issue. Please try rephrasing your request or try again.";
+            return new ChatResponseDTO(errorMsg, conversationId);
+        } catch (Exception e) {
+            String errorMsg = "An unexpected error occurred: " + e.getMessage();
+            return new ChatResponseDTO(errorMsg, conversationId);
+        }
     }
 }

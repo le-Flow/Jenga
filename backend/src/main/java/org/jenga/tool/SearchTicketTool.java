@@ -4,6 +4,7 @@ import dev.langchain4j.agent.tool.P;
 import dev.langchain4j.agent.tool.Tool;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import org.jenga.dto.TicketResponseDTO;
 import org.jenga.dto.TicketSearchDTO;
 import org.jenga.model.TicketPriority;
@@ -24,6 +25,7 @@ public class SearchTicketTool {
         Use this when the user asks to find multiple tickets, filter by status/priority, 
         or search for specific keywords in the title/description.
         """)
+    @Transactional
     public List<TicketResponseDTO> searchTickets(
             @P("The search query text for title or description (e.g., 'database error', 'login page')")
             String query,

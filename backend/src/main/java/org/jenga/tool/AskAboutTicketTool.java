@@ -17,14 +17,13 @@ public class AskAboutTicketTool {
     @Tool("Get information about a specific ticket by its project ID and ticket ID")
     
     public AskAboutTicketResponseDTO getTicketInfo(
-            @P("The project ID or key, e.g., 'PROJ' or 'ZEN'") String projectId,
             @P("The numerical ID of the ticket") Long ticketId) {
 
         TicketResponseDTO ticket = ticketService.findById(ticketId);
 
         if (ticket == null) {
             return new AskAboutTicketResponseDTO(
-                "Sorry, I couldn't find a ticket with ID " + projectId + "-" + ticketId,
+                "Sorry, I couldn't find a ticket with ID" + ticketId,
                 ticketId.toString()
             );
         }
