@@ -24,10 +24,13 @@ public class EditTicketTool {
 
     @Tool("Updates an existing ticket. Only fields that are provided (not null) will be changed.")
     public String editTicket(
-            @P("The project ID (e.g., 'MCP', 'Frontend') of the ticket to edit. This is mandatory.")
+            @P("The ticket ID (e.g., 123, 456) of the ticket to delete. This is mandatory.")
+            Long ticketId,
+
+            @P("The project ID (e.g., 'MCP', 'Frontend') of the ticket to edit.")
             String projectName,
             
-            @P("The ticket number (e.g., 123, 456) of the ticket to edit. This is mandatory.")
+            @P("The ticket number (e.g., 123, 456) of the ticket to edit.")
             Long ticketNumber,
             
             @P("The new title for the ticket. If null, the title will not be changed.")
@@ -55,9 +58,9 @@ public class EditTicketTool {
         try {
             TicketResponseDTO existingTicket;
             try {
-                existingTicket = ticketService.findByTicketNumber(projectName, ticketNumber);
+                existingTicket = ticketService.findById(ticketId);
             } catch (NotFoundException e) {
-                return "ERROR: Cannot edit ticket. Ticket " + projectName + "-" + ticketNumber + " not found.";
+                return "ERROR: Cannot edit ticket. Ticket " + ticketId + " not found.";
             }
 
             TicketRequestDTO updateDTO = new TicketRequestDTO();
