@@ -7,35 +7,44 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.NotFoundException;
 
 import org.jenga.dto.TicketResponseDTO;
-import org.jenga.service.ProjectService;
 import org.jenga.service.TicketService;
+import org.jenga.service.MCP_Server.ChatRequestContext;
 
 @ApplicationScoped
 public class DeleteTicketTool {
 
     @Inject
-    TicketService ticketService;
+    TicketService ticketService;    
+    @Inject
+    ChatRequestContext requestContext;
 
-    @Inject 
-    ProjectService projectService;
-
-    @Tool("Deletes a specific ticket using its project ID and ticket number (e.g., 'MCP', 123).")
+    @Tool("Deletes a specific ticket. If no ticketId is provided, it attempts to delete the user's current ticket.")
     public String deleteTicket(            
-            @P("The ticket ID (e.g., 123, 456) of the ticket to delete. This is mandatory.")
+            @P("The internal database ID (e.g., 101, 102) of the ticket to delete. If null, the user's current ticket context will be used.")
             Long ticketId
     ) {
         
         try {
-            TicketResponseDTO ticket = ticketService.findById(ticketId);
+            Long finalTicketId = ticketId;
+
+            if (finalTicketId == null) {
+                finalTicketId = requestContext.getCurrentTicketID();
+            }
+
+            if (finalTicketId == null) {
+                return "ERROR: Could not delete ticket. Reason: No ticket ID was provided, and there is no current ticket in context.";
+            }
+
+            TicketResponseDTO ticket = ticketService.findById(finalTicketId);
 
             ticketService.delete(ticket.getId());
             
-            return "SUCCESS: Successfully deleted ticket" + ticketId + ".";
+            return "SUCCESS: Successfully deleted ticket " + ticket.getTicketNumber() + ".";
 
         } catch (NotFoundException e) {
-            return "ERROR: Could not delete ticket. Reason: " + e.getMessage();
+            return "ERROR: Could not delete ticket. Reason: No ticket found with ID: " + (ticketId != null ? ticketId : requestContext.getCurrentTicketID());
         } catch (Exception e) {
-            return "ERROR: An unexpected error occurred while deleting ticket: " + e.getMessage();
+            return "ERROR: An unexpected error occurred while deleting the ticket: " + e.getMessage();
         }
     }
 }

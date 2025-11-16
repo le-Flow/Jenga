@@ -13,7 +13,7 @@ import org.jenga.model.TicketPriority;
 import org.jenga.model.TicketSize;
 import org.jenga.model.TicketStatus;
 import org.jenga.service.TicketService;
-
+import org.jenga.service.MCP_Server.ChatRequestContext;
 import java.util.List;
 
 @ApplicationScoped
@@ -22,16 +22,13 @@ public class EditTicketTool {
     @Inject
     TicketService ticketService;
 
+    @Inject
+    ChatRequestContext requestContext;
+
     @Tool("Updates an existing ticket. Only fields that are provided (not null) will be changed.")
     public String editTicket(
-            @P("The ticket ID (e.g., 123, 456) of the ticket to delete. This is mandatory.")
+            @P("The internal database ID (e.g., 101, 102) of the ticket to edit. If null, the user's current ticket context is used.")
             Long ticketId,
-
-            @P("The project ID (e.g., 'MCP', 'Frontend') of the ticket to edit.")
-            String projectName,
-            
-            @P("The ticket number (e.g., 123, 456) of the ticket to edit.")
-            Long ticketNumber,
             
             @P("The new title for the ticket. If null, the title will not be changed.")
             String title,
@@ -56,11 +53,20 @@ public class EditTicketTool {
     ) {
         
         try {
+            Long finalTicketId = ticketId;
+            if (finalTicketId == null) {
+                finalTicketId = requestContext.getCurrentTicketID();
+            }
+
+            if (finalTicketId == null) {
+                return "ERROR: Could not edit ticket. Reason: No ticket ID was provided, and there is no current ticket in context.";
+            }
+
             TicketResponseDTO existingTicket;
             try {
-                existingTicket = ticketService.findById(ticketId);
+                existingTicket = ticketService.findById(finalTicketId);
             } catch (NotFoundException e) {
-                return "ERROR: Cannot edit ticket. Ticket " + ticketId + " not found.";
+                return "ERROR: Cannot edit ticket. Ticket " + finalTicketId + " not found.";
             }
 
             TicketRequestDTO updateDTO = new TicketRequestDTO();
@@ -101,7 +107,7 @@ public class EditTicketTool {
 
             TicketResponseDTO updatedTicket = ticketService.update(existingTicket.getId(), updateDTO);
             
-            return "SUCCESS: Ticket " + updatedTicket.getProjectName() + "-" + updatedTicket.getTicketNumber() + " has been updated.";
+            return "SUCCESS: Ticket " + updatedTicket.getTicketNumber() + " has been updated.";
 
         } catch (NotFoundException | BadRequestException e) {
             return "ERROR: Could not update ticket. Reason: " + e.getMessage();
