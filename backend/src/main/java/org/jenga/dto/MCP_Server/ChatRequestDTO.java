@@ -8,6 +8,6 @@ public class ChatRequestDTO {
     private String conversationId;
 
     private String currentUser;
-    private String currentProject;
-    private String currentTicket;
+    private Long currentProjectID;
+    private Long currentTicketID;
 }
