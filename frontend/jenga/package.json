@@ -1,0 +1,28 @@
+{
+  "name": "vite-template-solid",
+  "version": "0.0.0",
+  "description": "",
+  "type": "module",
+  "scripts": {
+    "start": "vite",
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview",
+    "gen:api": "npx openapi-typescript-codegen --input http://localhost:8080/openapi --output ./src/api --client fetch"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "openapi-typescript-codegen": "^0.29.0",
+    "solid-devtools": "^0.34.3",
+    "typescript": "^5.7.2",
+    "vite": "^6.3.6",
+    "vite-plugin-solid": "^2.11.8"
+  },
+  "dependencies": {
+    "@solidjs/router": "^0.15.3",
+    "@suid/icons-material": "^0.9.0",
+    "@suid/material": "^0.19.0",
+    "@suid/vite-plugin": "^0.4.1",
+    "solid-js": "^1.9.5"
+  }
+}
