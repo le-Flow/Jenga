@@ -1,6 +1,6 @@
 import { TableRow, TableCell, Card, CardHeader, CardContent, TableContainer, Paper, Table, TableHead, TableBody, ListItem, List, ListItemButton } from "@suid/material"
 import { useContext, createMemo, For } from "solid-js"
-import { TicketResponseDTO, TicketStatus } from "../api"
+import { TicketResponseDTO, TicketStatus } from "../api/generated"
 import { ProjectContext } from "../provider/ProjectProvider"
 
 interface KanbanItemProps {

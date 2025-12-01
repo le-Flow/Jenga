@@ -1,5 +1,5 @@
 import { Stack } from "@suid/material"
-import { LoginResponseDTO } from "../api"
+import { LoginResponseDTO } from "../api/generated"
 
 interface UserInfoProps {
     user: LoginResponseDTO

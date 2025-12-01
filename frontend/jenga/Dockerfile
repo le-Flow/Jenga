@@ -18,11 +18,11 @@ COPY . .
 
 # Generate API client at build time
 # `src/api/openapi.json` has tio exist in the repo or is copied in
-RUN if [ -f src/api/openapi.json ]; then \
+RUN if [ -f src/api/openapi.yaml ]; then \
       echo "Generating API client..." && \
-      openapi-generator-cli generate -i src/api/openapi.json -g typescript-fetch -o src/api/generated; \
+      openapi-generator-cli generate -i src/api/openapi.yaml -g typescript-fetch -o src/api/generated; \
     else \
-      echo "Warning: src/api/openapi.json not found, skipping client generation"; \
+      echo "Warning: src/api/openapi.yaml not found, skipping client generation"; \
     fi
 
 # Expose dev server port

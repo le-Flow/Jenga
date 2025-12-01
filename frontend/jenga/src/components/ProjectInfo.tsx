@@ -1,6 +1,6 @@
 import { Stack, TextField } from "@suid/material"
 import { Setter } from "solid-js"
-import { ProjectResponseDTO } from "../api"
+import { ProjectResponseDTO } from "../api/generated"
 import { InfoMode } from "../utils/utils"
 
 interface ProjectInfoProps {

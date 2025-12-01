@@ -1,6 +1,6 @@
 import { Alert, AlertTitle, Button, Stack, TextField } from "@suid/material";
 import { Show, createSignal, useContext } from "solid-js";
-import { LoginRequestDTO } from "../api";
+import { LoginRequestDTO } from "../api/generated";
 import { AuthContext } from "../provider/AuthProvider";
 
 export const LogIn = () => {

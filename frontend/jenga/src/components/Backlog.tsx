@@ -1,7 +1,7 @@
 import { Add } from "@suid/icons-material"
 import { Card, CardHeader, CardContent, List, ListItem, ListItemButton, ListItemText, CardActions, IconButton, ListItemAvatar, Avatar } from "@suid/material"
 import { useContext, createSignal, For } from "solid-js"
-import { TicketResponseDTO } from "../api"
+import { TicketResponseDTO } from "../api/generatedi"
 import { ProjectContext } from "../provider/ProjectProvider"
 import { NewTicketDialog } from "./NewTicketDialog"
 

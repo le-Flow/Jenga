@@ -1,5 +1,6 @@
 import { Accessor, JSXElement, Resource, createContext, createMemo, createResource, createSignal } from "solid-js";
-import { AuthenticationResourceService, LoginRequestDTO, LoginResponseDTO, OpenAPI, RegisterRequestDTO } from "../api";
+import { AuthenticationResourceService, LoginRequestDTO, LoginResponseDTO, OpenAPI, RegisterRequestDTO } from "../api/generated";
+
 
 type AuthContextType = {
   login?: (request: LoginRequestDTO) => void;

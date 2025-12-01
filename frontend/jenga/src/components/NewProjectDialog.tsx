@@ -1,6 +1,6 @@
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@suid/material"
 import { Setter, useContext, createSignal, createEffect } from "solid-js"
-import { ProjectRequestDTO, ProjectResponseDTO, ProjectResourceService } from "../api"
+import { ProjectRequestDTO, ProjectResponseDTO, ProjectResourceService } from "../api/generated"
 import { ProjectContext } from "../provider/ProjectProvider"
 import { ProjectInfo } from "./ProjectInfo"
 import { InfoMode } from "../utils/utils"
