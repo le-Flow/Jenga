@@ -78,8 +78,7 @@ public class TicketResource {
     public List<TicketResponseDTO> searchTickets(TicketSearchDTO request) {
         log.info("POST /search/");
         log.info("Body: " + request);
-        List<TicketResponseDTO> results = ticketService.searchTickets(request);
-        return results;
+        return ticketService.searchTickets(request);
     }
 
     @POST
@@ -126,16 +125,14 @@ public class TicketResource {
     public AcceptanceCriteriaResponseDTO addAcceptanceCriteria(
             @PathParam("ticketId") Long ticketId,
             AcceptanceCriteriaRequestDTO request) {
-        AcceptanceCriteriaResponseDTO response = ticketService.addAcceptanceCriteria(ticketId, request);
-        return response;
+        return ticketService.addAcceptanceCriteria(ticketId, request);
     }
 
     @GET
     @Path("/{ticketId}/acceptance-criteria")
     public List<AcceptanceCriteriaResponseDTO> getAllAcceptanceCriteria(
             @PathParam("ticketId") Long ticketId) {
-        List<AcceptanceCriteriaResponseDTO> criteriaList = ticketService.getAllAcceptanceCriteria(ticketId);
-        return criteriaList;
+        return ticketService.getAllAcceptanceCriteria(ticketId);
     }
 
     @PUT
