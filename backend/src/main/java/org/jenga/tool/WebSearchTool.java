@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class WebSearchTool {
 
-    @Inject //leaving inject here since constructor injections with RestClient is a pain
+    @Inject // leaving inject here since constructor injections with RestClient is a pain
     @RestClient
     GoogleSearchApi searchApi;
 
@@ -30,6 +30,9 @@ public class WebSearchTool {
     @Tool("Performs a web search for a given query")
     public List<String> searchWeb(String query) {
         try {
+            if (apiKey == null || apiKey.isBlank() || searchEngineId == null || searchEngineId.isBlank()) {
+                return List.of("Web search is not configured (missing API key or CSE ID).");
+            }
             WebSearchResponseDTO response = searchApi.search(apiKey, searchEngineId, query);
 
             if (response == null || response.getItems() == null || response.getItems().isEmpty()) {
@@ -41,8 +44,7 @@ public class WebSearchTool {
                             "Title: %s\nSnippet: %s\nURL: %s",
                             item.getTitle(),
                             item.getSnippet(),
-                            item.getLink()
-                    ))
+                            item.getLink()))
                     .collect(Collectors.toList());
 
         } catch (Exception e) {
