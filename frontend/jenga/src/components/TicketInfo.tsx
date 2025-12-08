@@ -1,6 +1,6 @@
 import { FormControl, InputLabel, MenuItem, Select, Stack, TextField } from "@suid/material"
 import { For } from "solid-js"
-import { TicketResponseDTO, TicketPriority, TicketSize, TicketStatus } from "../api/generated"
+import { TicketResponseDTO, TicketPriority, TicketSize, TicketStatus } from "../api"
 import { InfoMode } from "../utils/utils"
 interface TicketInfoProps {
     mode: InfoMode

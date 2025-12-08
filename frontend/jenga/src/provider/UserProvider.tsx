@@ -1,5 +1,5 @@
 import { JSXElement, Resource, createContext, createEffect, createResource, useContext } from "solid-js";
-import { UserDTO, UserResourceService } from "../api/generated";
+import { UserDTO, UserResourceService } from "../api";
 import { AuthContext } from "./AuthProvider";
 
 type UserContextType = {

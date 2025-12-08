@@ -1,0 +1,1165 @@
+---
+openapi: 3.1.0
+paths:
+  /ai/chat:
+    get:
+      parameters:
+      - name: message
+        in: query
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+      summary: Chat With Gemini
+      tags:
+      - Ai Resource
+  /ai/story:
+    get:
+      parameters:
+      - name: animal
+        in: query
+        schema:
+          type: string
+      - name: setting
+        in: query
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+      summary: Get Story
+      tags:
+      - Ai Resource
+  /api/ai/chat:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatRequestDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatResponseDTO"
+        "400":
+          description: Bad Request
+      summary: Chat
+      tags:
+      - Ai Resource
+  /api/auth/login:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequestDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponseDTO"
+        "400":
+          description: Bad Request
+      summary: Login
+      tags:
+      - Authentication Resource
+  /api/auth/register:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequestDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponseDTO"
+        "400":
+          description: Bad Request
+      summary: Register
+      tags:
+      - Authentication Resource
+  /api/import/{projectId}/github:
+    post:
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/GitHubIssueDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      summary: Import From Git Hub
+      tags:
+      - Import Resource
+  /api/import/{projectId}/import:
+    post:
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/TicketRequestDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      summary: Import From Jenga
+      tags:
+      - Import Resource
+  /api/projects:
+    get:
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProjectResponseDTO"
+      summary: Get All Projects
+      tags:
+      - Project Resource
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectRequestDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectResponseDTO"
+        "400":
+          description: Bad Request
+      summary: Create Project
+      tags:
+      - Project Resource
+  /api/projects/{projectId}:
+    put:
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectRequestDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectResponseDTO"
+        "400":
+          description: Bad Request
+      summary: Update Project
+      tags:
+      - Project Resource
+    get:
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectResponseDTO"
+      summary: Get Project By Identifier
+      tags:
+      - Project Resource
+    delete:
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+      summary: Delete Project
+      tags:
+      - Project Resource
+  /api/projects/{projectId}/labels:
+    get:
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LabelDTO"
+      summary: Get All Labels
+      tags:
+      - Project Resource
+    post:
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LabelDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LabelDTO"
+        "400":
+          description: Bad Request
+      summary: Create Label
+      tags:
+      - Project Resource
+  /api/projects/{projectId}/labels/{labelName}:
+    delete:
+      parameters:
+      - name: labelName
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+      summary: Delete Label
+      tags:
+      - Project Resource
+  /api/tickets/search:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TicketSearchDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TicketResponseDTO"
+        "400":
+          description: Bad Request
+      summary: Search Tickets
+      tags:
+      - Ticket Resource
+  /api/tickets/{projectId}:
+    post:
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TicketRequestDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TicketResponseDTO"
+        "400":
+          description: Bad Request
+      summary: Create Ticket
+      tags:
+      - Ticket Resource
+  /api/tickets/{projectId}/all:
+    get:
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TicketResponseDTO"
+      summary: Get All Tickets
+      tags:
+      - Ticket Resource
+  /api/tickets/{projectId}/{ticketNumber}:
+    get:
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: ticketNumber
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TicketResponseDTO"
+      summary: Get Ticket By Number
+      tags:
+      - Ticket Resource
+  /api/tickets/{ticketId}:
+    put:
+      parameters:
+      - name: ticketId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TicketRequestDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TicketResponseDTO"
+        "400":
+          description: Bad Request
+      summary: Update Ticket
+      tags:
+      - Ticket Resource
+    get:
+      parameters:
+      - name: ticketId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TicketResponseDTO"
+      summary: Get Ticket By Id
+      tags:
+      - Ticket Resource
+    delete:
+      parameters:
+      - name: ticketId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+      summary: Delete Ticket
+      tags:
+      - Ticket Resource
+  /api/tickets/{ticketId}/acceptance-criteria:
+    get:
+      parameters:
+      - name: ticketId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AcceptanceCriteriaResponseDTO"
+      summary: Get All Acceptance Criteria
+      tags:
+      - Ticket Resource
+    post:
+      parameters:
+      - name: ticketId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AcceptanceCriteriaRequestDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AcceptanceCriteriaResponseDTO"
+        "400":
+          description: Bad Request
+      summary: Add Acceptance Criteria
+      tags:
+      - Ticket Resource
+  /api/tickets/{ticketId}/acceptance-criteria/{criteriaId}:
+    put:
+      parameters:
+      - name: criteriaId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: ticketId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AcceptanceCriteriaRequestDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AcceptanceCriteriaResponseDTO"
+        "400":
+          description: Bad Request
+      summary: Update Acceptance Criteria
+      tags:
+      - Ticket Resource
+    delete:
+      parameters:
+      - name: criteriaId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: ticketId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+      summary: Delete Acceptance Criteria
+      tags:
+      - Ticket Resource
+  /api/tickets/{ticketId}/assign:
+    put:
+      parameters:
+      - name: ticketId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: username
+        in: query
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+      summary: Assign Ticket
+      tags:
+      - Ticket Resource
+  /api/tickets/{ticketId}/block/{blockedTicketId}:
+    delete:
+      parameters:
+      - name: blockedTicketId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: ticketId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+      summary: Remove Blocking Ticket
+      tags:
+      - Ticket Resource
+    put:
+      parameters:
+      - name: blockedTicketId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: ticketId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+      summary: Add Blocking Ticket
+      tags:
+      - Ticket Resource
+  /api/tickets/{ticketId}/comments:
+    get:
+      parameters:
+      - name: ticketId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CommentResponseDTO"
+      summary: Get All Comments
+      tags:
+      - Ticket Resource
+    post:
+      parameters:
+      - name: ticketId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CommentRequestDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommentResponseDTO"
+        "400":
+          description: Bad Request
+      summary: Create Comment
+      tags:
+      - Ticket Resource
+  /api/tickets/{ticketId}/comments/{commentId}:
+    delete:
+      parameters:
+      - name: commentId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: ticketId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+      summary: Delete Comment
+      tags:
+      - Ticket Resource
+  /api/tickets/{ticketId}/duplicate:
+    post:
+      parameters:
+      - name: ticketId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TicketResponseDTO"
+      summary: Duplicate Ticket
+      tags:
+      - Ticket Resource
+  /api/tickets/{ticketId}/related/{relatedTicketId}:
+    delete:
+      parameters:
+      - name: relatedTicketId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: ticketId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+      summary: Remove Related Ticket
+      tags:
+      - Ticket Resource
+    put:
+      parameters:
+      - name: relatedTicketId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: ticketId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+      summary: Add Related Ticket
+      tags:
+      - Ticket Resource
+  /api/tickets/{ticketId}/unassign:
+    put:
+      parameters:
+      - name: ticketId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+      summary: Unassign Ticket
+      tags:
+      - Ticket Resource
+  /api/users/search:
+    get:
+      parameters:
+      - name: username
+        in: query
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserDTO"
+      summary: Search Users
+      tags:
+      - User Resource
+  /api/users/{username}:
+    get:
+      parameters:
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDTO"
+      summary: Get User By Username
+      tags:
+      - User Resource
+components:
+  schemas:
+    AcceptanceCriteriaRequestDTO:
+      type: object
+      properties:
+        description:
+          type: string
+        completed:
+          type: boolean
+    AcceptanceCriteriaResponseDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        description:
+          type: string
+        completed:
+          type: boolean
+    ChatRequestDTO:
+      type: object
+      properties:
+        message:
+          type: string
+        conversationId:
+          type: string
+        currentUser:
+          type: string
+        currentProjectID:
+          type: integer
+          format: int64
+        currentTicketID:
+          type: integer
+          format: int64
+    ChatResponseDTO:
+      type: object
+      properties:
+        response:
+          type: string
+        conversationId:
+          type: string
+    CommentRequestDTO:
+      type: object
+      properties:
+        comment:
+          type: string
+    CommentResponseDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        author:
+          type: string
+        comment:
+          type: string
+        createDate:
+          $ref: "#/components/schemas/LocalDateTime"
+        modifyDate:
+          $ref: "#/components/schemas/LocalDateTime"
+    Filter:
+      type: object
+      properties:
+        priority:
+          type: array
+          items:
+            $ref: "#/components/schemas/TicketPriority"
+        size:
+          type: array
+          items:
+            $ref: "#/components/schemas/TicketSize"
+        status:
+          type: array
+          items:
+            $ref: "#/components/schemas/TicketStatus"
+        reporter:
+          type: array
+          items:
+            type: string
+        assignee:
+          type: array
+          items:
+            type: string
+        labels:
+          type: array
+          items:
+            type: string
+    GitHubAssigneeDTO:
+      type: object
+      properties:
+        login:
+          type: string
+    GitHubCommentDTO:
+      type: object
+      properties:
+        body:
+          type: string
+        createdAt:
+          type: string
+        author:
+          $ref: "#/components/schemas/GitHubAssigneeDTO"
+    GitHubIssueDTO:
+      type: object
+      properties:
+        milestone:
+          $ref: "#/components/schemas/GitHubMilestoneDTO"
+        number:
+          type: integer
+          format: int32
+        assignees:
+          type: array
+          items:
+            $ref: "#/components/schemas/GitHubAssigneeDTO"
+        title:
+          type: string
+        comments:
+          type: array
+          items:
+            $ref: "#/components/schemas/GitHubCommentDTO"
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        projectItems:
+          type: array
+          items:
+            $ref: "#/components/schemas/GitHubProjectItemDTO"
+        labels:
+          type: array
+          items:
+            $ref: "#/components/schemas/GitHubLabelDTO"
+        body:
+          type: string
+    GitHubLabelDTO:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        color:
+          type: string
+    GitHubMilestoneDTO:
+      type: object
+      properties:
+        title:
+          type: string
+    GitHubProjectItemDTO:
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/GitHubProjectStatusDTO"
+    GitHubProjectStatusDTO:
+      type: object
+      properties:
+        name:
+          type: string
+    LabelDTO:
+      type: object
+      properties:
+        name:
+          type: string
+        color:
+          type: string
+    LocalDateTime:
+      type: string
+      format: date-time
+      examples:
+      - 2022-03-10T12:15:50
+    LoginRequestDTO:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+    LoginResponseDTO:
+      type: object
+      properties:
+        username:
+          type: string
+        token:
+          type: string
+        expiresIn:
+          type: integer
+          format: int32
+    ProjectRequestDTO:
+      type: object
+      properties:
+        identifier:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+    ProjectResponseDTO:
+      type: object
+      properties:
+        identifier:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        createDate:
+          $ref: "#/components/schemas/LocalDateTime"
+        modifyDate:
+          $ref: "#/components/schemas/LocalDateTime"
+    RegisterRequestDTO:
+      type: object
+      properties:
+        email:
+          type: string
+        username:
+          type: string
+        password:
+          type: string
+    TicketPriority:
+      type: string
+      enum:
+      - LOW
+      - MEDIUM
+      - HIGH
+      - CRITICAL
+    TicketRequestDTO:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        priority:
+          $ref: "#/components/schemas/TicketPriority"
+        size:
+          $ref: "#/components/schemas/TicketSize"
+        status:
+          $ref: "#/components/schemas/TicketStatus"
+        projectName:
+          type: string
+        assignee:
+          type: string
+        reporter:
+          type: string
+        labels:
+          type: array
+          items:
+            type: string
+        acceptanceCriteria:
+          type: array
+          items:
+            $ref: "#/components/schemas/AcceptanceCriteriaRequestDTO"
+        relatedTicketsIds:
+          type: array
+          items:
+            type: integer
+            format: int64
+        blockingTicketIds:
+          type: array
+          items:
+            type: integer
+            format: int64
+        blockedTicketIds:
+          type: array
+          items:
+            type: integer
+            format: int64
+    TicketResponseDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        ticketNumber:
+          type: integer
+          format: int64
+        title:
+          type: string
+        description:
+          type: string
+        projectName:
+          type: string
+        priority:
+          $ref: "#/components/schemas/TicketPriority"
+        size:
+          $ref: "#/components/schemas/TicketSize"
+        status:
+          $ref: "#/components/schemas/TicketStatus"
+        createDate:
+          $ref: "#/components/schemas/LocalDateTime"
+        modifyDate:
+          $ref: "#/components/schemas/LocalDateTime"
+        reporter:
+          type: string
+        assignee:
+          type: string
+        labels:
+          type: array
+          items:
+            type: string
+        acceptanceCriteria:
+          type: array
+          items:
+            $ref: "#/components/schemas/AcceptanceCriteriaResponseDTO"
+        relatedTicketsIds:
+          type: array
+          items:
+            type: integer
+            format: int64
+        blockingTicketIds:
+          type: array
+          items:
+            type: integer
+            format: int64
+        blockedTicketIds:
+          type: array
+          items:
+            type: integer
+            format: int64
+    TicketSearchDTO:
+      type: object
+      properties:
+        projectId:
+          type: string
+        query:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        filter:
+          $ref: "#/components/schemas/Filter"
+        limit:
+          type: integer
+          format: int32
+    TicketSize:
+      type: string
+      enum:
+      - TINY
+      - SMALL
+      - MEDIUM
+      - LARGE
+      - HUGE
+    TicketStatus:
+      type: string
+      enum:
+      - OPEN
+      - IN_PROGRESS
+      - IN_REVIEW
+      - RESOLVED
+      - CLOSED
+      - ON_HOLD
+    UserDTO:
+      type: object
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+  securitySchemes:
+    SecurityScheme:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Authentication
+info:
+  title: Jenga API
+  version: 0.0.1-SNAPSHOT
+servers:
+- url: http://localhost:8080
+  description: Auto generated value
+- url: http://0.0.0.0:8080
+  description: Auto generated value

@@ -1,6 +1,6 @@
 import { Box, Button } from "@suid/material"
 import { createEffect, createSignal, useContext } from "solid-js"
-import { GitHubIssueDTO, ImportResourceService } from "../api/generated"
+import { GitHubIssueDTO, ImportResourceService } from "../api"
 import { ProjectContext } from "../provider/ProjectProvider"
 
 export const Filedrop = () => {

@@ -1,6 +1,6 @@
 import { Button, Stack, TextField } from "@suid/material";
 import { createSignal, useContext } from "solid-js";
-import { RegisterRequestDTO } from "../api/generated";
+import { RegisterRequestDTO } from "../api";
 import { AuthContext } from "../provider/AuthProvider";
 
 export const Register = () => {

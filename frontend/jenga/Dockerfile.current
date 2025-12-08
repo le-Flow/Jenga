@@ -7,38 +7,20 @@ FROM node:${NODE_VERSION}-alpine AS build
 WORKDIR /app
 
 # Install system dependencies --> need Java for OpenAPI generator
-RUN apk add --no-cache curl bash git openjdk17
+#RUN apk add --no-cache curl bash git openjdk17
 
 # Copy package files and install dependencies
 COPY package*.json ./
 RUN npm ci
 
-# Install OpenAPI generator CLI globally
-RUN npm install -g @openapitools/openapi-generator-cli
-
 # Copy the rest of the source code
 COPY . .
 
 # Ensure output folder exists
-RUN mkdir -p src/api/generated
+RUN mkdir -p src/api
 
-# Generate OpenAPI client at build time if openapi.yaml exists
-RUN if [ -f src/api/openapi.yaml ]; then \
-      echo "Generating OpenAPI client from YAML..." && \
-      openapi-generator-cli generate -i src/api/openapi.yaml -g typescript-fetch -o src/api/generated --skip-validate-spec --enable-post-process-file; \
-    else \
-      echo "Warning: src/api/openapi.yaml not found, skipping client generation"; \
-    fi
+RUN npm run gen:api
 
-# Generate a robust index.ts exporting all generated modules
-RUN echo "Generating src/api/generated/index.ts..." && \
-    find src/api/generated -maxdepth 1 -type f -name '*.ts' ! -name 'index.ts' \
-    -exec basename {} .ts \; | awk '{print "export * from \"./"$1"\";"}' > src/api/generated/index.ts
-
-# check essential export AuthenticationResourceService
-RUN grep -q "AuthenticationResourceService" src/api/generated/index.ts || echo "WARNING: AuthenticationResourceService not exported in index.ts"
-
-# Build production frontend
 RUN npm run build
 
 # ============================
@@ -46,6 +28,7 @@ RUN npm run build
 # ============================
 FROM nginx:1.27-alpine AS runtime
 
+WORKDIR /app
 # Copy built frontend
 COPY --from=build /app/dist /usr/share/nginx/html
 

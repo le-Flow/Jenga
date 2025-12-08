@@ -1,5 +1,5 @@
 import { Accessor, JSXElement, Resource, Setter, createContext, createEffect, createResource, createSignal, useContext } from "solid-js";
-import { ProjectResponseDTO, ProjectResourceService, TicketResponseDTO, TicketResourceService } from "../api/generated";
+import { ProjectResponseDTO, ProjectResourceService, TicketResponseDTO, TicketResourceService } from "../api";
 import { AuthContext } from "./AuthProvider";
 
 type ProjectContextType = {

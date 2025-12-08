@@ -1,6 +1,6 @@
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@suid/material"
 import { Setter, useContext, createSignal, createEffect } from "solid-js"
-import { TicketPriority, TicketSize, TicketStatus, TicketRequestDTO, TicketResponseDTO, TicketResourceService } from "../api/generated"
+import { TicketPriority, TicketSize, TicketStatus, TicketRequestDTO, TicketResponseDTO, TicketResourceService } from "../api"
 import { ProjectContext } from "../provider/ProjectProvider"
 import { TicketInfo } from "./TicketInfo"
 import { InfoMode } from "../utils/utils"
