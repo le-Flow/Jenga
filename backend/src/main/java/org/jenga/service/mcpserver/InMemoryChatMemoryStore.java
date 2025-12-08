@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+
 @ApplicationScoped
 public class InMemoryChatMemoryStore implements ChatMemoryStore {
 
