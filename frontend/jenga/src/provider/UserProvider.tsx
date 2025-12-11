@@ -1,4 +1,4 @@
-import { JSXElement, Resource, createContext, createResource, useContext } from "solid-js";
+import { JSXElement, Resource, createContext, createEffect, createResource, useContext } from "solid-js";
 import { UserDTO, UserResourceService } from "../api";
 import { AuthContext } from "./AuthProvider";
 
@@ -26,6 +26,12 @@ export const UserProvider = (props: ProviderProps) => {
             return await UserResourceService.getApiUsers(username);
         }
     );
+
+    createEffect(() => {
+        if (!auth?.isLoggedIn()) {
+            setUser(() => undefined);
+        }
+    });
 
     const value: UserContextType = {
         user,

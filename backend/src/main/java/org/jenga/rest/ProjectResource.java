@@ -1,8 +1,8 @@
 package org.jenga.rest;
 
 import org.jenga.service.ProjectService;
-import org.jenga.dto.ProjectDTO;
-import org.jenga.dto.CreateProjectDTO;
+import org.jenga.dto.ProjectRequestDTO;
+import org.jenga.dto.ProjectResponseDTO;
 import org.jenga.dto.LabelDTO;
 
 
@@ -10,38 +10,38 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import lombok.RequiredArgsConstructor;
+
 import java.util.List;
 
 @Path("/api/projects")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@RequiredArgsConstructor(onConstructor_ = {@Inject})
 public class ProjectResource {
 
-    @Inject
-    ProjectService projectService;
+    private final ProjectService projectService;
 
     @POST
-    public Response createProject(CreateProjectDTO createProjectDTO) {
-        projectService.create(createProjectDTO);
-        return Response.status(Response.Status.CREATED).build();
+    public ProjectResponseDTO createProject(ProjectRequestDTO projectRequestDTO) {
+        return projectService.create(projectRequestDTO);
     }
 
     @GET
-    public List<ProjectDTO> getAllProjects() {
+    public List<ProjectResponseDTO> getAllProjects() {
         return projectService.findAll();
     }
 
     @GET
     @Path("/{projectId}")
-    public ProjectDTO getProjectByIdentifier(@PathParam("projectId") String projectId) {
+    public ProjectResponseDTO getProjectByIdentifier(@PathParam("projectId") String projectId) {
         return projectService.findById(projectId);
     }
 
     @PUT
     @Path("/{projectId}")
-    public Response updateProject(@PathParam("projectId") String projectId, ProjectDTO projectDTO) {
-        projectService.update(projectId, projectDTO);
-        return Response.ok().build();
+    public ProjectResponseDTO updateProject(@PathParam("projectId") String projectId, ProjectRequestDTO projectRequestDTO) {
+        return projectService.update(projectId, projectRequestDTO);
     }
 
     @DELETE
@@ -53,9 +53,8 @@ public class ProjectResource {
 
     @POST
     @Path("/{projectId}/labels")
-    public Response createLabel(@PathParam("projectId") String projectId, LabelDTO labelDTO) {
-        projectService.createLabel(projectId, labelDTO);
-        return Response.status(Response.Status.CREATED).build();
+    public LabelDTO createLabel(@PathParam("projectId") String projectId, LabelDTO labelDTO) {
+        return projectService.createLabel(projectId, labelDTO);
     }
 
     @GET
