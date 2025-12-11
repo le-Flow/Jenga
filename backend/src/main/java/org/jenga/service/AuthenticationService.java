@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 
 import javax.security.auth.login.LoginException;
 import jakarta.ws.rs.BadRequestException;
+import io.quarkus.security.AuthenticationFailedException;
 import io.quarkus.elytron.security.common.BcryptUtil;
 import io.smallrye.jwt.build.Jwt;
 
@@ -97,7 +98,7 @@ public class AuthenticationService {
         User currentUser = userRepository.findByUsername(username);
 
         if (currentUser == null) {
-            throw new RuntimeException("Failed to get user from security context: " + username);
+            throw new AuthenticationFailedException("Failed to get user from security context: " + username);
         }
 
         return currentUser;
