@@ -1,4 +1,4 @@
-package org.jenga.dto.MCP_Server;
+package org.jenga.dto.mcpserver;
 
 import lombok.Data;
 import lombok.AllArgsConstructor;
@@ -9,4 +9,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ChatResponseDTO {
     private String response;
+    private String conversationId;
 }

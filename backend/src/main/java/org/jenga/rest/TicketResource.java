@@ -13,15 +13,19 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.List;
 
 @Path("/api/tickets")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@Slf4j
+@RequiredArgsConstructor(onConstructor_ = {@Inject})
 public class TicketResource {
 
-    @Inject
-    TicketService ticketService;
+    private final TicketService ticketService;
 
     @POST
     @Path("/{projectId}")
@@ -72,10 +76,9 @@ public class TicketResource {
     @POST
     @Path("/search")
     public List<TicketResponseDTO> searchTickets(TicketSearchDTO request) {
-            System.out.println("POST /search/");
-    System.out.println("Body: " + request);
-        List<TicketResponseDTO> results = ticketService.searchTickets(request);
-        return results;
+        log.info("POST /search/");
+        log.info("Body: " + request);
+        return ticketService.searchTickets(request);
     }
 
     @POST
@@ -122,16 +125,14 @@ public class TicketResource {
     public AcceptanceCriteriaResponseDTO addAcceptanceCriteria(
             @PathParam("ticketId") Long ticketId,
             AcceptanceCriteriaRequestDTO request) {
-        AcceptanceCriteriaResponseDTO response = ticketService.addAcceptanceCriteria(ticketId, request);
-        return response;
+        return ticketService.addAcceptanceCriteria(ticketId, request);
     }
 
     @GET
     @Path("/{ticketId}/acceptance-criteria")
     public List<AcceptanceCriteriaResponseDTO> getAllAcceptanceCriteria(
             @PathParam("ticketId") Long ticketId) {
-        List<AcceptanceCriteriaResponseDTO> criteriaList = ticketService.getAllAcceptanceCriteria(ticketId);
-        return criteriaList;
+        return ticketService.getAllAcceptanceCriteria(ticketId);
     }
 
     @PUT
@@ -154,7 +155,7 @@ public class TicketResource {
 
     @PUT
     @Path("/{ticketId}/related/{relatedTicketId}")
-    public Response AddRelatedTicket(
+    public Response addRelatedTicket(
             @PathParam("ticketId") Long ticketId,
             @PathParam("relatedTicketId") Long relatedTicketId) {
         ticketService.addRelatedTicket(ticketId, relatedTicketId);
