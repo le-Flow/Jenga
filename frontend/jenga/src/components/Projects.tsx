@@ -1,12 +1,51 @@
-import { Button, Card, CardActions, CardContent, CardHeader, List, ListItem, ListItemButton, ListItemSecondaryAction, ListItemText, Stack } from "@suid/material"
+import { Button, Card, CardActions, CardContent, CardHeader, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, List, ListItem, ListItemButton, ListItemSecondaryAction, ListItemText, Stack } from "@suid/material"
 import { ProjectContext } from "../provider/ProjectProvider"
-import { Show, createMemo, createSignal, For, useContext } from "solid-js"
+import { Show, createMemo, createSignal, For, useContext, Setter, Accessor } from "solid-js"
 import { Delete } from "@suid/icons-material"
 import { NewProjectDialog } from "./NewProjectDialog"
 import { ProjectResourceService } from "../api"
 import { ProjectInfo } from "./ProjectInfo"
 import { AuthContext } from "../provider/AuthProvider"
 import { InfoMode } from "../utils/utils"
+
+interface ConfirmDialogProps {
+    setOpen: Setter<boolean>
+    open: boolean
+}
+
+const ConfirmDialog = (props: ConfirmDialogProps) => {
+    const pCtx = useContext(ProjectContext)
+
+    const onCancel = () => {
+        props.setOpen(false)
+    }
+
+    const onConfirm = () => {
+        const id = pCtx?.selectedProject()?.identifier
+        if (id) pCtx?.deleteProject(id);
+        props.setOpen(false)
+    }
+
+    return (
+        <Dialog
+            open={props.open}
+        >
+            <DialogTitle>Confirm Deletion</DialogTitle>
+            <DialogContent>
+                <DialogContentText>
+                    <Stack>
+                        Are you sure?
+                        This can't be undone!
+                    </Stack>
+                </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={onCancel}>Cancel</Button>
+                <Button onClick={onConfirm} color="warning">Confirm</Button>
+            </DialogActions>
+        </Dialog>
+    )
+}
 
 
 export const Projects = () => {
@@ -15,6 +54,7 @@ export const Projects = () => {
     const aCtx = useContext(AuthContext)
 
     const [open, setOpen] = createSignal(false)
+    const [openConfirm, setOpenConfirm] = createSignal(false)
 
     const projectCtx = useContext(ProjectContext)
     const formId = "selected-project-form"
@@ -48,7 +88,10 @@ export const Projects = () => {
                                                     />
                                                 </ListItemButton>
                                                 <ListItemSecondaryAction>
-                                                    <ListItemButton onClick={() => { if (p.identifier) pCtx?.deleteProject(p.identifier) }}>
+                                                    <ListItemButton onClick={() => {
+                                                        pCtx?.setSelectedProject(p);
+                                                        setOpenConfirm(true);
+                                                    }}>
                                                         <Delete></Delete>
                                                     </ListItemButton>
                                                 </ListItemSecondaryAction>
@@ -70,35 +113,36 @@ export const Projects = () => {
                         <Card>
                             <CardHeader title="ProjectInfo" />
                             <CardContent>
-                                    <ProjectInfo
-                                        mode={InfoMode.Edit}
-                                        formId={formId}
-                                        project={project()}
-                                        onProjectChange={(next) => pCtx?.setSelectedProject(() => next)}
-                                        onSubmit={async (next) => {
-                                            if (!next.identifier) return
-                                            try {
-                                                await ProjectResourceService.putApiProjects(next.identifier, next)
-                                                pCtx?.setProjects((prev) =>
-                                                    prev?.map((existing) =>
-                                                        existing.identifier === next.identifier ? { ...existing, ...next } : existing
-                                                    )
+                                <ProjectInfo
+                                    mode={InfoMode.Edit}
+                                    formId={formId}
+                                    project={project()}
+                                    onProjectChange={(next) => pCtx?.setSelectedProject(() => next)}
+                                    onSubmit={async (next) => {
+                                        if (!next.identifier) return
+                                        try {
+                                            await ProjectResourceService.putApiProjects(next.identifier, next)
+                                            pCtx?.setProjects((prev) =>
+                                                prev?.map((existing) =>
+                                                    existing.identifier === next.identifier ? { ...existing, ...next } : existing
                                                 )
-                                                pCtx?.setSelectedProject(() => ({ ...next }))
-                                            } catch (error) {
-                                                console.error("Failed to update project", error)
-                                            }
-                                        }}
-                                    />
-                                    <Button type="submit" form={formId}>
-                                        save
-                                    </Button>
+                                            )
+                                            pCtx?.setSelectedProject(() => ({ ...next }))
+                                        } catch (error) {
+                                            console.error("Failed to update project", error)
+                                        }
+                                    }}
+                                />
+                                <Button type="submit" form={formId}>
+                                    save
+                                </Button>
                             </CardContent>
                         </Card>
                     )}
                 </Show>
             </Stack>
             <NewProjectDialog open={open()} setOpen={setOpen}></NewProjectDialog>
+            <ConfirmDialog open={openConfirm()} setOpen={setOpenConfirm}></ConfirmDialog>
         </>
     )
 }
