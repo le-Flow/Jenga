@@ -3,7 +3,6 @@ package org.jenga.tool;
 import jakarta.ws.rs.NotFoundException;
 import org.jenga.dto.TicketRequestDTO;
 import org.jenga.dto.TicketResponseDTO;
-import org.jenga.model.TicketPriority;
 import org.jenga.model.TicketStatus;
 import org.jenga.service.TicketService;
 import org.jenga.service.mcpserver.ChatRequestContext;

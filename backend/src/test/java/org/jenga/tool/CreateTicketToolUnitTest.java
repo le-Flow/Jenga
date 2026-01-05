@@ -14,8 +14,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.Collections;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -71,7 +69,8 @@ public class CreateTicketToolUnitTest {
         when(userRepository.findByUsername("alice")).thenReturn(assigneeUser);
 
         // Mocking Panache Query logic for labels
-        PanacheQuery query = mock(PanacheQuery.class);
+        @SuppressWarnings("unchecked")
+        PanacheQuery<Label> query = mock(PanacheQuery.class);
         when(labelRepository.find(anyString(), any(Object.class), any(Object.class))).thenReturn(query);
         Label label = new Label();
         label.setName("bug");

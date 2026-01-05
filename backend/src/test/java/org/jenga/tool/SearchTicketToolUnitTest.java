@@ -1,6 +1,5 @@
 package org.jenga.tool;
 
-import org.jenga.dto.TicketResponseDTO;
 import org.jenga.dto.TicketSearchDTO;
 import org.jenga.model.TicketPriority;
 import org.jenga.model.TicketStatus;
@@ -16,7 +15,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
