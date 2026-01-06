@@ -19,10 +19,10 @@ public class ChatSessionEntity extends PanacheEntityBase {
     public String sessionId;
 
     @jakarta.persistence.ManyToOne
-    @jakarta.persistence.JoinColumn(name = "user_id") // Maps to 'users' table PK (username)
+    @jakarta.persistence.JoinColumn(name = "user_id")
     public User user;
 
-    public Long projectId; // Added to scope chat to a project
+    public Long projectId;
     public String title;
     public LocalDateTime startedAt;
 

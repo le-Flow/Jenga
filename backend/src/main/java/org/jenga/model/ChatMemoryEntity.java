@@ -14,21 +14,11 @@ import lombok.Data;
 @lombok.EqualsAndHashCode(callSuper = true)
 public class ChatMemoryEntity extends PanacheEntity {
 
-    @Column(nullable = false) // Removed index=true as it's not standard JPA, though Hibernate supports it.
-                              // For now, keeping it simple or I can add @Index to @Table if needed, but the
-                              // prompt used @Column(index=true) which might be a shorthand in some versions
-                              // or pseudocode. Wait, @Column in JPA doesn't have index attribute. Use
-                              // @Table(indexes = ...). However, maybe the user meant a specific extension. I
-                              // will stick to standard JPA.
-    // Actually, let's look at the user snippet: @Column(nullable = false, index =
-    // true). 'index' is not a member of jakarta.persistence.Column. It might be a
-    // mistake in the user's snippet. Use distinct index annotation or table index.
-    // I will remove 'index = true' to avoid compilation error and maybe add it
-    // properly if needed, or just leave it out for now.
+    @Column(nullable = false)
     public String memoryId;
 
-    @Column(columnDefinition = "TEXT") // or JSONB if using Postgres
+    @Column(columnDefinition = "TEXT")
     public String messageJson;
 
-    public String messageType; // "USER", "AI", "SYSTEM" (Optional, for debugging)
+    public String messageType; // "USER", "AI", "SYSTEM"
 }

@@ -9,5 +9,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ChatMessageDTO {
     private String type;
-    private String content; // Text content
+    private String content;
 }
