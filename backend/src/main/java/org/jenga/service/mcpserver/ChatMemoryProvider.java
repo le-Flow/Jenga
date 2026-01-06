@@ -9,15 +9,15 @@ import lombok.RequiredArgsConstructor;
 import java.util.function.Supplier;
 
 @ApplicationScoped
-@RequiredArgsConstructor(onConstructor_ = {@Inject})
+@RequiredArgsConstructor(onConstructor_ = { @Inject })
 public class ChatMemoryProvider implements Supplier<ChatMemory> {
 
-    private final InMemoryChatMemoryStore store;
+    private final DatabaseChatMemoryStore store;
 
     @Override
     public ChatMemory get() {
         return MessageWindowChatMemory.builder()
-                .maxMessages(10)
+                .maxMessages(20)
                 .chatMemoryStore(store)
                 .build();
     }
