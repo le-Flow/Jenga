@@ -8,6 +8,7 @@ import dev.langchain4j.data.message.ChatMessageDeserializer;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 import org.jenga.model.ChatMemoryEntity;
+import org.jenga.model.MessageType;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,7 +34,7 @@ public class DatabaseChatMemoryStore implements ChatMemoryStore {
             ChatMemoryEntity entity = new ChatMemoryEntity();
             entity.memoryId = memoryId.toString();
             entity.messageJson = ChatMessageSerializer.messageToJson(message);
-            entity.messageType = message.type().toString();
+            entity.messageType = MessageType.valueOf(message.type().name());
             entity.persist();
         }
     }
