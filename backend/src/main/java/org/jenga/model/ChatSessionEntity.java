@@ -6,6 +6,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
 
 import java.time.LocalDateTime;
 
@@ -18,8 +20,8 @@ public class ChatSessionEntity extends PanacheEntityBase {
     @Id
     public String sessionId;
 
-    @jakarta.persistence.ManyToOne
-    @jakarta.persistence.JoinColumn(name = "user_id")
+    @ManyToOne
+    @JoinColumn(name = "user_id")
     public User user;
 
     public Long projectId;

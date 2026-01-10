@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.data.message.AiMessage;
+import org.junit.jupiter.api.AfterEach;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -55,7 +56,7 @@ public class AiResourceTest {
         transaction.commit();
     }
 
-    @org.junit.jupiter.api.AfterEach
+    @AfterEach
     void tearDown() throws Exception {
         transaction.begin();
         ChatSessionEntity.deleteAll();

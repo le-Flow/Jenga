@@ -17,6 +17,7 @@ import org.jenga.model.TicketStatus;
 import org.jenga.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import io.quarkus.test.InjectMock;
 
 import java.util.Collections;
 import java.util.List;
@@ -26,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @QuarkusTest
 public class ImportResourceTest {
 
-    @io.quarkus.test.InjectMock
+    @InjectMock
     org.jenga.service.AuthenticationService authenticationService;
 
     @Inject

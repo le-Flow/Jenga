@@ -16,6 +16,7 @@ import org.jenga.model.TicketStatus;
 import org.jenga.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import io.quarkus.test.InjectMock;
 
 import java.util.Collections;
 import java.util.List;
@@ -37,7 +38,7 @@ public class ImportServiceTest {
     @Inject
     UserRepository userRepository;
 
-    @io.quarkus.test.InjectMock
+    @InjectMock
     AuthenticationService authenticationService;
 
     private final String projectId = "import-integ-proj";
