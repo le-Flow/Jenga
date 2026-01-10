@@ -18,6 +18,7 @@ import org.jenga.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import io.quarkus.test.InjectMock;
+import org.jenga.service.AuthenticationService;
 
 import java.util.Collections;
 import java.util.List;
@@ -28,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ImportResourceTest {
 
     @InjectMock
-    org.jenga.service.AuthenticationService authenticationService;
+    AuthenticationService authenticationService;
 
     @Inject
     ImportResource importResource;

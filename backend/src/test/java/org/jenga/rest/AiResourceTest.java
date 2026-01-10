@@ -17,6 +17,7 @@ import org.mockito.Mockito;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.data.message.AiMessage;
 import org.junit.jupiter.api.AfterEach;
+import jakarta.transaction.UserTransaction;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -41,7 +42,7 @@ public class AiResourceTest {
     UserRepository userRepository;
 
     @Inject
-    jakarta.transaction.UserTransaction transaction;
+    UserTransaction transaction;
 
     @BeforeEach
     void setup() throws Exception {
