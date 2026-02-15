@@ -92,6 +92,7 @@ public class AuthenticationService {
 
         LoginResponseDTO loginResponse = new LoginResponseDTO();
         loginResponse.setUsername(user.getUsername());
+        loginResponse.setDisplayName(user.getDisplayName());
         loginResponse.setToken(generateToken(user));
         loginResponse.setExpiresIn(EXPIRATION_TIME_SECONDS);
 
