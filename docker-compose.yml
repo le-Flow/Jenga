@@ -4,7 +4,7 @@ services:
   frontend:
     container_name: jenga-frontend
     build:
-      context: ../Jenga/frontend/jenga
+      context: ./frontend/jenga
       dockerfile: Dockerfile.current
     depends_on:
       backend:
@@ -16,8 +16,11 @@ services:
 
 #backend
   backend: 
-    image: quarkus-backend:latest
+    #image: quarkus-backend:latest
     container_name: jenga-backend
+    build: 
+      context: ./backend/
+      dockerfile: Dockerfile.dev
     depends_on:
       db: 
         condition: service_healthy
