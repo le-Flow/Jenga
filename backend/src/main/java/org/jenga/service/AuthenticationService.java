@@ -78,10 +78,10 @@ public class AuthenticationService {
     public LoginResponseDTO login(LoginRequestDTO loginRequest) throws LoginException {
         User user = userRepository.findByUsername(loginRequest.getUsername().toLowerCase());
 
-        Log.infof("Login attempt with username %s", user.getUsername());
+        Log.infof("Login attempt with username %s", loginRequest.getUsername());
 
         if (user == null) {
-            Log.warnf("Failed login attempt with username %s: Invalid username", user.getUsername());
+            Log.warnf("Failed login attempt with username %s: Invalid username", loginRequest.getUsername());
             throw new BadRequestException("Invalid username or password");
         }
 
