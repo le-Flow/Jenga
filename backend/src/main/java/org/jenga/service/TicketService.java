@@ -147,7 +147,7 @@ public class TicketService {
     }
 
     public TicketResponseDTO findByTicketNumber(String projectId, Long ticketNumber) {
-        Log.infof("Fetch ticket by number %d", ticketNumber);
+        Log.infof("Fetch ticket by number %d in project %s", ticketNumber, projectId);
 
         Project project = projectRepository.findById(projectId);
         if (project == null) {
@@ -306,7 +306,7 @@ public class TicketService {
 
     @Transactional
     public void unassignTicket(Long ticketId) {
-        Log.infof("Unassign ticket %d", ticketId);
+        Log.infof("Unassign ticket %d from user", ticketId);
 
         Ticket ticket = ticketRepository.findById(ticketId);
         if (ticket == null) {
