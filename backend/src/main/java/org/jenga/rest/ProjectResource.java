@@ -5,11 +5,11 @@ import org.jenga.dto.ProjectRequestDTO;
 import org.jenga.dto.ProjectResponseDTO;
 import org.jenga.dto.LabelDTO;
 
-
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -23,7 +23,7 @@ public class ProjectResource {
     private final ProjectService projectService;
 
     @POST
-    public ProjectResponseDTO createProject(ProjectRequestDTO projectRequestDTO) {
+    public ProjectResponseDTO createProject(@Valid ProjectRequestDTO projectRequestDTO) {
         return projectService.create(projectRequestDTO);
     }
 

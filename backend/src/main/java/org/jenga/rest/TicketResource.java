@@ -13,6 +13,7 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,7 +30,7 @@ public class TicketResource {
 
     @POST
     @Path("/{projectId}")
-    public TicketResponseDTO createTicket(@PathParam("projectId") String projectId, TicketRequestDTO ticketRequestDTO) {
+    public TicketResponseDTO createTicket(@PathParam("projectId") String projectId, @Valid TicketRequestDTO ticketRequestDTO) {
         return ticketService.create(projectId, ticketRequestDTO);
     }
 
@@ -103,7 +104,7 @@ public class TicketResource {
 
     @POST
     @Path("/{ticketId}/comments")
-    public CommentResponseDTO createComment(@PathParam("ticketId") Long ticketId, CommentRequestDTO commentDTO) {
+    public CommentResponseDTO createComment(@PathParam("ticketId") Long ticketId, @Valid CommentRequestDTO commentDTO) {
         return ticketService.createComment(ticketId, commentDTO);
     }
 
@@ -124,7 +125,7 @@ public class TicketResource {
     @Path("/{ticketId}/acceptance-criteria")
     public AcceptanceCriteriaResponseDTO addAcceptanceCriteria(
             @PathParam("ticketId") Long ticketId,
-            AcceptanceCriteriaRequestDTO request) {
+            @Valid AcceptanceCriteriaRequestDTO request) {
         return ticketService.addAcceptanceCriteria(ticketId, request);
     }
 
