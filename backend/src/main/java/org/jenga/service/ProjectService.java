@@ -18,6 +18,7 @@ import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
+import io.quarkus.logging.Log;
 
 @ApplicationScoped
 public class ProjectService {
@@ -43,6 +44,8 @@ public class ProjectService {
     @Transactional
     public ProjectResponseDTO create(ProjectRequestDTO projectRequestDTO) {
         String identifier = projectRequestDTO.getIdentifier();
+
+        Log.infof("Attempting to create new project: %s", identifier);
 
         if (identifier == null || identifier.trim().isEmpty()) {
             throw new BadRequestException("Project identifier cannot be empty");
@@ -73,16 +76,22 @@ public class ProjectService {
 
         projectRepository.persist(project);
 
+        Log.infof("Created new project: %s", identifier);
+
         return projectMapper.projectToProjectDTO(project);
     }
 
     public List<ProjectResponseDTO> findAll() {
+        Log.info("Fetching all projects");
+
         return projectRepository.findAll().stream()
                 .map(projectMapper::projectToProjectDTO)
                 .collect(Collectors.toList());
     }
 
     public ProjectResponseDTO findById(String projectId) {
+        Log.infof("Fetch project with Id", projectId);
+
         Project project = projectRepository.findById(projectId);
         if (project == null) {
             throw new NotFoundException("Project not found with ID: " + projectId);
@@ -92,6 +101,8 @@ public class ProjectService {
 
     @Transactional
     public ProjectResponseDTO update(String projectId, ProjectRequestDTO projectRequestDTO) {
+        Log.infof("Update project with Id", projectId);
+
         Project existing = projectRepository.findById(projectId);
         if (existing == null) {
             throw new NotFoundException("Project not found with ID: " + projectId);
@@ -107,6 +118,8 @@ public class ProjectService {
 
     @Transactional
     public void delete(String projectId) {
+        Log.infof("Delete project with Id", projectId);
+
         Project project = projectRepository.findById(projectId);
         if (project == null) {
             throw new NotFoundException("Project not found with ID: " + projectId);
@@ -117,6 +130,8 @@ public class ProjectService {
 
     @Transactional
     public LabelDTO createLabel(String projectId, LabelDTO labelDTO) {
+        Log.infof("Create label for project %s", projectId);
+
         Project project = projectRepository.findById(projectId);
         if (project == null) {
             throw new NotFoundException("Project not found with ID: " + projectId);
@@ -142,6 +157,8 @@ public class ProjectService {
     }
 
     public List<LabelDTO> getAllLabels(String projectId) {
+        Log.infof("Fetching all labels for project %s", projectId);
+
         List<Label> labels = labelRepository.findByProjectId(projectId);
 
         return labels.stream()
@@ -151,6 +168,8 @@ public class ProjectService {
 
     @Transactional
     public void deleteLabel(String projectId, String labelName) {
+        Log.infof("Delete label %s for project %s", labelName, projectId);
+
         Label label = labelRepository.findByProjectIdAndLabelName(projectId, labelName);
         if (label != null) {
             for (Ticket ticket : label.getTickets()) {

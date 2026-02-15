@@ -28,6 +28,7 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
+import io.quarkus.logging.Log;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -73,6 +74,8 @@ public class TicketService {
 
     @Transactional
     public TicketResponseDTO create(String projectId, TicketRequestDTO ticketRequestDTO) {
+        Log.infof("Create ticket for project %s", projectId);
+
         Project project = projectRepository.findById(projectId);
         if (project == null) {
             throw new NotFoundException("Project not found with name: " + projectId);
@@ -120,6 +123,8 @@ public class TicketService {
     }
     
     public List<TicketResponseDTO> findAll(String projectId) {
+        Log.infof("Fetch all ticket for project %s", projectId);
+
         Project project = projectRepository.findById(projectId);
         if (project == null) {
             throw new NotFoundException("Project not found with name: " + projectId);
@@ -131,6 +136,8 @@ public class TicketService {
     }
 
     public TicketResponseDTO findById(Long ticketId) {
+        Log.infof("Fetch ticket %d", ticketId);
+
         Ticket ticket = ticketRepository.findById(ticketId);
         if (ticket == null) {
             throw new NotFoundException("Ticket not found");
@@ -140,6 +147,8 @@ public class TicketService {
     }
 
     public TicketResponseDTO findByTicketNumber(String projectId, Long ticketNumber) {
+        Log.infof("Fetch ticket by number %d", ticketNumber);
+
         Project project = projectRepository.findById(projectId);
         if (project == null) {
             throw new NotFoundException("Project not found with name: " + projectId);
@@ -155,6 +164,8 @@ public class TicketService {
 
     @Transactional
     public TicketResponseDTO update(Long ticketId, TicketRequestDTO ticketDTO) {
+        Log.infof("Update ticket %d", ticketId);
+
         Ticket existing = ticketRepository.findById(ticketId);
         if (existing == null) {
             throw new NotFoundException("Ticket not found");
@@ -189,6 +200,8 @@ public class TicketService {
 
     @Transactional
     public void delete(Long ticketId) {
+        Log.infof("Delete ticket %d", ticketId);
+
         Ticket ticket = ticketRepository.findById(ticketId);
         if (ticket == null) {
             throw new NotFoundException("Ticket not found");
@@ -215,6 +228,8 @@ public class TicketService {
     }
 
     public List<TicketResponseDTO> searchTickets(TicketSearchDTO request) {
+        Log.info("Searching for tickets");
+
         List<Ticket> tickets = ticketRepository.searchTickets(request);
         return tickets.stream()
                 .map(ticketMapper::ticketToTicketResponseDTO)
@@ -223,6 +238,8 @@ public class TicketService {
 
     @Transactional
     public TicketResponseDTO duplicateTicket(Long ticketId) {
+        Log.infof("Duplicate ticket %d", ticketId);
+
         Ticket originalTicket = ticketRepository.findById(ticketId);
 
         if (originalTicket == null) {
@@ -272,6 +289,8 @@ public class TicketService {
 
     @Transactional
     public void assignTicket(Long ticketId, String username) {
+        Log.infof("Assign ticket %d to user %s", ticketId, username);
+
         Ticket ticket = ticketRepository.findById(ticketId);
         if (ticket == null) {
             throw new BadRequestException("Ticket not found");
@@ -287,6 +306,8 @@ public class TicketService {
 
     @Transactional
     public void unassignTicket(Long ticketId) {
+        Log.infof("Unassign ticket %d", ticketId);
+
         Ticket ticket = ticketRepository.findById(ticketId);
         if (ticket == null) {
             throw new BadRequestException("Ticket not found");

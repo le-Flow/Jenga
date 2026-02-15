@@ -18,6 +18,7 @@ import jakarta.ws.rs.BadRequestException;
 import io.quarkus.security.AuthenticationFailedException;
 import io.quarkus.elytron.security.common.BcryptUtil;
 import io.smallrye.jwt.build.Jwt;
+import io.quarkus.logging.Log;
 
 @ApplicationScoped
 @RequiredArgsConstructor(onConstructor_ = {@Inject})
@@ -32,6 +33,8 @@ public class AuthenticationService {
 
     @Transactional
     public LoginResponseDTO register(RegisterRequestDTO registerRequest) {
+        Log.infof("Attempt registration with E-Mail %s and username %s", registerRequest.getEmail(), registerRequest.getUsername());
+
         String username = registerRequest.getUsername().toLowerCase();
 
         User existingUser = userRepository.findByUsername(username);
@@ -67,17 +70,23 @@ public class AuthenticationService {
         loginResponse.setToken(generateToken(user));
         loginResponse.setExpiresIn(EXPIRATION_TIME_SECONDS);
 
+        Log.infof("User created with username %s", username);
+
         return loginResponse;
     }
 
     public LoginResponseDTO login(LoginRequestDTO loginRequest) throws LoginException {
         User user = userRepository.findByUsername(loginRequest.getUsername().toLowerCase());
 
+        Log.infof("Login attempt with username %s", user.getUsername());
+
         if (user == null) {
+            Log.warnf("Failed login attempt with username %s: Invalid username", user.getUsername());
             throw new BadRequestException("Invalid username or password");
         }
 
         if (!BcryptUtil.matches(loginRequest.getPassword(), user.getPassword())) {
+            Log.warnf("Failed login attempt with username %s: Invalid password", user.getUsername());
             throw new BadRequestException("Invalid username or password");
         }
 
@@ -91,6 +100,8 @@ public class AuthenticationService {
 
     public String generateToken(User user) {
         long expirationTime = (System.currentTimeMillis() / 1000L) + EXPIRATION_TIME_SECONDS;
+
+        Log.infof("Generating JWT token for user %s", user.getUsername());
 
         return Jwt.issuer("jenga")
                   .upn(user.getUsername())
