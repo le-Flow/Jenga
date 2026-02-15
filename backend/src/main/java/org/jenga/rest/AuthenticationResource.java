@@ -9,6 +9,7 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @Path("/api/auth")
@@ -21,13 +22,13 @@ public class AuthenticationResource {
 
     @POST
     @Path("/register")
-    public LoginResponseDTO register(RegisterRequestDTO registerRequest) {
+    public LoginResponseDTO register(@Valid RegisterRequestDTO registerRequest) {
         return authenticationService.register(registerRequest);
     }
 
     @POST
     @Path("/login")
-    public LoginResponseDTO login(LoginRequestDTO loginRequest) {
+    public LoginResponseDTO login(@Valid LoginRequestDTO loginRequest) {
         try {
             return authenticationService.login(loginRequest);
         } catch (Exception e) {
