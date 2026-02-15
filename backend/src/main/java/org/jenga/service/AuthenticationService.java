@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 
 import javax.security.auth.login.LoginException;
 import jakarta.ws.rs.BadRequestException;
+import io.quarkus.security.AuthenticationFailedException;
 import io.quarkus.elytron.security.common.BcryptUtil;
 import io.smallrye.jwt.build.Jwt;
 
@@ -48,15 +49,21 @@ public class AuthenticationService {
 
         if (!username.matches("[a-zA-Z0-9]+")) {
             throw new BadRequestException("Username must only contain letters and numbers");
+        } 
+
+        String displayName = registerRequest.getDisplayName();
+        if (displayName == null || displayName.isEmpty()) {
+            displayName = username;
         }
 
         String email = registerRequest.getEmail();
         String hashedPassword = BcryptUtil.bcryptHash(registerRequest.getPassword());
-        User user = new User(username, email, hashedPassword, null, null);
+        User user = new User(username, displayName, email, hashedPassword, null, null);
         userRepository.persist(user);
 
         LoginResponseDTO loginResponse = new LoginResponseDTO();
         loginResponse.setUsername(username);
+        loginResponse.setDisplayName(displayName);
         loginResponse.setToken(generateToken(user));
         loginResponse.setExpiresIn(EXPIRATION_TIME_SECONDS);
 
@@ -97,7 +104,7 @@ public class AuthenticationService {
         User currentUser = userRepository.findByUsername(username);
 
         if (currentUser == null) {
-            throw new RuntimeException("Failed to get user from security context: " + username);
+            throw new AuthenticationFailedException("Failed to get user from security context: " + username);
         }
 
         return currentUser;
