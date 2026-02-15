@@ -90,7 +90,7 @@ public class ProjectService {
     }
 
     public ProjectResponseDTO findById(String projectId) {
-        Log.infof("Fetch project with Id", projectId);
+        Log.infof("Fetch project with Id %s", projectId);
 
         Project project = projectRepository.findById(projectId);
         if (project == null) {
