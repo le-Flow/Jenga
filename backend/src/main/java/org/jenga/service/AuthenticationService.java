@@ -49,15 +49,21 @@ public class AuthenticationService {
 
         if (!username.matches("[a-zA-Z0-9]+")) {
             throw new BadRequestException("Username must only contain letters and numbers");
+        } 
+
+        String displayName = registerRequest.getDisplayName();
+        if (displayName == null || displayName.isEmpty()) {
+            displayName = username;
         }
 
         String email = registerRequest.getEmail();
         String hashedPassword = BcryptUtil.bcryptHash(registerRequest.getPassword());
-        User user = new User(username, email, hashedPassword, null, null);
+        User user = new User(username, displayName, email, hashedPassword, null, null);
         userRepository.persist(user);
 
         LoginResponseDTO loginResponse = new LoginResponseDTO();
         loginResponse.setUsername(username);
+        loginResponse.setDisplayName(displayName);
         loginResponse.setToken(generateToken(user));
         loginResponse.setExpiresIn(EXPIRATION_TIME_SECONDS);
 
