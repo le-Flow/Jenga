@@ -96,7 +96,7 @@ public class EditTicketTool {
             }
             
             if (assignee != null) {
-                if (assignee.equalsIgnoreCase("unassigned") || assignee.isBlank()) {
+                if ("unassigned".equalsIgnoreCase(assignee) || assignee.isBlank()) {
                     updateDTO.setAssignee(null);
                 } else {
                     updateDTO.setAssignee(assignee);

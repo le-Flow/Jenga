@@ -1,7 +1,6 @@
 package org.jenga.service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.jenga.db.UserRepository;
 import org.jenga.model.User;
@@ -42,7 +41,7 @@ public class UserService {
         Log.infof("Search for user %s", usernamePart);
 
         List<User> users = userRepository.searchByUsernameStartsWith(usernamePart.toLowerCase());
-        return users.stream().map(userMapper::userToUserDTO).collect(Collectors.toList());
+        return users.stream().map(userMapper::userToUserDTO).toList();
     }
 
     @Transactional
@@ -51,7 +50,6 @@ public class UserService {
 
         List<User> users = userRepository.findAll().list(); 
         return users.stream()
-                    .map(userMapper::userToUserDTO)
-                    .collect(Collectors.toList());
+                    .map(userMapper::userToUserDTO).toList();
     }
 }
