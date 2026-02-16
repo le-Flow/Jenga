@@ -114,7 +114,7 @@ public class AiResource {
                 .list();
         return sessions.stream()
                 .map(s -> new ChatSessionDTO(s.sessionId, s.title, s.startedAt))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @GET
@@ -123,8 +123,7 @@ public class AiResource {
         List<ChatMessage> messages = memoryStore.getMessages(sessionId);
 
         return messages.stream()
-                .map(this::mapToDTO)
-                .collect(Collectors.toList());
+                .map(this::mapToDTO).toList();
     }
 
     private ChatMessageDTO mapToDTO(ChatMessage message) {

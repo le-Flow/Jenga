@@ -11,7 +11,6 @@ import org.jenga.service.mcpserver.GoogleSearchApi;
 import org.jenga.dto.mcpserver.WebSearchResponseDTO;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @ApplicationScoped
 @Slf4j
@@ -45,7 +44,7 @@ public class WebSearchTool {
                             item.getTitle(),
                             item.getSnippet(),
                             item.getLink()))
-                    .collect(Collectors.toList());
+                    .toList();
 
         } catch (Exception e) {
             log.warn("Error calling search API: " + e.getMessage());

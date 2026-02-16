@@ -2,7 +2,6 @@ package org.jenga.mapper;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.jenga.model.Ticket;
 import org.jenga.model.Label;
@@ -44,8 +43,7 @@ public interface TicketMapper {
             return Collections.emptyList();
         }
         return labels.stream()
-                     .map(Label::getName)
-                     .collect(Collectors.toList());
+                     .map(Label::getName).toList();
     }
 
     // Map List<String> labels to List<Label> labels
@@ -58,8 +56,7 @@ public interface TicketMapper {
                              Label label = new Label();
                              label.setName(name);
                              return label;
-                         })
-                         .collect(Collectors.toList());
+                         }).toList();
     }
 
     // Map AcceptanceCriteria model to AcceptanceCriteria DTO
@@ -68,8 +65,7 @@ public interface TicketMapper {
             return Collections.emptyList();
         }
         return criteria.stream()
-                       .map(this::mapAcceptanceCriteriaToResponse)
-                       .collect(Collectors.toList());
+                       .map(this::mapAcceptanceCriteriaToResponse).toList();
     }
 
     // Single mapping of AcceptanceCriteria model to AcceptanceCriteria DTO
@@ -91,8 +87,7 @@ public interface TicketMapper {
             return Collections.emptyList();
         }
         return relatedTickets.stream()
-                             .map(Ticket::getId)
-                             .collect(Collectors.toList());
+                             .map(Ticket::getId).toList();
     }
 
     // Map blockingTickets list to a List<Long> of IDs
@@ -102,8 +97,7 @@ public interface TicketMapper {
             return Collections.emptyList();
         }
         return blockingTickets.stream()
-                              .map(Ticket::getId)
-                              .collect(Collectors.toList());
+                              .map(Ticket::getId).toList();
     }
 
     // Map blockedTickets list to a List<Long> of IDs
@@ -113,7 +107,6 @@ public interface TicketMapper {
             return Collections.emptyList();
         }
         return blockedTickets.stream()
-                             .map(Ticket::getId)
-                             .collect(Collectors.toList());
+                             .map(Ticket::getId).toList();
     }
 }

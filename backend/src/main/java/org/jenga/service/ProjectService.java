@@ -17,7 +17,6 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
 import java.util.List;
-import java.util.stream.Collectors;
 import io.quarkus.logging.Log;
 
 @ApplicationScoped
@@ -85,8 +84,7 @@ public class ProjectService {
         Log.info("Fetching all projects");
 
         return projectRepository.findAll().stream()
-                .map(projectMapper::projectToProjectDTO)
-                .collect(Collectors.toList());
+                .map(projectMapper::projectToProjectDTO).toList();
     }
 
     public ProjectResponseDTO findById(String projectId) {
@@ -162,8 +160,7 @@ public class ProjectService {
         List<Label> labels = labelRepository.findByProjectId(projectId);
 
         return labels.stream()
-                     .map(labelMapper::labelToLabelDTO)
-                     .collect(Collectors.toList());
+                     .map(labelMapper::labelToLabelDTO).toList();
     }
 
     @Transactional

@@ -31,7 +31,6 @@ import jakarta.ws.rs.NotFoundException;
 import io.quarkus.logging.Log;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class TicketService {
@@ -131,8 +130,7 @@ public class TicketService {
         }
 
         return ticketRepository.findByProjectId(project.getId()).stream()
-                .map(ticketMapper::ticketToTicketResponseDTO)
-                .collect(Collectors.toList());
+                .map(ticketMapper::ticketToTicketResponseDTO).toList();
     }
 
     public TicketResponseDTO findById(Long ticketId) {
@@ -232,8 +230,7 @@ public class TicketService {
 
         List<Ticket> tickets = ticketRepository.searchTickets(request);
         return tickets.stream()
-                .map(ticketMapper::ticketToTicketResponseDTO)
-                .collect(Collectors.toList());
+                .map(ticketMapper::ticketToTicketResponseDTO).toList();
     }
 
     @Transactional
@@ -266,7 +263,7 @@ public class TicketService {
                     newLabel.setName(label.getName());
                     return newLabel;
                 })
-                .collect(Collectors.toList());
+                .toList();
 
         duplicatedTicket.setLabels(duplicatedLabels);
 
@@ -278,7 +275,7 @@ public class TicketService {
                     newCriterion.setTicket(duplicatedTicket);
                     return newCriterion;
                 })
-                .collect(Collectors.toList());
+                .toList();
 
         duplicatedTicket.setAcceptanceCriteria(duplicatedCriteria);
 
@@ -321,7 +318,7 @@ public class TicketService {
         Log.infof("Create comment for ticket %d", ticketId);
         Ticket ticket = ticketRepository.findById(ticketId);
         if (ticket == null) {
-            throw new RuntimeException("Ticket not found");
+            throw new NotFoundException("Ticket not found");
         }
 
         Comment comment = commentMapper.commentRequestDTOToComment(commentDTO);
@@ -342,8 +339,7 @@ public class TicketService {
         List<Comment> comments = commentRepository.findByTicketId(ticketId);
 
         return comments.stream()
-                .map(commentMapper::commentToCommentResponseDTO)
-                .collect(Collectors.toList());
+                .map(commentMapper::commentToCommentResponseDTO).toList();
     }
 
     @Transactional
@@ -383,8 +379,7 @@ public class TicketService {
 
         List<AcceptanceCriteria> criteriaList = acceptanceCriteriaRepository.findByTicketId(ticketId);
         return criteriaList.stream()
-                .map(acceptanceCriteriaMapper::toResponse)
-                .collect(Collectors.toList());
+                .map(acceptanceCriteriaMapper::toResponse).toList();
     }
 
     @Transactional
