@@ -15,22 +15,22 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import io.quarkus.logging.Log;
 
 import java.util.List;
 
 @Path("/api/tickets")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-@Slf4j
-@RequiredArgsConstructor(onConstructor_ = {@Inject})
+@RequiredArgsConstructor(onConstructor_ = { @Inject })
 public class TicketResource {
 
     private final TicketService ticketService;
 
     @POST
     @Path("/{projectId}")
-    public TicketResponseDTO createTicket(@PathParam("projectId") String projectId, @Valid TicketRequestDTO ticketRequestDTO) {
+    public TicketResponseDTO createTicket(@PathParam("projectId") String projectId,
+            @Valid TicketRequestDTO ticketRequestDTO) {
         return ticketService.create(projectId, ticketRequestDTO);
     }
 
@@ -48,7 +48,8 @@ public class TicketResource {
 
     @GET
     @Path("/{projectId}/{ticketNumber}")
-    public TicketResponseDTO getTicketByNumber(@PathParam("projectId") String projectId, @PathParam("ticketNumber") Long ticketNumber) {
+    public TicketResponseDTO getTicketByNumber(@PathParam("projectId") String projectId,
+            @PathParam("ticketNumber") Long ticketNumber) {
         return ticketService.findByTicketNumber(projectId, ticketNumber);
     }
 
@@ -66,19 +67,20 @@ public class TicketResource {
     }
 
     /*
-    @GET
-    @Path("/search")
-    public Response searchTicketsGet(@BeanParam TicketSearchDTO request) {
-        List<TicketResponseDTO> results = ticketService.searchTickets(request);
-        return Response.ok(results).build();
-    }
-    */
+     * @GET
+     * 
+     * @Path("/search")
+     * public Response searchTicketsGet(@BeanParam TicketSearchDTO request) {
+     * List<TicketResponseDTO> results = ticketService.searchTickets(request);
+     * return Response.ok(results).build();
+     * }
+     */
 
     @POST
     @Path("/search")
     public List<TicketResponseDTO> searchTickets(TicketSearchDTO request) {
-        log.info("POST /search/");
-        log.info("Body: " + request);
+        Log.info("POST /search/");
+        Log.info("Body: " + request);
         return ticketService.searchTickets(request);
     }
 

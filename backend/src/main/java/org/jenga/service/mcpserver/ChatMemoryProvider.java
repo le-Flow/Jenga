@@ -5,6 +5,7 @@ import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;
+import io.quarkus.logging.Log;
 
 import java.util.function.Supplier;
 
@@ -16,6 +17,7 @@ public class ChatMemoryProvider implements Supplier<ChatMemory> {
 
     @Override
     public ChatMemory get() {
+        Log.debug("Providing ChatMemory instance");
         return MessageWindowChatMemory.builder()
                 .maxMessages(20)
                 .chatMemoryStore(store)

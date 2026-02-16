@@ -7,6 +7,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import lombok.RequiredArgsConstructor;
+import io.quarkus.logging.Log;
 
 import java.util.UUID;
 
@@ -59,6 +60,9 @@ public class AiResource {
         ensureSessionExists(conversationId, request.getCurrentUser(), request.getCurrentProjectID(),
                 request.getMessage());
 
+        Log.info("Processing chat request for conversationId: " + conversationId + ", userId: "
+                + request.getCurrentUser() + ", projectId: " + request.getCurrentProjectID());
+
         requestContext.setCurrentUser(request.getCurrentUser());
         requestContext.setCurrentProjectID(request.getCurrentProjectID());
         requestContext.setCurrentTicketID(request.getCurrentTicketID());
@@ -68,9 +72,11 @@ public class AiResource {
             return new ChatResponseDTO(aiResponse, conversationId);
 
         } catch (NullPointerException e) {
+            Log.error("NPE during chat processing for conversationId: " + conversationId, e);
             String errorMsg = "I encountered an error processing that request. This is usually due to a tool execution issue. Please try rephrasing your request or try again.";
             return new ChatResponseDTO(errorMsg, conversationId);
         } catch (Exception e) {
+            Log.error("Unexpected error during chat processing for conversationId: " + conversationId, e);
             String errorMsg = "An unexpected error occurred: " + e.getMessage();
             return new ChatResponseDTO(errorMsg, conversationId);
         }
@@ -100,12 +106,14 @@ public class AiResource {
             session.title = title;
 
             session.persist();
+            Log.info("Created new chat session: " + conversationId);
         }
     }
 
     @GET
     @Path("/sessions")
     public List<ChatSessionDTO> getSessions(@QueryParam("userId") String userId) {
+        Log.debug("Fetching chat sessions for userId: " + userId);
         if (userId == null || userId.isBlank()) {
             return Collections.emptyList();
         }
@@ -120,6 +128,7 @@ public class AiResource {
     @GET
     @Path("/sessions/{sessionId}/messages")
     public List<ChatMessageDTO> getSessionMessages(@PathParam("sessionId") String sessionId) {
+        Log.debug("Fetching messages for sessionId: " + sessionId);
         List<ChatMessage> messages = memoryStore.getMessages(sessionId);
 
         return messages.stream()

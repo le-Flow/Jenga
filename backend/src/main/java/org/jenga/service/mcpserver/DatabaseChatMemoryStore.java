@@ -4,6 +4,7 @@ import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 import dev.langchain4j.data.message.ChatMessageSerializer;
 import dev.langchain4j.data.message.ChatMessageDeserializer;
+import io.quarkus.logging.Log;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
@@ -17,6 +18,7 @@ public class DatabaseChatMemoryStore implements ChatMemoryStore {
 
     @Override
     public List<ChatMessage> getMessages(Object memoryId) {
+        Log.debug("Retrieving messages for memoryId: " + memoryId);
         List<ChatMemoryEntity> entities = ChatMemoryEntity.list("memoryId", memoryId.toString());
 
         return entities.stream()
@@ -27,6 +29,7 @@ public class DatabaseChatMemoryStore implements ChatMemoryStore {
     @Override
     @Transactional
     public void updateMessages(Object memoryId, List<ChatMessage> messages) {
+        Log.debug("Updating messages for memoryId: " + memoryId + ". Count: " + messages.size());
         deleteMessages(memoryId);
 
         for (ChatMessage message : messages) {
@@ -41,6 +44,7 @@ public class DatabaseChatMemoryStore implements ChatMemoryStore {
     @Override
     @Transactional
     public void deleteMessages(Object memoryId) {
+        Log.debug("Deleting messages for memoryId: " + memoryId);
         ChatMemoryEntity.delete("memoryId", memoryId.toString());
     }
 }

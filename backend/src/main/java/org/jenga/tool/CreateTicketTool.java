@@ -6,6 +6,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import io.quarkus.logging.Log;
 
 import org.jenga.db.LabelRepository;
 import org.jenga.db.ProjectRepository;
@@ -165,11 +166,15 @@ public class CreateTicketTool {
             newTicket.setTicketNumber(ticketRepository.findMaxTicketNumberByProject(project) + 1);
             ticketRepository.persist(newTicket);
 
+            Log.info("Successfully created ticket " + newTicket.getProject().getId() + "-"
+                    + newTicket.getTicketNumber());
+
             return "SUCCESS: Created new ticket " +
                     newTicket.getProject().getId() + "-" + newTicket.getTicketNumber() +
                     ": '" + newTicket.getTitle() + "'.";
 
         } catch (Exception e) {
+            Log.error("CreateTicketTool: Unexpected error: " + e.getMessage(), e);
             return "ERROR: An unexpected error occurred: " + e.getMessage();
         }
     }

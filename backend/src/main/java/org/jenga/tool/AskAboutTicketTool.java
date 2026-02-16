@@ -6,6 +6,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
+import io.quarkus.logging.Log;
 
 import org.jenga.dto.TicketResponseDTO;
 import org.jenga.dto.mcpserver.AskAboutTicketResponseDTO;
@@ -16,13 +17,15 @@ import org.jenga.service.mcpserver.ChatRequestContext;
 @RequiredArgsConstructor(onConstructor_ = {@Inject})
 public class AskAboutTicketTool {
 
-    private final TicketService ticketService; 
+    private final TicketService ticketService;
     private final ChatRequestContext requestContext;
 
     @Tool("Get information about a specific ticket. If no ticketId is provided, it uses the user's current ticket context.")
     public AskAboutTicketResponseDTO getTicketInfo(
             @P("The internal database ID (e.g., 101, 102) of the ticket. If null, the user's current ticket is used.") 
-            Long ticketId) {
+        Long ticketId) {
+
+        Log.debug("AskAboutTicketTool.getTicketInfo called with ticketId: " + ticketId);
 
         try {
             Long finalTicketId = ticketId;
@@ -32,7 +35,7 @@ public class AskAboutTicketTool {
 
             if (finalTicketId == null) {
                 return new AskAboutTicketResponseDTO(
-                    "ERROR: No ticket ID was provided, and there is no current ticket in context.",
+                        "ERROR: No ticket ID was provided, and there is no current ticket in context.",
                     null
                 );
             }
@@ -42,13 +45,13 @@ public class AskAboutTicketTool {
             String assigneeName = ticket.getAssignee() != null ? ticket.getAssignee() : "Unassigned";
 
             String message = String.format(
-                "Ticket %s-%d: '%s' (%s). Assigned to: %s. Description: %s",
-                ticket.getProjectName(),
-                ticket.getTicketNumber(),
-                ticket.getTitle(),
-                ticket.getStatus(),
-                assigneeName,
-                ticket.getDescription()
+                    "Ticket %s-%d: '%s' (%s). Assigned to: %s. Description: %s",
+                    ticket.getProjectName(),
+                    ticket.getTicketNumber(),
+                    ticket.getTitle(),
+                    ticket.getStatus(),
+                    assigneeName,
+                    ticket.getDescription()
             );
 
             return new AskAboutTicketResponseDTO(message, ticket.getId().toString());
@@ -63,13 +66,15 @@ public class AskAboutTicketTool {
             } else {
                 errorId = "N/A";
             }
+            Log.warn("AskAboutTicketTool: Ticket not found. ID: " + errorId);
             return new AskAboutTicketResponseDTO(
-                "ERROR: Sorry, I couldn't find a ticket with ID: " + errorId,
+                    "ERROR: Sorry, I couldn't find a ticket with ID: " + errorId,
                 errorId
             );
         } catch (Exception e) {
+            Log.error("AskAboutTicketTool: Unexpected error: " + e.getMessage(), e);
             return new AskAboutTicketResponseDTO(
-                "ERROR: An unexpected error occurred: " + e.getMessage(),
+                    "ERROR: An unexpected error occurred: " + e.getMessage(),
                 null
             );
         }
