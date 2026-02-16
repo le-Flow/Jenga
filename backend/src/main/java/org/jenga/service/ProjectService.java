@@ -50,8 +50,8 @@ public class ProjectService {
             throw new BadRequestException("Project identifier cannot be empty");
         }
 
-        if (identifier.length() > 10) {
-            throw new BadRequestException("Project identifier cannot exceed 10 characters");
+        if (identifier.length() > 30) {
+            throw new BadRequestException("Project identifier cannot exceed 30 characters");
         }
 
         if (!identifier.equals(identifier.trim())) {
