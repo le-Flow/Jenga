@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Set;
 
 @ApplicationScoped
-@RequiredArgsConstructor(onConstructor_ = {@Inject})
+@RequiredArgsConstructor(onConstructor_ = { @Inject })
 public class CreateTicketTool {
 
     private final TicketRepository ticketRepository;
@@ -31,35 +31,35 @@ public class CreateTicketTool {
     private final ChatRequestContext requestContext;
 
     @Tool("Creates a new software development ticket (e.g., bug, feature, task) in the specified project.")
-    @Transactional 
+    @Transactional
     public String createTicket(
-            @P("The title or summary of the ticket. This is mandatory.")
-            String title,
+        @P("The title or summary of the ticket. This is mandatory.") 
+        String title,
 
-            @P("A detailed description of the ticket, including steps to reproduce for bugs. This is mandatory.")
-            String description,
+        @P("A detailed description of the ticket, including steps to reproduce for bugs. This is mandatory.") 
+        String description,
 
-            @P("The project ID (e.g., 'MCP', 'Frontend'). If not provided, the user's current project will be used.")
-            Long projectId, 
-            
-            @P("The username of the person reporting the ticket. If null, 'unassigned', or empty, it defaults to the current user.") 
-            String reporterUsername, 
+        @P("The project ID (e.g., 'MCP', 'Frontend'). If not provided, the user's current project will be used.") 
+        Long projectId,
 
-            @P("The username of the person to assign the ticket to. If null, 'unassigned', or empty, it defaults to the current user.")
-            String assigneeUsername, 
+        @P("The username of the person reporting the ticket. If null, 'unassigned', or empty, it defaults to the current user.") 
+        String reporterUsername,
 
-            @P("The priority of the ticket. Valid values are LOW, MEDIUM, HIGH, CRITICAL. Can be null.")
-            TicketPriority priority,
+        @P("The username of the person to assign the ticket to. If null, 'unassigned', or empty, it defaults to the current user.") 
+        String assigneeUsername,
 
-            @P("The estimated size or effort. Valid values are SMALL, MEDIUM, LARGE, EXTRA_LARGE. Can be null.")
-            TicketSize size,
+        @P("The priority of the ticket. Valid values are LOW, MEDIUM, HIGH, CRITICAL. Can be null.") 
+        TicketPriority priority,
 
-            @P("A comma-separated string of label names to add to the ticket, e.g., 'bug,ui,backend'. Can be null or empty.")
-            String labels,
+        @P("The estimated size or effort. Valid values are SMALL, MEDIUM, LARGE, EXTRA_LARGE. Can be null.") 
+        TicketSize size,
 
-            @P("A semicolon-separated list of acceptance criteria, e.g., 'User can login; Password is validated; Error message shows'. Can be null or empty.")
-            String acceptanceCriteria
-    ) {
+        @P("A comma-separated string of label names to add to the ticket, e.g., 'bug,ui,backend'. Can be null or empty.") 
+        String labels,
+
+        @P("A semicolon-separated list of acceptance criteria, e.g., 'User can login; Password is validated; Error message shows'. Can be null or empty.") 
+        String acceptanceCriteria
+    ){
         try {
             Long finalProjectId;
 
@@ -80,15 +80,17 @@ public class CreateTicketTool {
 
             String finalReporterUsername;
 
-            if (reporterUsername != null && !reporterUsername.isEmpty() && !reporterUsername.equalsIgnoreCase("unassigned")) {
+            if (reporterUsername != null && !reporterUsername.isEmpty()
+                    && !"unassigned".equalsIgnoreCase(reporterUsername)) {
                 finalReporterUsername = reporterUsername;
             } else {
                 finalReporterUsername = requestContext.getCurrentUser();
             }
-            
+
             String finalAssigneeUsername;
 
-            if (assigneeUsername != null && !assigneeUsername.isEmpty() && !assigneeUsername.equalsIgnoreCase("unassigned")) {
+            if (assigneeUsername != null && !assigneeUsername.isEmpty()
+                    && !"unassigned".equalsIgnoreCase(assigneeUsername)) {
                 finalAssigneeUsername = assigneeUsername;
             } else {
                 finalAssigneeUsername = requestContext.getCurrentUser();
@@ -98,7 +100,7 @@ public class CreateTicketTool {
             newTicket.setTitle(title);
             newTicket.setDescription(description);
             newTicket.setProject(project);
-            newTicket.setStatus(TicketStatus.OPEN); 
+            newTicket.setStatus(TicketStatus.OPEN);
 
             if (finalReporterUsername != null && !finalReporterUsername.isEmpty()) {
                 User reporter = userRepository.findByUsername(finalReporterUsername);
@@ -126,7 +128,8 @@ public class CreateTicketTool {
                 String[] labelNames = labels.split(",");
                 for (String labelName : labelNames) {
                     labelName = labelName.trim();
-                    if (labelName.isEmpty()) continue;
+                    if (labelName.isEmpty())
+                        continue;
                     Label label = labelRepository.find("project = ?1 and name = ?2", project, labelName).firstResult();
                     if (label == null) {
                         label = new Label();
@@ -146,7 +149,8 @@ public class CreateTicketTool {
                 String[] criteriaItems = acceptanceCriteria.split(";");
                 for (String criteriaText : criteriaItems) {
                     criteriaText = criteriaText.trim();
-                    if (criteriaText.isEmpty()) continue;
+                    if (criteriaText.isEmpty())
+                        continue;
                     AcceptanceCriteria criteria = new AcceptanceCriteria();
                     criteria.setDescription(criteriaText);
                     criteria.setCompleted(false);
@@ -162,8 +166,8 @@ public class CreateTicketTool {
             ticketRepository.persist(newTicket);
 
             return "SUCCESS: Created new ticket " +
-                   newTicket.getProject().getId() + "-" + newTicket.getTicketNumber() +
-                   ": '" + newTicket.getTitle() + "'.";
+                    newTicket.getProject().getId() + "-" + newTicket.getTicketNumber() +
+                    ": '" + newTicket.getTitle() + "'.";
 
         } catch (Exception e) {
             return "ERROR: An unexpected error occurred: " + e.getMessage();

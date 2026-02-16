@@ -118,4 +118,35 @@ public class CreateTicketToolUnitTest {
 
         assertTrue(result.startsWith("SUCCESS"));
     }
+
+    @Test
+    void testCreateTicket_UnassignedAssignee_DefaultsToCurrentUser() {
+        Project project = new Project();
+        project.setId("PROJ");
+        doReturn(project).when(projectRepository).findById(any(Long.class));
+
+        // Current user is "currentUser"
+        when(requestContext.getCurrentUser()).thenReturn("currentUser");
+
+        // "currentUser" exists in DB
+        User currentUserEntity = new User();
+        currentUserEntity.setUsername("currentUser");
+        when(userRepository.findByUsername("currentUser")).thenReturn(currentUserEntity);
+
+        // "unassigned" should be ignored and default to "currentUser"
+        String assigneeInput = "unassigned";
+
+        when(ticketRepository.findMaxTicketNumberByProject(project)).thenReturn(1L);
+
+        String result = createTicketTool.createTicket("Title", "Desc", 1L, null, assigneeInput, TicketPriority.LOW,
+                TicketSize.SMALL, null, null);
+
+        assertTrue(result.startsWith("SUCCESS"));
+
+        ArgumentCaptor<Ticket> ticketCaptor = ArgumentCaptor.forClass(Ticket.class);
+        verify(ticketRepository).persist(ticketCaptor.capture());
+        Ticket saved = ticketCaptor.getValue();
+
+        assertEquals("currentUser", saved.getAssignee().getUsername());
+    }
 }
