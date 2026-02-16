@@ -3,7 +3,8 @@ package org.jenga.tool;
 import dev.langchain4j.agent.tool.Tool;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import lombok.extern.slf4j.Slf4j;
+
+import io.quarkus.logging.Log;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
@@ -13,7 +14,6 @@ import org.jenga.dto.mcpserver.WebSearchResponseDTO;
 import java.util.List;
 
 @ApplicationScoped
-@Slf4j
 public class WebSearchTool {
 
     @Inject // leaving inject here since constructor injections with RestClient is a pain
@@ -30,8 +30,10 @@ public class WebSearchTool {
     public List<String> searchWeb(String query) {
         try {
             if (apiKey == null || apiKey.isBlank() || searchEngineId == null || searchEngineId.isBlank()) {
+                Log.warn("Web search is not configured (missing API key or CSE ID).");
                 return List.of("Web search is not configured (missing API key or CSE ID).");
             }
+            Log.info("WebSearchTool.searchWeb called with query: " + query);
             WebSearchResponseDTO response = searchApi.search(apiKey, searchEngineId, query);
 
             if (response == null || response.getItems() == null || response.getItems().isEmpty()) {
@@ -47,7 +49,7 @@ public class WebSearchTool {
                     .toList();
 
         } catch (Exception e) {
-            log.warn("Error calling search API: " + e.getMessage());
+            Log.warn("Error calling search API: " + e.getMessage());
             return List.of("Error performing search: " + e.getMessage());
         }
     }

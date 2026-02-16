@@ -4,7 +4,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import io.quarkus.logging.Log;
 
 import org.jenga.db.ProjectRepository;
 import org.jenga.db.TicketRepository;
@@ -29,8 +29,8 @@ import java.util.List;
 import java.util.Set;
 
 @ApplicationScoped
+
 @RequiredArgsConstructor(onConstructor_ = { @Inject })
-@Slf4j
 public class ImportService {
 
     private final TicketRepository ticketRepository;
@@ -57,7 +57,7 @@ public class ImportService {
                 processGitHubIssue(project, reporter, githubDto);
                 successfulImportCount++;
             } catch (Exception e) {
-                log.warn("Failed to import ticket '" + githubDto.getTitle() + "': " + e.getMessage());
+                Log.warn("Failed to import ticket '" + githubDto.getTitle() + "': " + e.getMessage());
                 failedImports.add("Failed to import ticket '" + githubDto.getTitle() + "': " + e.getMessage());
             }
         }
@@ -90,7 +90,7 @@ public class ImportService {
             case "ON HOLD":
                 return TicketStatus.ON_HOLD;
             default:
-                log.warn("Warning: Unrecognized status '" + githubStatusName + "'. Defaulting to OPEN.");
+                Log.warn("Warning: Unrecognized status '" + githubStatusName + "'. Defaulting to OPEN.");
                 return TicketStatus.OPEN;
         }
     }
@@ -173,7 +173,7 @@ public class ImportService {
             if (assignee != null) {
                 ticket.setAssignee(assignee);
             } else {
-                log.warn("Import Warning: Assignee not found, skipping: {}", username);
+                Log.warn("Import Warning: Assignee not found, skipping: " + username);
             }
         }
 
