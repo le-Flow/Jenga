@@ -11,7 +11,6 @@ import org.jenga.model.ChatMemoryEntity;
 import org.jenga.model.MessageType;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class DatabaseChatMemoryStore implements ChatMemoryStore {
@@ -22,7 +21,7 @@ public class DatabaseChatMemoryStore implements ChatMemoryStore {
 
         return entities.stream()
                 .map(entity -> ChatMessageDeserializer.messageFromJson(entity.messageJson))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
