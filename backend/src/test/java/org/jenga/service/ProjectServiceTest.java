@@ -14,11 +14,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import jakarta.inject.Inject;
+import org.jenga.exception.ProjectNotFoundException;
 import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.NotFoundException;
 
 @QuarkusTest
-class ProjectServiceTest{
+class ProjectServiceTest {
     @Inject
     ProjectService service;
 
@@ -33,7 +33,7 @@ class ProjectServiceTest{
         dto.setIdentifier(PROJECT_IDENTIFIER);
         dto.setName(PROJECT_NAME);
         dto.setDescription(PROJECT_DESCRIPTION);
-        
+
         ProjectResponseDTO response = service.create(dto);
 
         assertEquals(response.getIdentifier(), PROJECT_IDENTIFIER);
@@ -48,7 +48,7 @@ class ProjectServiceTest{
         dto.setIdentifier(PROJECT_IDENTIFIER);
         dto.setName(PROJECT_NAME);
         dto.setDescription(PROJECT_DESCRIPTION);
-        
+
         ProjectResponseDTO response = service.create(dto);
 
         assertEquals(response.getIdentifier(), PROJECT_IDENTIFIER);
@@ -60,10 +60,10 @@ class ProjectServiceTest{
 
     @Test
     @TestTransaction
-    void testFindallProjects() { 
+    void testFindallProjects() {
         String id1 = "project1";
         String name1 = "Project 1";
-        String description1= "Description 1";
+        String description1 = "Description 1";
 
         String id2 = "project2";
         String name2 = "Project 2";
@@ -87,18 +87,18 @@ class ProjectServiceTest{
         assertTrue(projects.size() >= 2);
 
         ProjectResponseDTO response1 = projects.stream()
-            .filter(p -> p.getIdentifier().equals(id1))
-            .findFirst()
-            .orElseThrow();
+                .filter(p -> p.getIdentifier().equals(id1))
+                .findFirst()
+                .orElseThrow();
 
         assertEquals(name1, response1.getName());
         assertEquals(description1, response1.getDescription());
 
         ProjectResponseDTO response2 = projects.stream()
-            .filter(p -> p.getIdentifier().equals(id2))
-            .findFirst()
-            .orElseThrow();
-        
+                .filter(p -> p.getIdentifier().equals(id2))
+                .findFirst()
+                .orElseThrow();
+
         assertEquals(name2, response2.getName());
         assertEquals(description2, response2.getDescription());
     }
@@ -110,7 +110,7 @@ class ProjectServiceTest{
         dto.setIdentifier(PROJECT_IDENTIFIER);
         dto.setName(PROJECT_NAME);
         dto.setDescription(PROJECT_DESCRIPTION);
-        
+
         service.create(dto);
 
         ProjectResponseDTO response = service.findById(PROJECT_IDENTIFIER);
@@ -123,7 +123,7 @@ class ProjectServiceTest{
     @Test
     @TestTransaction
     void testFindProjectByIdNonExisting() {
-        assertThrows(NotFoundException.class, () -> service.findById(PROJECT_IDENTIFIER));
+        assertThrows(ProjectNotFoundException.class, () -> service.findById(PROJECT_IDENTIFIER));
     }
 
     @Test
@@ -136,7 +136,7 @@ class ProjectServiceTest{
         dto.setIdentifier(PROJECT_IDENTIFIER);
         dto.setName(PROJECT_NAME);
         dto.setDescription(PROJECT_DESCRIPTION);
-        
+
         service.create(dto);
 
         dto.setName(new_name);
@@ -155,7 +155,7 @@ class ProjectServiceTest{
         dto.setIdentifier(PROJECT_IDENTIFIER);
         dto.setName(PROJECT_NAME);
         dto.setDescription(PROJECT_DESCRIPTION);
-        
+
         ProjectResponseDTO response = service.create(dto);
 
         assertNotNull(response);
@@ -163,13 +163,13 @@ class ProjectServiceTest{
 
         service.delete(PROJECT_IDENTIFIER);
 
-        assertThrows(NotFoundException.class, () -> service.findById(PROJECT_IDENTIFIER));
+        assertThrows(ProjectNotFoundException.class, () -> service.findById(PROJECT_IDENTIFIER));
     }
 
     @Test
     @TestTransaction
     void testDeleteNonExistingProject() {
-        assertThrows(NotFoundException.class, () -> service.findById(PROJECT_IDENTIFIER));
+        assertThrows(ProjectNotFoundException.class, () -> service.findById(PROJECT_IDENTIFIER));
     }
 
     @Test
@@ -179,7 +179,7 @@ class ProjectServiceTest{
         dto.setIdentifier(PROJECT_IDENTIFIER);
         dto.setName(PROJECT_NAME);
         dto.setDescription(PROJECT_DESCRIPTION);
-        
+
         service.create(dto);
 
         List<LabelDTO> labels = service.getAllLabels(PROJECT_IDENTIFIER);
@@ -199,7 +199,7 @@ class ProjectServiceTest{
         labels = service.getAllLabels(PROJECT_IDENTIFIER);
         assertEquals(0, labels.size());
     }
-    
+
     @Test
     @TestTransaction
     void testCreateLabelInvalidProject() {
@@ -207,6 +207,6 @@ class ProjectServiceTest{
         label.setName("testing");
         label.setColor("#123456");
 
-        assertThrows(NotFoundException.class, () -> service.createLabel("invalid", label));
+        assertThrows(ProjectNotFoundException.class, () -> service.createLabel("invalid", label));
     }
 }

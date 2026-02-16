@@ -27,7 +27,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.AfterAll;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import jakarta.ws.rs.NotFoundException;
+import org.jenga.exception.TicketNotFoundException;
 
 import org.mockito.Mockito;
 
@@ -43,7 +43,7 @@ class TicketServiceTest {
 
     @InjectMock
     AuthenticationService authenticationService;
-    
+
     @Inject
     jakarta.persistence.EntityManager entityManager;
 
@@ -60,7 +60,7 @@ class TicketServiceTest {
         mockUser.setEmail("test@test.com");
 
         Mockito.when(authenticationService.getCurrentUser())
-               .thenReturn(mockUser);
+                .thenReturn(mockUser);
     }
 
     @BeforeAll
@@ -70,7 +70,7 @@ class TicketServiceTest {
         dto.setIdentifier(PROJECT_IDENTIFIER);
         dto.setName(PROJECT_NAME);
         dto.setDescription(PROJECT_DESCRIPTION);
-        
+
         projectService.create(dto);
 
         RegisterRequestDTO userDto = new RegisterRequestDTO();
@@ -87,8 +87,8 @@ class TicketServiceTest {
         projectService.delete(PROJECT_IDENTIFIER);
 
         entityManager.createQuery("DELETE FROM User u WHERE u.username = :username")
-             .setParameter("username", USER_NAME)
-             .executeUpdate();
+                .setParameter("username", USER_NAME)
+                .executeUpdate();
     }
 
     @Test
@@ -112,7 +112,7 @@ class TicketServiceTest {
         assertEquals(USER_NAME, response.getReporter());
 
         Long ticketId = response.getId();
-        
+
         String myComment = "My comment";
         CommentRequestDTO comment = new CommentRequestDTO();
         comment.setComment(myComment);
@@ -128,7 +128,7 @@ class TicketServiceTest {
         ac.setDescription(myDescription);
         ac.setCompleted(true);
 
-        AcceptanceCriteriaResponseDTO acResponse =  service.addAcceptanceCriteria(ticketId, ac);
+        AcceptanceCriteriaResponseDTO acResponse = service.addAcceptanceCriteria(ticketId, ac);
         assertNotNull(acResponse);
         assertNotNull(acResponse.getId());
         assertEquals(acResponse.getDescription(), myDescription);
@@ -142,7 +142,7 @@ class TicketServiceTest {
         CommentRequestDTO comment = new CommentRequestDTO();
         comment.setComment("My comment");
 
-        assertThrows(NotFoundException.class, () -> service.createComment(invalidId, comment));
+        assertThrows(TicketNotFoundException.class, () -> service.createComment(invalidId, comment));
     }
 
     @Test
@@ -153,6 +153,6 @@ class TicketServiceTest {
         ac.setDescription("My descrption");
         ac.setCompleted(true);
 
-        assertThrows(NotFoundException.class, () -> service.addAcceptanceCriteria(invalidId, ac));
+        assertThrows(TicketNotFoundException.class, () -> service.addAcceptanceCriteria(invalidId, ac));
     }
 }
