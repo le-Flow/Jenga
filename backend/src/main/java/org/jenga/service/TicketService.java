@@ -142,7 +142,7 @@ public class TicketService {
 
         Ticket ticket = ticketRepository.findById(ticketId);
         if (ticket == null) {
-            throw new TicketNotFoundException("Ticket mit ID " + ticketId + " nicht gefunden");
+            throw new TicketNotFoundException("Ticket not found with ID: " + ticketId);
         }
 
         return ticketMapper.ticketToTicketResponseDTO(ticket);
@@ -158,7 +158,7 @@ public class TicketService {
 
         Ticket ticket = ticketRepository.findByTicketNumberAndProjectId(ticketNumber, project.getId());
         if (ticket == null) {
-            throw new TicketNotFoundException("Ticket mit Nummer " + ticketNumber + " nicht gefunden");
+            throw new TicketNotFoundException("Ticket not found with number: " + ticketNumber);
         }
 
         return ticketMapper.ticketToTicketResponseDTO(ticket);
@@ -170,7 +170,7 @@ public class TicketService {
 
         Ticket existing = ticketRepository.findById(ticketId);
         if (existing == null) {
-            throw new TicketNotFoundException("Ticket mit ID " + ticketId + " nicht gefunden");
+            throw new TicketNotFoundException("Ticket not found with ID: " + ticketId);
         }
 
         existing.setTitle(ticketDTO.getTitle());
@@ -207,7 +207,7 @@ public class TicketService {
 
         Ticket ticket = ticketRepository.findById(ticketId);
         if (ticket == null) {
-            throw new TicketNotFoundException("Ticket mit ID " + ticketId + " nicht gefunden");
+            throw new TicketNotFoundException("Ticket not found with ID: " + ticketId);
         }
 
         // Remove all relating ticktes
@@ -245,7 +245,7 @@ public class TicketService {
         Ticket originalTicket = ticketRepository.findById(ticketId);
 
         if (originalTicket == null) {
-            throw new TicketNotFoundException("Ticket mit ID " + ticketId + " nicht gefunden");
+            throw new TicketNotFoundException("Ticket not found with ID: " + ticketId);
         }
 
         Project project = projectRepository.findById(originalTicket.getProject().getId());
@@ -295,7 +295,7 @@ public class TicketService {
 
         Ticket ticket = ticketRepository.findById(ticketId);
         if (ticket == null) {
-            throw new TicketNotFoundException("Ticket mit ID " + ticketId + " nicht gefunden");
+            throw new TicketNotFoundException("Ticket not found with ID: " + ticketId);
         }
         User assignee = userRepository.findByUsername(username);
         if (assignee == null) {
@@ -312,7 +312,7 @@ public class TicketService {
 
         Ticket ticket = ticketRepository.findById(ticketId);
         if (ticket == null) {
-            throw new TicketNotFoundException("Ticket mit ID " + ticketId + " nicht gefunden");
+            throw new TicketNotFoundException("Ticket not found with ID: " + ticketId);
         }
         ticket.setAssignee(null);
         ticketRepository.persist(ticket);
@@ -323,7 +323,7 @@ public class TicketService {
         Log.infof("Create comment for ticket %d", ticketId);
         Ticket ticket = ticketRepository.findById(ticketId);
         if (ticket == null) {
-            throw new TicketNotFoundException("Ticket mit ID " + ticketId + " nicht gefunden");
+            throw new TicketNotFoundException("Ticket not found with ID: " + ticketId);
         }
 
         Comment comment = commentMapper.commentRequestDTOToComment(commentDTO);
@@ -364,7 +364,7 @@ public class TicketService {
 
         Ticket ticket = ticketRepository.findById(ticketId);
         if (ticket == null) {
-            throw new TicketNotFoundException("Ticket mit ID " + ticketId + " nicht gefunden");
+            throw new TicketNotFoundException("Ticket not found with ID: " + ticketId);
         }
 
         AcceptanceCriteria criteria = acceptanceCriteriaMapper.toEntity(request);
@@ -379,7 +379,7 @@ public class TicketService {
 
         Ticket ticket = ticketRepository.findById(ticketId);
         if (ticket == null) {
-            throw new TicketNotFoundException("Ticket mit ID " + ticketId + " nicht gefunden");
+            throw new TicketNotFoundException("Ticket not found with ID: " + ticketId);
         }
 
         List<AcceptanceCriteria> criteriaList = acceptanceCriteriaRepository.findByTicketId(ticketId);
@@ -394,7 +394,7 @@ public class TicketService {
 
         Ticket ticket = ticketRepository.findById(ticketId);
         if (ticket == null) {
-            throw new TicketNotFoundException("Ticket mit ID " + ticketId + " nicht gefunden");
+            throw new TicketNotFoundException("Ticket not found with ID: " + ticketId);
         }
 
         AcceptanceCriteria criteria = acceptanceCriteriaRepository.findByIdAndTicketId(criteriaId, ticketId);
@@ -415,7 +415,7 @@ public class TicketService {
 
         Ticket ticket = ticketRepository.findById(ticketId);
         if (ticket == null) {
-            throw new TicketNotFoundException("Ticket mit ID " + ticketId + " nicht gefunden");
+            throw new TicketNotFoundException("Ticket not found with ID: " + ticketId);
         }
 
         AcceptanceCriteria criteria = acceptanceCriteriaRepository.findByIdAndTicketId(criteriaId, ticketId);
@@ -432,12 +432,12 @@ public class TicketService {
 
         Ticket ticket = ticketRepository.findById(ticketId);
         if (ticket == null) {
-            throw new TicketNotFoundException("Ticket mit ID " + ticketId + " nicht gefunden");
+            throw new TicketNotFoundException("Ticket not found with ID: " + ticketId);
         }
 
         Ticket relatedTicket = ticketRepository.findById(relatedTicketId);
         if (relatedTicket == null) {
-            throw new TicketNotFoundException("Ticket mit ID " + relatedTicketId + " nicht gefunden");
+            throw new TicketNotFoundException("Ticket not found with ID: " + relatedTicketId);
         }
 
         ticket.getRelatedTickets().add(relatedTicket);
@@ -455,12 +455,12 @@ public class TicketService {
 
         Ticket ticket = ticketRepository.findById(ticketId);
         if (ticket == null) {
-            throw new TicketNotFoundException("Ticket mit ID " + ticketId + " nicht gefunden");
+            throw new TicketNotFoundException("Ticket not found with ID: " + ticketId);
         }
 
         Ticket relatedTicket = ticketRepository.findById(relatedTicketId);
         if (relatedTicket == null) {
-            throw new TicketNotFoundException("Ticket mit ID " + relatedTicketId + " nicht gefunden");
+            throw new TicketNotFoundException("Ticket not found with ID: " + relatedTicketId);
         }
 
         ticket.getRelatedTickets().remove(relatedTicket);
@@ -478,12 +478,12 @@ public class TicketService {
 
         Ticket ticket = ticketRepository.findById(ticketId);
         if (ticket == null) {
-            throw new TicketNotFoundException("Ticket mit ID " + ticketId + " nicht gefunden");
+            throw new TicketNotFoundException("Ticket not found with ID: " + ticketId);
         }
 
         Ticket blockingTicket = ticketRepository.findById(blockingTicketId);
         if (blockingTicket == null) {
-            throw new TicketNotFoundException("Ticket mit ID " + blockingTicketId + " nicht gefunden");
+            throw new TicketNotFoundException("Ticket not found with ID: " + blockingTicketId);
         }
 
         ticket.getBlockingTickets().add(blockingTicket);
@@ -496,12 +496,12 @@ public class TicketService {
 
         Ticket ticket = ticketRepository.findById(ticketId);
         if (ticket == null) {
-            throw new TicketNotFoundException("Ticket mit ID " + ticketId + " nicht gefunden");
+            throw new TicketNotFoundException("Ticket not found with ID: " + ticketId);
         }
 
         Ticket blockingTicket = ticketRepository.findById(blockingTicketId);
         if (blockingTicket == null) {
-            throw new TicketNotFoundException("Ticket mit ID " + blockingTicketId + " nicht gefunden");
+            throw new TicketNotFoundException("Ticket not found with ID: " + blockingTicketId);
         }
 
         ticket.getBlockingTickets().remove(blockingTicket);
