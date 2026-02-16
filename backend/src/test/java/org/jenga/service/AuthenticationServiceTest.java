@@ -7,7 +7,6 @@ import org.jenga.db.UserRepository;
 
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeEach;
 import io.quarkus.test.TestTransaction;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -15,7 +14,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
 
 import jakarta.ws.rs.BadRequestException;
 
