@@ -172,4 +172,42 @@ class ProjectServiceTest{
     void testDeleteNonExistingProject() {
         assertThrows(NotFoundException.class, () -> service.findById(PROJECT_IDENTIFIER));
     }
+
+    @Test
+    @TestTransaction
+    void testCreateLabelsForProject() {
+        ProjectRequestDTO dto = new ProjectRequestDTO();
+        dto.setIdentifier(PROJECT_IDENTIFIER);
+        dto.setName(PROJECT_NAME);
+        dto.setDescription(PROJECT_DESCRIPTION);
+        
+        service.create(dto);
+
+        List<LabelDTO> labels = service.getAllLabels(PROJECT_IDENTIFIER);
+        assertEquals(0, labels.size());
+
+        LabelDTO label = new LabelDTO();
+        label.setName("testing");
+        label.setColor("#123456");
+        service.createLabel(PROJECT_IDENTIFIER, label);
+
+        labels = service.getAllLabels(PROJECT_IDENTIFIER);
+        assertEquals(1, labels.size());
+        assertEquals(label.getName(), labels.get(0).getName());
+
+        service.deleteLabel(PROJECT_IDENTIFIER, label.getName());
+
+        labels = service.getAllLabels(PROJECT_IDENTIFIER);
+        assertEquals(0, labels.size());
+    }
+    
+    @Test
+    @TestTransaction
+    void testCreateLabelInvalidProject() {
+        LabelDTO label = new LabelDTO();
+        label.setName("testing");
+        label.setColor("#123456");
+
+        assertThrows(NotFoundException.class, () -> service.createLabel("invalid", label));
+    }
 }
