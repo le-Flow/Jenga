@@ -3,7 +3,6 @@ package org.jenga.service;
 import org.jenga.dto.LoginRequestDTO;
 import org.jenga.dto.LoginResponseDTO;
 import org.jenga.dto.RegisterRequestDTO;
-import org.jenga.db.UserRepository;
 
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
@@ -21,9 +20,6 @@ import jakarta.ws.rs.BadRequestException;
 class AuthenticationServiceTest{
     @Inject
     AuthenticationService service;
-
-    @Inject
-    UserRepository userRepository;
 
     private static final String EMAIL = "user@test.com";
     private static final String USERNAME = "user";
