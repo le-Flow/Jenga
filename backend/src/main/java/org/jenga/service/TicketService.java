@@ -321,7 +321,7 @@ public class TicketService {
         Log.infof("Create comment for ticket %d", ticketId);
         Ticket ticket = ticketRepository.findById(ticketId);
         if (ticket == null) {
-            throw new RuntimeException("Ticket not found");
+            throw new NotFoundException("Ticket not found");
         }
 
         Comment comment = commentMapper.commentRequestDTOToComment(commentDTO);
