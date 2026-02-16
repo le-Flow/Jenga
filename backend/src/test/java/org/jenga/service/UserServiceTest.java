@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import jakarta.inject.Inject;
 
-import jakarta.ws.rs.NotFoundException;
+import org.jenga.exception.UserNotFoundException;
 
 @QuarkusTest
 class UserServiceTest {
@@ -30,23 +30,23 @@ class UserServiceTest {
     @Test
     @TestTransaction
     void testGettingUser() {
-        assertThrows(NotFoundException.class, () -> service.findByUsername(USERNAME));
+        assertThrows(UserNotFoundException.class, () -> service.findByUsername(USERNAME));
 
         RegisterRequestDTO dto = new RegisterRequestDTO();
         dto.setEmail(EMAIL);
         dto.setUsername(USERNAME);
         dto.setPassword(PASSWORD);
         authService.register(dto);
-        
+
         UserDTO user = service.findByUsername(USERNAME);
         assertNotNull(user);
         assertEquals(user.getUsername(), USERNAME);
 
         List<UserDTO> users = service.findAll();
         UserDTO foundUser = users.stream()
-            .filter(u -> u.getUsername().equals(USERNAME))
-            .findFirst()
-            .orElseThrow(() -> new AssertionError());
+                .filter(u -> u.getUsername().equals(USERNAME))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError());
 
         assertEquals(foundUser.getUsername(), USERNAME);
     }
@@ -54,6 +54,6 @@ class UserServiceTest {
     @Test
     @TestTransaction
     void testGettingNonexistingUser() {
-        assertThrows(NotFoundException.class, () -> service.findByUsername("nonexisting1ufn1f"));
+        assertThrows(UserNotFoundException.class, () -> service.findByUsername("nonexisting1ufn1f"));
     }
 }
