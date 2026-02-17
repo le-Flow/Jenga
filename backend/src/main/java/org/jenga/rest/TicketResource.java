@@ -80,7 +80,7 @@ public class TicketResource {
     @Path("/search")
     public List<TicketResponseDTO> searchTickets(TicketSearchDTO request) {
         Log.info("POST /search/");
-        Log.info("Body: " + request);
+        Log.infof("Body: %s", request);
         return ticketService.searchTickets(request);
     }
 

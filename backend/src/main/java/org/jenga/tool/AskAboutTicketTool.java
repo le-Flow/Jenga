@@ -14,7 +14,7 @@ import org.jenga.service.TicketService;
 import org.jenga.service.mcpserver.ChatRequestContext;
 
 @ApplicationScoped
-@RequiredArgsConstructor(onConstructor_ = {@Inject})
+@RequiredArgsConstructor(onConstructor_ = { @Inject })
 public class AskAboutTicketTool {
 
     private final TicketService ticketService;
@@ -22,10 +22,9 @@ public class AskAboutTicketTool {
 
     @Tool("Get information about a specific ticket. If no ticketId is provided, it uses the user's current ticket context.")
     public AskAboutTicketResponseDTO getTicketInfo(
-            @P("The internal database ID (e.g., 101, 102) of the ticket. If null, the user's current ticket is used.") 
-        Long ticketId) {
+            @P("The internal database ID (e.g., 101, 102) of the ticket. If null, the user's current ticket is used.") Long ticketId) {
 
-        Log.debug("AskAboutTicketTool.getTicketInfo called with ticketId: " + ticketId);
+        Log.debugf("AskAboutTicketTool.getTicketInfo called with ticketId: %s", ticketId);
 
         try {
             Long finalTicketId = ticketId;
@@ -36,8 +35,7 @@ public class AskAboutTicketTool {
             if (finalTicketId == null) {
                 return new AskAboutTicketResponseDTO(
                         "ERROR: No ticket ID was provided, and there is no current ticket in context.",
-                    null
-                );
+                        null);
             }
 
             TicketResponseDTO ticket = ticketService.findById(finalTicketId);
@@ -51,8 +49,7 @@ public class AskAboutTicketTool {
                     ticket.getTitle(),
                     ticket.getStatus(),
                     assigneeName,
-                    ticket.getDescription()
-            );
+                    ticket.getDescription());
 
             return new AskAboutTicketResponseDTO(message, ticket.getId().toString());
 
@@ -66,17 +63,15 @@ public class AskAboutTicketTool {
             } else {
                 errorId = "N/A";
             }
-            Log.warn("AskAboutTicketTool: Ticket not found. ID: " + errorId);
+            Log.warnf("AskAboutTicketTool: Ticket not found. ID: %s", errorId);
             return new AskAboutTicketResponseDTO(
                     "ERROR: Sorry, I couldn't find a ticket with ID: " + errorId,
-                errorId
-            );
+                    errorId);
         } catch (Exception e) {
-            Log.error("AskAboutTicketTool: Unexpected error: " + e.getMessage(), e);
+            Log.errorf(e, "AskAboutTicketTool: Unexpected error: %s", e.getMessage());
             return new AskAboutTicketResponseDTO(
                     "ERROR: An unexpected error occurred: " + e.getMessage(),
-                null
-            );
+                    null);
         }
     }
 }

@@ -13,7 +13,7 @@ import org.jenga.service.TicketService;
 import org.jenga.service.mcpserver.ChatRequestContext;
 
 @ApplicationScoped
-@RequiredArgsConstructor(onConstructor_ = {@Inject})
+@RequiredArgsConstructor(onConstructor_ = { @Inject })
 public class DeleteTicketTool {
 
     private final TicketService ticketService;
@@ -21,10 +21,8 @@ public class DeleteTicketTool {
 
     @Tool("Deletes a specific ticket. If no ticketId is provided, it attempts to delete the user's current ticket.")
     public String deleteTicket(
-            @P("The internal database ID (e.g., 101, 102) of the ticket to delete. If null, the user's current ticket context will be used.") 
-            Long ticketId) 
-        {
-        Log.info("DeleteTicketTool.deleteTicket called with ticketId: " + ticketId);
+            @P("The internal database ID (e.g., 101, 102) of the ticket to delete. If null, the user's current ticket context will be used.") Long ticketId) {
+        Log.infof("DeleteTicketTool.deleteTicket called with ticketId: %s", ticketId);
 
         try {
             Long finalTicketId = ticketId;
@@ -44,11 +42,11 @@ public class DeleteTicketTool {
             return "SUCCESS: Successfully deleted ticket " + ticket.getTicketNumber() + ".";
 
         } catch (NotFoundException e) {
-            Log.warn("DeleteTicketTool: Ticket not found for deletion. ID: " + ticketId);
+            Log.warnf("DeleteTicketTool: Ticket not found for deletion. ID: %s", ticketId);
             return "ERROR: Could not delete ticket. Reason: No ticket found with ID: "
                     + (ticketId != null ? ticketId : requestContext.getCurrentTicketID());
         } catch (Exception e) {
-            Log.error("DeleteTicketTool: Unexpected error: " + e.getMessage(), e);
+            Log.errorf(e, "DeleteTicketTool: Unexpected error: %s", e.getMessage());
             return "ERROR: An unexpected error occurred while deleting the ticket: " + e.getMessage();
         }
     }

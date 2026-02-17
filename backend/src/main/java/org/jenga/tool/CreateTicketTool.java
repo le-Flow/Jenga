@@ -34,33 +34,23 @@ public class CreateTicketTool {
     @Tool("Creates a new software development ticket (e.g., bug, feature, task) in the specified project.")
     @Transactional
     public String createTicket(
-        @P("The title or summary of the ticket. This is mandatory.") 
-        String title,
+            @P("The title or summary of the ticket. This is mandatory.") String title,
 
-        @P("A detailed description of the ticket, including steps to reproduce for bugs. This is mandatory.") 
-        String description,
+            @P("A detailed description of the ticket, including steps to reproduce for bugs. This is mandatory.") String description,
 
-        @P("The project ID (e.g., 'MCP', 'Frontend'). If not provided, the user's current project will be used.") 
-        Long projectId,
+            @P("The project ID (e.g., 'MCP', 'Frontend'). If not provided, the user's current project will be used.") Long projectId,
 
-        @P("The username of the person reporting the ticket. If null, 'unassigned', or empty, it defaults to the current user.") 
-        String reporterUsername,
+            @P("The username of the person reporting the ticket. If null, 'unassigned', or empty, it defaults to the current user.") String reporterUsername,
 
-        @P("The username of the person to assign the ticket to. If null, 'unassigned', or empty, it defaults to the current user.") 
-        String assigneeUsername,
+            @P("The username of the person to assign the ticket to. If null, 'unassigned', or empty, it defaults to the current user.") String assigneeUsername,
 
-        @P("The priority of the ticket. Valid values are LOW, MEDIUM, HIGH, CRITICAL. Can be null.") 
-        TicketPriority priority,
+            @P("The priority of the ticket. Valid values are LOW, MEDIUM, HIGH, CRITICAL. Can be null.") TicketPriority priority,
 
-        @P("The estimated size or effort. Valid values are SMALL, MEDIUM, LARGE, EXTRA_LARGE. Can be null.") 
-        TicketSize size,
+            @P("The estimated size or effort. Valid values are SMALL, MEDIUM, LARGE, EXTRA_LARGE. Can be null.") TicketSize size,
 
-        @P("A comma-separated string of label names to add to the ticket, e.g., 'bug,ui,backend'. Can be null or empty.") 
-        String labels,
+            @P("A comma-separated string of label names to add to the ticket, e.g., 'bug,ui,backend'. Can be null or empty.") String labels,
 
-        @P("A semicolon-separated list of acceptance criteria, e.g., 'User can login; Password is validated; Error message shows'. Can be null or empty.") 
-        String acceptanceCriteria
-    ){
+            @P("A semicolon-separated list of acceptance criteria, e.g., 'User can login; Password is validated; Error message shows'. Can be null or empty.") String acceptanceCriteria) {
         try {
             Long finalProjectId;
 
@@ -166,15 +156,14 @@ public class CreateTicketTool {
             newTicket.setTicketNumber(ticketRepository.findMaxTicketNumberByProject(project) + 1);
             ticketRepository.persist(newTicket);
 
-            Log.info("Successfully created ticket " + newTicket.getProject().getId() + "-"
-                    + newTicket.getTicketNumber());
+            Log.infof("Successfully created ticket %s-%d", newTicket.getProject().getId(), newTicket.getTicketNumber());
 
             return "SUCCESS: Created new ticket " +
                     newTicket.getProject().getId() + "-" + newTicket.getTicketNumber() +
                     ": '" + newTicket.getTitle() + "'.";
 
         } catch (Exception e) {
-            Log.error("CreateTicketTool: Unexpected error: " + e.getMessage(), e);
+            Log.errorf(e, "CreateTicketTool: Unexpected error: %s", e.getMessage());
             return "ERROR: An unexpected error occurred: " + e.getMessage();
         }
     }

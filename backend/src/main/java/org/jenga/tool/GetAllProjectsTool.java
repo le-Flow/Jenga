@@ -34,7 +34,7 @@ public class GetAllProjectsTool {
                             .collect(Collectors.joining("\n"));
 
         } catch (Exception e) {
-            Log.error("GetAllProjectsTool: Unexpected error: " + e.getMessage(), e);
+            Log.errorf(e, "GetAllProjectsTool: Unexpected error: %s", e.getMessage());
             return "ERROR: An unexpected error occurred while fetching projects: " + e.getMessage();
         }
     }

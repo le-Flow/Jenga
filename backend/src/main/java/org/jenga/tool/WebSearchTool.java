@@ -33,7 +33,7 @@ public class WebSearchTool {
                 Log.warn("Web search is not configured (missing API key or CSE ID).");
                 return List.of("Web search is not configured (missing API key or CSE ID).");
             }
-            Log.info("WebSearchTool.searchWeb called with query: " + query);
+            Log.infof("WebSearchTool.searchWeb called with query: %s", query);
             WebSearchResponseDTO response = searchApi.search(apiKey, searchEngineId, query);
 
             if (response == null || response.getItems() == null || response.getItems().isEmpty()) {
@@ -49,7 +49,7 @@ public class WebSearchTool {
                     .toList();
 
         } catch (Exception e) {
-            Log.warn("Error calling search API: " + e.getMessage());
+            Log.warnf("Error calling search API: %s", e.getMessage());
             return List.of("Error performing search: " + e.getMessage());
         }
     }

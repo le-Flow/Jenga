@@ -18,7 +18,7 @@ import org.jenga.service.TicketService;
 import java.util.List;
 
 @ApplicationScoped
-@RequiredArgsConstructor(onConstructor_ = {@Inject})
+@RequiredArgsConstructor(onConstructor_ = { @Inject })
 public class SearchTicketTool {
 
     private final TicketService ticketService;
@@ -30,40 +30,28 @@ public class SearchTicketTool {
             """)
     @Transactional
     public List<TicketResponseDTO> searchTickets(
-            @P("The search query text for title or description (e.g., 'database error', 'login page')")
-            String query,
+            @P("The search query text for title or description (e.g., 'database error', 'login page')") String query,
 
-            @P("Filter by a specific ticket title")
-            String title,
+            @P("Filter by a specific ticket title") String title,
 
-            @P("Search for text within the ticket description")
-            String description,
+            @P("Search for text within the ticket description") String description,
 
-            @P("Filter by list of priorities (e.g., HIGH, CRITICAL)")
-            List<TicketPriority> priorities,
+            @P("Filter by list of priorities (e.g., HIGH, CRITICAL)") List<TicketPriority> priorities,
 
-            @P("Filter by list of statuses (e.g., OPEN, IN_PROGRESS)")
-            List<TicketStatus> statuses,
+            @P("Filter by list of statuses (e.g., OPEN, IN_PROGRESS)") List<TicketStatus> statuses,
 
-            @P("Filter by list of sizes (e.g., SMALL, LARGE)")
-            List<TicketSize> sizes,
+            @P("Filter by list of sizes (e.g., SMALL, LARGE)") List<TicketSize> sizes,
 
-            @P("Filter by a list of assignee usernames")
-            List<String> assignees,
+            @P("Filter by a list of assignee usernames") List<String> assignees,
 
-            @P("Filter by a list of reporter usernames")
-            List<String> reporters,
+            @P("Filter by a list of reporter usernames") List<String> reporters,
 
-            @P("Filter by a list of labels (e.g., 'bug', 'feature')")
-            List<String> labels,
+            @P("Filter by a list of labels (e.g., 'bug', 'feature')") List<String> labels,
 
-            @P("Filter by a specific project ID")
-            String projectId,
+            @P("Filter by a specific project ID") String projectId,
 
-            @P("Limit the number of results (default to 5 if not specified)") 
-            Integer limit) 
-        {
-        Log.debug("SearchTicketTool.searchTickets called with query: '" + query + "'");
+            @P("Limit the number of results (default to 5 if not specified)") Integer limit) {
+        Log.debugf("SearchTicketTool.searchTickets called with query: '%s'", query);
         TicketSearchDTO request = new TicketSearchDTO();
         TicketSearchDTO.Filter filter = new TicketSearchDTO.Filter();
 

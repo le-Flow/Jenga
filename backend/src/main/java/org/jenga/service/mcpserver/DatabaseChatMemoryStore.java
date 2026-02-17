@@ -18,7 +18,7 @@ public class DatabaseChatMemoryStore implements ChatMemoryStore {
 
     @Override
     public List<ChatMessage> getMessages(Object memoryId) {
-        Log.debug("Retrieving messages for memoryId: " + memoryId);
+        Log.debugf("Retrieving messages for memoryId: %s", memoryId);
         List<ChatMemoryEntity> entities = ChatMemoryEntity.list("memoryId", memoryId.toString());
 
         return entities.stream()
@@ -29,7 +29,7 @@ public class DatabaseChatMemoryStore implements ChatMemoryStore {
     @Override
     @Transactional
     public void updateMessages(Object memoryId, List<ChatMessage> messages) {
-        Log.debug("Updating messages for memoryId: " + memoryId + ". Count: " + messages.size());
+        Log.debugf("Updating messages for memoryId: %s. Count: %d", memoryId, messages.size());
         deleteMessages(memoryId);
 
         for (ChatMessage message : messages) {
@@ -44,7 +44,7 @@ public class DatabaseChatMemoryStore implements ChatMemoryStore {
     @Override
     @Transactional
     public void deleteMessages(Object memoryId) {
-        Log.debug("Deleting messages for memoryId: " + memoryId);
+        Log.debugf("Deleting messages for memoryId: %s", memoryId);
         ChatMemoryEntity.delete("memoryId", memoryId.toString());
     }
 }

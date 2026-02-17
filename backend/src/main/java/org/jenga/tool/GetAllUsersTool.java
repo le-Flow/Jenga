@@ -35,7 +35,7 @@ public class GetAllUsersTool {
                             .collect(Collectors.joining(", "));
 
         } catch (Exception e) {
-            Log.error("GetAllUsersTool: Unexpected error: " + e.getMessage(), e);
+            Log.errorf(e, "GetAllUsersTool: Unexpected error: %s", e.getMessage());
             return "ERROR: An unexpected error occurred while fetching users: " + e.getMessage();
         }
     }

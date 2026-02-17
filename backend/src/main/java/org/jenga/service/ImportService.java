@@ -57,7 +57,7 @@ public class ImportService {
                 processGitHubIssue(project, reporter, githubDto);
                 successfulImportCount++;
             } catch (Exception e) {
-                Log.warn("Failed to import ticket '" + githubDto.getTitle() + "': " + e.getMessage());
+                Log.warnf("Failed to import ticket '%s': %s", githubDto.getTitle(), e.getMessage());
                 failedImports.add("Failed to import ticket '" + githubDto.getTitle() + "': " + e.getMessage());
             }
         }
@@ -90,7 +90,7 @@ public class ImportService {
             case "ON HOLD":
                 return TicketStatus.ON_HOLD;
             default:
-                Log.warn("Warning: Unrecognized status '" + githubStatusName + "'. Defaulting to OPEN.");
+                Log.warnf("Warning: Unrecognized status '%s'. Defaulting to OPEN.", githubStatusName);
                 return TicketStatus.OPEN;
         }
     }
@@ -173,7 +173,7 @@ public class ImportService {
             if (assignee != null) {
                 ticket.setAssignee(assignee);
             } else {
-                Log.warn("Import Warning: Assignee not found, skipping: " + username);
+                Log.warnf("Import Warning: Assignee not found, skipping: %s", username);
             }
         }
 

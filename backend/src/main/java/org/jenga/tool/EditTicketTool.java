@@ -19,38 +19,29 @@ import org.jenga.service.mcpserver.ChatRequestContext;
 import java.util.List;
 
 @ApplicationScoped
-@RequiredArgsConstructor(onConstructor_ = {@Inject})
+@RequiredArgsConstructor(onConstructor_ = { @Inject })
 public class EditTicketTool {
     private final TicketService ticketService;
     private final ChatRequestContext requestContext;
 
     @Tool("Updates an existing ticket. Only fields that are provided (not null) will be changed.")
     public String editTicket(
-            @P("The internal database ID (e.g., 101, 102) of the ticket to edit. If null, the user's current ticket context is used.")
-            Long ticketId,
+            @P("The internal database ID (e.g., 101, 102) of the ticket to edit. If null, the user's current ticket context is used.") Long ticketId,
 
-            @P("The new title for the ticket. If null, the title will not be changed.")
-            String title,
+            @P("The new title for the ticket. If null, the title will not be changed.") String title,
 
-            @P("The new detailed description for the ticket. If null, the description will not be changed.")
-            String description,
+            @P("The new detailed description for the ticket. If null, the description will not be changed.") String description,
 
-            @P("The username of the new assignee. Use 'unassigned' to unassign. If null, the assignee will not be changed.")
-            String assignee,
+            @P("The username of the new assignee. Use 'unassigned' to unassign. If null, the assignee will not be changed.") String assignee,
 
-            @P("The new priority. If null, the priority will not be changed.")
-            TicketPriority priority,
+            @P("The new priority. If null, the priority will not be changed.") TicketPriority priority,
 
-            @P("The new size. If null, the size will not be changed.")
-            TicketSize size,
+            @P("The new size. If null, the size will not be changed.") TicketSize size,
 
-            @P("The new status. If null, the status will not be changed.")
-            TicketStatus status,
+            @P("The new status. If null, the status will not be changed.") TicketStatus status,
 
-            @P("A new list of label names. This will REPLACE the old list. If null, labels will not be changed.") 
-            List<String> labels) 
-        {
-        Log.info("EditTicketTool.editTicket called with ticketId: " + ticketId);
+            @P("A new list of label names. This will REPLACE the old list. If null, labels will not be changed.") List<String> labels) {
+        Log.infof("EditTicketTool.editTicket called with ticketId: %s", ticketId);
 
         try {
             Long finalTicketId = ticketId;
@@ -110,10 +101,10 @@ public class EditTicketTool {
             return "SUCCESS: Ticket " + updatedTicket.getTicketNumber() + " has been updated.";
 
         } catch (NotFoundException | BadRequestException e) {
-            Log.warn("EditTicketTool: Ticket not found or invalid request: " + e.getMessage());
+            Log.warnf("EditTicketTool: Ticket not found or invalid request: %s", e.getMessage());
             return "ERROR: Could not update ticket. Reason: " + e.getMessage();
         } catch (Exception e) {
-            Log.error("EditTicketTool: Unexpected error: " + e.getMessage(), e);
+            Log.errorf(e, "EditTicketTool: Unexpected error: %s", e.getMessage());
             return "ERROR: An unexpected error occurred: " + e.getMessage();
         }
     }
