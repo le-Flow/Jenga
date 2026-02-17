@@ -31,12 +31,12 @@ public class ImportResource {
     public Response importFromGitHub(
             @PathParam("projectId") String projectId,
             List<GitHubIssueDTO> githubIssues) {
-        Log.info("Received request to import " + githubIssues.size() + " GitHub issues for project: " + projectId);
+        Log.infof("Received request to import %d GitHub issues for project: %s", githubIssues.size(), projectId);
 
         ImportReportDTO report = importService.importFromGitHub(projectId, githubIssues);
 
-        Log.info("GitHub import completed for project: " + projectId + ". Success: " + report.getSuccessfulImportCount()
-                + ", Failed: " + report.getFailedImports().size());
+        Log.infof("GitHub import completed for project: %s. Success: %d, Failed: %d", projectId,
+                report.getSuccessfulImportCount(), report.getFailedImports().size());
         return Response.ok(report).build();
     }
 
@@ -45,12 +45,12 @@ public class ImportResource {
     public Response importFromJenga(
             @PathParam("projectId") String projectId,
             List<TicketRequestDTO> jengaIssues) {
-        Log.info("Received request to import " + jengaIssues.size() + " Jenga tickets for project: " + projectId);
+        Log.infof("Received request to import %d Jenga tickets for project: %s", jengaIssues.size(), projectId);
 
         ImportReportDTO report = importService.importFromJenga(projectId, jengaIssues);
 
-        Log.info("Jenga import completed for project: " + projectId + ". Success: " + report.getSuccessfulImportCount()
-                + ", Failed: " + report.getFailedImports().size());
+        Log.infof("Jenga import completed for project: %s. Success: %d, Failed: %d", projectId,
+                report.getSuccessfulImportCount(), report.getFailedImports().size());
         return Response.ok(report).build();
     }
 }
