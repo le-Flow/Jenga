@@ -1,5 +1,5 @@
 import { AppBar, Box, Card, CssBaseline, IconButton, Stack, ThemeProvider, Toolbar, createTheme } from '@suid/material';
-import { Show, createSignal, type JSXElement } from 'solid-js';
+import { Show, createEffect, createSignal, type JSXElement } from 'solid-js';
 import { ProjectProvider } from './provider/ProjectProvider';
 import { AuthProvider } from './provider/AuthProvider';
 import { UserProvider } from './provider/UserProvider';
@@ -8,6 +8,7 @@ import { Auth } from './components/Auth';
 import { Sidebar } from './components/Sidebar';
 import { Menu } from '@suid/icons-material';
 import { Footer } from './components/Footer';
+import { useLocation } from '@solidjs/router';
 
 const theme = createTheme()
 
@@ -16,7 +17,15 @@ interface AppProps {
 }
 
 const App = (props: AppProps) => {
-  const [open, setOpen] = createSignal(false)
+  const [open, setOpen] = createSignal(false);
+
+  const location = useLocation();
+
+  createEffect(() => {
+    if (location.pathname === "/Home" || location.pathname === "/") {
+      setOpen(true);
+    }
+  });
 
   return (
     <>
