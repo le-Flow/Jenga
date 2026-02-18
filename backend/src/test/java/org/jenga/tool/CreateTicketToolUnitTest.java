@@ -49,7 +49,7 @@ public class CreateTicketToolUnitTest {
     void testCreateTicket_Success() {
         String title = "New Ticket";
         String description = "Desc";
-        Long projectId = 100L;
+        String projectId = "100";
         TicketPriority priority = TicketPriority.HIGH;
         TicketSize size = TicketSize.MEDIUM;
         String assignee = "alice";
@@ -65,7 +65,7 @@ public class CreateTicketToolUnitTest {
         User assigneeUser = new User();
         assigneeUser.setUsername("alice");
 
-        doReturn(project).when(projectRepository).findById(any(Long.class));
+        doReturn(project).when(projectRepository).findById(anyString());
         when(userRepository.findByUsername("alice")).thenReturn(assigneeUser);
 
         // Mocking Panache Query logic for labels
@@ -96,9 +96,9 @@ public class CreateTicketToolUnitTest {
 
     @Test
     void testCreateTicket_ProjectNotFound() {
-        doReturn(null).when(projectRepository).findById(any(Long.class));
+        doReturn(null).when(projectRepository).findById(anyString());
 
-        String result = createTicketTool.createTicket("Title", "Desc", 999L, null, null, TicketPriority.LOW,
+        String result = createTicketTool.createTicket("Title", "Desc", "999", null, null, TicketPriority.LOW,
                 TicketSize.SMALL, null, null);
 
         assertTrue(result.startsWith("ERROR"));
@@ -108,12 +108,12 @@ public class CreateTicketToolUnitTest {
     @Test
     void testCreateTicket_AssigneeNotFound_Ignored() {
         Project project = new Project();
-        doReturn(project).when(projectRepository).findById(any(Long.class));
+        doReturn(project).when(projectRepository).findById(anyString());
 
         when(requestContext.getCurrentUser()).thenReturn("currentUser");
         when(userRepository.findByUsername("ghost")).thenReturn(null);
 
-        String result = createTicketTool.createTicket("Title", "Desc", 1L, null, "ghost", TicketPriority.LOW,
+        String result = createTicketTool.createTicket("Title", "Desc", "1", null, "ghost", TicketPriority.LOW,
                 TicketSize.SMALL, null, null);
 
         assertTrue(result.startsWith("SUCCESS"));
@@ -123,7 +123,7 @@ public class CreateTicketToolUnitTest {
     void testCreateTicket_UnassignedAssignee_DefaultsToCurrentUser() {
         Project project = new Project();
         project.setId("PROJ");
-        doReturn(project).when(projectRepository).findById(any(Long.class));
+        doReturn(project).when(projectRepository).findById(anyString());
 
         // Current user is "currentUser"
         when(requestContext.getCurrentUser()).thenReturn("currentUser");
@@ -138,7 +138,7 @@ public class CreateTicketToolUnitTest {
 
         when(ticketRepository.findMaxTicketNumberByProject(project)).thenReturn(1L);
 
-        String result = createTicketTool.createTicket("Title", "Desc", 1L, null, assigneeInput, TicketPriority.LOW,
+        String result = createTicketTool.createTicket("Title", "Desc", "1", null, assigneeInput, TicketPriority.LOW,
                 TicketSize.SMALL, null, null);
 
         assertTrue(result.startsWith("SUCCESS"));

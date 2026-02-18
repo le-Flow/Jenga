@@ -18,8 +18,9 @@ public class DatabaseChatMemoryStore implements ChatMemoryStore {
 
     @Override
     public List<ChatMessage> getMessages(Object memoryId) {
-        Log.debugf("Retrieving messages for memoryId: %s", memoryId);
+        Log.infof("Retrieving messages for memoryId: %s", memoryId);
         List<ChatMemoryEntity> entities = ChatMemoryEntity.list("memoryId", memoryId.toString());
+        Log.infof("Found %d entities for memoryId: %s", entities.size(), memoryId);
 
         return entities.stream()
                 .map(entity -> ChatMessageDeserializer.messageFromJson(entity.messageJson))
@@ -27,24 +28,26 @@ public class DatabaseChatMemoryStore implements ChatMemoryStore {
     }
 
     @Override
-    @Transactional
     public void updateMessages(Object memoryId, List<ChatMessage> messages) {
-        Log.debugf("Updating messages for memoryId: %s. Count: %d", memoryId, messages.size());
-        deleteMessages(memoryId);
+        Log.infof("Updating messages for memoryId: %s. Count: %d", memoryId, messages.size());
 
-        for (ChatMessage message : messages) {
-            ChatMemoryEntity entity = new ChatMemoryEntity();
-            entity.memoryId = memoryId.toString();
-            entity.messageJson = ChatMessageSerializer.messageToJson(message);
-            entity.messageType = MessageType.valueOf(message.type().name());
-            entity.persist();
-        }
+        io.quarkus.narayana.jta.QuarkusTransaction.requiringNew().run(() -> {
+            deleteMessages(memoryId);
+
+            for (ChatMessage message : messages) {
+                ChatMemoryEntity entity = new ChatMemoryEntity();
+                entity.memoryId = memoryId.toString();
+                entity.messageJson = ChatMessageSerializer.messageToJson(message);
+                entity.messageType = MessageType.valueOf(message.type().name());
+                entity.persist();
+            }
+        });
     }
 
     @Override
     @Transactional
     public void deleteMessages(Object memoryId) {
-        Log.debugf("Deleting messages for memoryId: %s", memoryId);
+        Log.infof("Deleting messages for memoryId: %s", memoryId);
         ChatMemoryEntity.delete("memoryId", memoryId.toString());
     }
 }

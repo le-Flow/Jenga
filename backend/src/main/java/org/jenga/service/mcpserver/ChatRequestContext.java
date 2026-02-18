@@ -7,6 +7,6 @@ import lombok.Data;
 @Data
 public class ChatRequestContext {
     private String currentUser;
-    private Long currentProjectID;
+    private String currentProjectID;
     private Long currentTicketID;
 }

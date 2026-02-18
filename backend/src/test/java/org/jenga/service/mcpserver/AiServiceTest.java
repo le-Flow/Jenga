@@ -72,7 +72,7 @@ public class AiServiceTest {
     @Test
     void testChat_CreateTicket_Workflow_Mocked() {
         requestContext.setCurrentUser(username);
-        requestContext.setCurrentProjectID(Long.parseLong(projectId));
+        requestContext.setCurrentProjectID(projectId);
 
         String conversationId = "test-conv-mock";
 

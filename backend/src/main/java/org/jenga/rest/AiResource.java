@@ -11,6 +11,9 @@ import io.quarkus.logging.Log;
 
 import java.util.UUID;
 
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.SecurityContext;
+
 import org.jenga.dto.mcpserver.ChatRequestDTO;
 import org.jenga.dto.mcpserver.ChatResponseDTO;
 import org.jenga.dto.mcpserver.ChatMessageDTO;
@@ -31,11 +34,9 @@ import dev.langchain4j.data.message.TextContent;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.Collections;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.QueryParam;
 
 @Path("/api/ai")
 @Produces(MediaType.APPLICATION_JSON)
@@ -67,23 +68,54 @@ public class AiResource {
         requestContext.setCurrentProjectID(request.getCurrentProjectID());
         requestContext.setCurrentTicketID(request.getCurrentTicketID());
 
+        List<dev.langchain4j.data.message.ChatMessage> updatedMessages = null;
+
         try {
+            // Manually persist user message BEFORE calling AI service
+            List<dev.langchain4j.data.message.ChatMessage> existingMessages = memoryStore.getMessages(conversationId);
+            updatedMessages = new java.util.ArrayList<>(existingMessages);
+            updatedMessages.add(dev.langchain4j.data.message.UserMessage.from(request.getMessage()));
+            memoryStore.updateMessages(conversationId, updatedMessages);
+            Log.infof("Manually persisted UserMessage for conversationId: %s", conversationId);
+
             String aiResponse = assistant.chat(conversationId, request.getMessage());
+
+            // Manually persist AI response AFTER receiving it
+            updatedMessages.add(dev.langchain4j.data.message.AiMessage.from(aiResponse));
+            memoryStore.updateMessages(conversationId, updatedMessages);
+            Log.infof("Manually persisted AiMessage for conversationId: %s", conversationId);
+
             return new ChatResponseDTO(aiResponse, conversationId);
 
         } catch (NullPointerException e) {
             Log.errorf(e, "NPE during chat processing for conversationId: %s", conversationId);
             String errorMsg = "I encountered an error processing that request. This is usually due to a tool execution issue. Please try rephrasing your request or try again.";
+
+            // Persist error message as AI response
+            if (updatedMessages != null) {
+                updatedMessages.add(dev.langchain4j.data.message.AiMessage.from(errorMsg));
+                memoryStore.updateMessages(conversationId, updatedMessages);
+                Log.infof("Manually persisted error AiMessage for conversationId: %s", conversationId);
+            }
+
             return new ChatResponseDTO(errorMsg, conversationId);
         } catch (Exception e) {
             Log.errorf(e, "Unexpected error during chat processing for conversationId: %s", conversationId);
             String errorMsg = "An unexpected error occurred: " + e.getMessage();
+
+            // Persist error message as AI response
+            if (updatedMessages != null) {
+                updatedMessages.add(dev.langchain4j.data.message.AiMessage.from(errorMsg));
+                memoryStore.updateMessages(conversationId, updatedMessages);
+                Log.infof("Manually persisted error AiMessage for conversationId: %s", conversationId);
+            }
+
             return new ChatResponseDTO(errorMsg, conversationId);
         }
     }
 
     @Transactional
-    void ensureSessionExists(String conversationId, String userId, Long projectId, String initialMessage) {
+    void ensureSessionExists(String conversationId, String userId, String projectId, String initialMessage) {
         if (ChatSessionEntity.findBySessionId(conversationId) == null) {
             ChatSessionEntity session = new ChatSessionEntity();
             session.sessionId = conversationId;
@@ -110,13 +142,14 @@ public class AiResource {
         }
     }
 
+    @Context
+    SecurityContext securityContext;
+
     @GET
     @Path("/sessions")
-    public List<ChatSessionDTO> getSessions(@QueryParam("userId") String userId) {
+    public List<ChatSessionDTO> getSessions() {
+        String userId = securityContext.getUserPrincipal().getName();
         Log.debugf("Fetching chat sessions for userId: %s", userId);
-        if (userId == null || userId.isBlank()) {
-            return Collections.emptyList();
-        }
 
         List<ChatSessionEntity> sessions = ChatSessionEntity.find("user.username = ?1 ORDER BY startedAt DESC", userId)
                 .list();
@@ -128,8 +161,9 @@ public class AiResource {
     @GET
     @Path("/sessions/{sessionId}/messages")
     public List<ChatMessageDTO> getSessionMessages(@PathParam("sessionId") String sessionId) {
-        Log.debugf("Fetching messages for sessionId: %s", sessionId);
+        Log.infof("Fetching messages for sessionId: %s", sessionId);
         List<ChatMessage> messages = memoryStore.getMessages(sessionId);
+        Log.infof("Found %d messages for sessionId: %s", messages.size(), sessionId);
 
         return messages.stream()
                 .map(this::mapToDTO).toList();

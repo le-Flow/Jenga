@@ -38,7 +38,7 @@ public class CreateTicketTool {
 
             @P("A detailed description of the ticket, including steps to reproduce for bugs. This is mandatory.") String description,
 
-            @P("The project ID (e.g., 'MCP', 'Frontend'). If not provided, the user's current project will be used.") Long projectId,
+            @P("The project ID (e.g., 'MCP', 'Frontend'). If not provided, the user's current project will be used.") String projectId,
 
             @P("The username of the person reporting the ticket. If null, 'unassigned', or empty, it defaults to the current user.") String reporterUsername,
 
@@ -52,15 +52,15 @@ public class CreateTicketTool {
 
             @P("A semicolon-separated list of acceptance criteria, e.g., 'User can login; Password is validated; Error message shows'. Can be null or empty.") String acceptanceCriteria) {
         try {
-            Long finalProjectId;
+            String finalProjectId;
 
-            if (projectId != null && projectId > 0) {
+            if (projectId != null && !projectId.isBlank()) {
                 finalProjectId = projectId;
             } else {
                 finalProjectId = requestContext.getCurrentProjectID();
             }
 
-            if (finalProjectId == null || finalProjectId < 0) {
+            if (finalProjectId == null || finalProjectId.isBlank()) {
                 return "ERROR: Could not create ticket. Reason: Project ID is mandatory. Please specify a project.";
             }
 

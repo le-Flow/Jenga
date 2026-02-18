@@ -25,7 +25,7 @@ public class ChatSessionEntity extends PanacheEntityBase {
     @JoinColumn(name = "user_id")
     public User user;
 
-    public Long projectId;
+    public String projectId;
     public String title;
     public LocalDateTime startedAt;
 

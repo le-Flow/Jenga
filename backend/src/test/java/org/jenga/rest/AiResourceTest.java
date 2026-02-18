@@ -74,7 +74,7 @@ public class AiResourceTest {
         ChatRequestDTO request = new ChatRequestDTO();
         request.setMessage("Hi");
         request.setCurrentUser("testuser");
-        request.setCurrentProjectID(1L);
+        request.setCurrentProjectID("1");
 
         given()
                 .contentType(ContentType.JSON)
@@ -143,7 +143,6 @@ public class AiResourceTest {
         transaction.commit();
 
         given()
-                .queryParam("userId", "testuser")
                 .when()
                 .get("/api/ai/sessions")
                 .then()
