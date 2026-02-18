@@ -22,6 +22,7 @@ import org.jenga.model.ChatSessionEntity;
 import org.jenga.model.User;
 import org.jenga.db.UserRepository;
 import org.jenga.service.mcpserver.AiService;
+import org.jenga.service.mcpserver.ChatMemoryProvider;
 import org.jenga.service.mcpserver.ChatRequestContext;
 import org.jenga.service.mcpserver.DatabaseChatMemoryStore;
 
@@ -47,6 +48,7 @@ public class AiResource {
     private final AiService assistant;
     private final ChatRequestContext requestContext;
     private final DatabaseChatMemoryStore memoryStore;
+    private final ChatMemoryProvider chatMemoryProvider;
     private final UserRepository userRepository;
 
     @POST
@@ -73,6 +75,11 @@ public class AiResource {
         try {
             // Manually persist user message BEFORE calling AI service
             List<dev.langchain4j.data.message.ChatMessage> existingMessages = memoryStore.getMessages(conversationId);
+            dev.langchain4j.memory.ChatMemory chatMemory = chatMemoryProvider.get(conversationId);
+            // Clear and re-seed to avoid duplicates on repeated calls
+            chatMemory.clear();
+            existingMessages.forEach(chatMemory::add);
+
             updatedMessages = new java.util.ArrayList<>(existingMessages);
             updatedMessages.add(dev.langchain4j.data.message.UserMessage.from(request.getMessage()));
             memoryStore.updateMessages(conversationId, updatedMessages);
@@ -91,7 +98,6 @@ public class AiResource {
             Log.errorf(e, "NPE during chat processing for conversationId: %s", conversationId);
             String errorMsg = "I encountered an error processing that request. This is usually due to a tool execution issue. Please try rephrasing your request or try again.";
 
-            // Persist error message as AI response
             if (updatedMessages != null) {
                 updatedMessages.add(dev.langchain4j.data.message.AiMessage.from(errorMsg));
                 memoryStore.updateMessages(conversationId, updatedMessages);
@@ -103,7 +109,6 @@ public class AiResource {
             Log.errorf(e, "Unexpected error during chat processing for conversationId: %s", conversationId);
             String errorMsg = "An unexpected error occurred: " + e.getMessage();
 
-            // Persist error message as AI response
             if (updatedMessages != null) {
                 updatedMessages.add(dev.langchain4j.data.message.AiMessage.from(errorMsg));
                 memoryStore.updateMessages(conversationId, updatedMessages);

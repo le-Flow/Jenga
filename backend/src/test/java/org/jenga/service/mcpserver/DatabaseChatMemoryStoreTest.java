@@ -4,6 +4,7 @@ import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.data.message.TextContent;
+import dev.langchain4j.memory.ChatMemory;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -11,6 +12,7 @@ import org.jenga.model.ChatMemoryEntity;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -20,6 +22,9 @@ public class DatabaseChatMemoryStoreTest {
 
     @Inject
     DatabaseChatMemoryStore store;
+
+    @Inject
+    ChatMemoryProvider chatMemoryProvider;
 
     @AfterEach
     @Transactional
@@ -83,5 +88,49 @@ public class DatabaseChatMemoryStoreTest {
     void testGetMessages_ReturnsEmptyListWhenNoMessages() {
         List<ChatMessage> retrieved = store.getMessages("non-existent-id");
         assertTrue(retrieved.isEmpty());
+    }
+
+    @Test
+    void testMultipleSequentialUpdates_FinalStateIsComplete() {
+        String memoryId = "test-session-competing";
+        UserMessage userMsg = UserMessage.from("Create a ticket");
+        AiMessage toolCallMsg = AiMessage.from("[tool: getAllProjects]");
+        AiMessage finalAiMsg = AiMessage.from("Done! Ticket created.");
+
+        // Round-trip 1: LangChain4j persists [userMsg, toolCallMsg]
+        List<ChatMessage> round1 = new ArrayList<>(List.of(userMsg, toolCallMsg));
+        store.updateMessages(memoryId, round1);
+
+        // Round-trip 2: LangChain4j persists [userMsg, toolCallMsg, finalAiMsg]
+        List<ChatMessage> round2 = new ArrayList<>(List.of(userMsg, toolCallMsg, finalAiMsg));
+        store.updateMessages(memoryId, round2);
+
+        // The DB must contain the final complete state — not be empty
+        List<ChatMessage> retrieved = store.getMessages(memoryId);
+        assertEquals(3, retrieved.size(),
+                "DB must contain the complete final conversation after multiple updateMessages calls");
+        assertTrue(retrieved.get(0) instanceof UserMessage);
+        assertTrue(retrieved.get(1) instanceof AiMessage);
+        assertEquals("Done! Ticket created.", ((AiMessage) retrieved.get(2)).text());
+    }
+
+    @Test
+    void testChatMemoryProvider_ReusesSameInstanceForSameMemoryId() {
+        String memoryId = "test-provider-cache";
+
+        ChatMemory first = chatMemoryProvider.get(memoryId);
+        ChatMemory second = chatMemoryProvider.get(memoryId);
+
+        assertSame(first, second,
+                "ChatMemoryProvider must return the same cached instance for the same memoryId to prevent competing writes");
+    }
+
+    @Test
+    void testChatMemoryProvider_ReturnsDifferentInstancesForDifferentMemoryIds() {
+        ChatMemory forSession1 = chatMemoryProvider.get("session-A");
+        ChatMemory forSession2 = chatMemoryProvider.get("session-B");
+
+        assertNotSame(forSession1, forSession2,
+                "ChatMemoryProvider must return different instances for different memoryIds");
     }
 }
