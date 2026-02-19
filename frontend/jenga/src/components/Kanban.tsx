@@ -59,9 +59,7 @@ const StatusCell = (props: KanbanCellProps) => {
                 if (!projectId) return
 
                 const updated: TicketResponseDTO = { ...ticket, status: props.status, assignee: props.username }
-                pCtx?.setTickets((prev) => prev?.map((entry) => (entry.id === ticketId ? updated : entry)) ?? prev)
-                if (pCtx?.selectedTicket()?.id === ticketId) pCtx?.setSelectedTicket(() => updated)
-                void pCtx?.updateTicket(projectId, updated)
+                void pCtx?.updateTicket(projectId, updated).catch(() => undefined)
             }}
         >
             <List>

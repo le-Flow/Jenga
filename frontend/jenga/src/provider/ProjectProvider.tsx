@@ -78,6 +78,14 @@ export const ProjectProvider = (props: ProviderProps) => {
             return;
         }
 
+        const previousTickets = tickets();
+        const previousSelectedTicket = selectedTicket();
+
+        setTickets((prev) =>
+            prev?.map((existing) => (existing.id === ticket.id ? { ...existing, ...ticket } : existing)) ?? prev
+        );
+        setSelectedTicket((prev) => (prev?.id === ticket.id ? { ...prev, ...ticket } : prev));
+
         try {
             const newTicket = await TicketResourceService.putApiTickets(ticket.id, ticket)
 
@@ -85,9 +93,11 @@ export const ProjectProvider = (props: ProviderProps) => {
                 prev?.map((existing) => (existing.id === ticket.id ? { ...existing, ...newTicket } : existing)) ?? prev
             );
 
-            setSelectedTicket((prev: TicketResponseDTO) => (prev?.id === ticket.id ? { ...prev, ...newTicket } : prev));
+            setSelectedTicket((prev) => (prev?.id === ticket.id ? { ...prev, ...newTicket } : prev));
         } catch (error) {
             console.error("Failed to update ticket", error);
+            setTickets(() => previousTickets);
+            setSelectedTicket(() => previousSelectedTicket);
             throw error;
         }
     };
