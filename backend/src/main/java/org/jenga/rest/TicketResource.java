@@ -13,19 +13,24 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import io.quarkus.logging.Log;
+
 import java.util.List;
 
 @Path("/api/tickets")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@RequiredArgsConstructor(onConstructor_ = { @Inject })
 public class TicketResource {
 
-    @Inject
-    TicketService ticketService;
+    private final TicketService ticketService;
 
     @POST
     @Path("/{projectId}")
-    public TicketResponseDTO createTicket(@PathParam("projectId") String projectId, TicketRequestDTO ticketRequestDTO) {
+    public TicketResponseDTO createTicket(@PathParam("projectId") String projectId,
+            @Valid TicketRequestDTO ticketRequestDTO) {
         return ticketService.create(projectId, ticketRequestDTO);
     }
 
@@ -43,7 +48,8 @@ public class TicketResource {
 
     @GET
     @Path("/{projectId}/{ticketNumber}")
-    public TicketResponseDTO getTicketByNumber(@PathParam("projectId") String projectId, @PathParam("ticketNumber") Long ticketNumber) {
+    public TicketResponseDTO getTicketByNumber(@PathParam("projectId") String projectId,
+            @PathParam("ticketNumber") Long ticketNumber) {
         return ticketService.findByTicketNumber(projectId, ticketNumber);
     }
 
@@ -61,21 +67,21 @@ public class TicketResource {
     }
 
     /*
-    @GET
-    @Path("/search")
-    public Response searchTicketsGet(@BeanParam TicketSearchDTO request) {
-        List<TicketResponseDTO> results = ticketService.searchTickets(request);
-        return Response.ok(results).build();
-    }
-    */
+     * @GET
+     * 
+     * @Path("/search")
+     * public Response searchTicketsGet(@BeanParam TicketSearchDTO request) {
+     * List<TicketResponseDTO> results = ticketService.searchTickets(request);
+     * return Response.ok(results).build();
+     * }
+     */
 
     @POST
     @Path("/search")
     public List<TicketResponseDTO> searchTickets(TicketSearchDTO request) {
-            System.out.println("POST /search/");
-    System.out.println("Body: " + request);
-        List<TicketResponseDTO> results = ticketService.searchTickets(request);
-        return results;
+        Log.info("POST /search/");
+        Log.infof("Body: %s", request);
+        return ticketService.searchTickets(request);
     }
 
     @POST
@@ -100,7 +106,7 @@ public class TicketResource {
 
     @POST
     @Path("/{ticketId}/comments")
-    public CommentResponseDTO createComment(@PathParam("ticketId") Long ticketId, CommentRequestDTO commentDTO) {
+    public CommentResponseDTO createComment(@PathParam("ticketId") Long ticketId, @Valid CommentRequestDTO commentDTO) {
         return ticketService.createComment(ticketId, commentDTO);
     }
 
@@ -121,17 +127,15 @@ public class TicketResource {
     @Path("/{ticketId}/acceptance-criteria")
     public AcceptanceCriteriaResponseDTO addAcceptanceCriteria(
             @PathParam("ticketId") Long ticketId,
-            AcceptanceCriteriaRequestDTO request) {
-        AcceptanceCriteriaResponseDTO response = ticketService.addAcceptanceCriteria(ticketId, request);
-        return response;
+            @Valid AcceptanceCriteriaRequestDTO request) {
+        return ticketService.addAcceptanceCriteria(ticketId, request);
     }
 
     @GET
     @Path("/{ticketId}/acceptance-criteria")
     public List<AcceptanceCriteriaResponseDTO> getAllAcceptanceCriteria(
             @PathParam("ticketId") Long ticketId) {
-        List<AcceptanceCriteriaResponseDTO> criteriaList = ticketService.getAllAcceptanceCriteria(ticketId);
-        return criteriaList;
+        return ticketService.getAllAcceptanceCriteria(ticketId);
     }
 
     @PUT
@@ -154,7 +158,7 @@ public class TicketResource {
 
     @PUT
     @Path("/{ticketId}/related/{relatedTicketId}")
-    public Response AddRelatedTicket(
+    public Response addRelatedTicket(
             @PathParam("ticketId") Long ticketId,
             @PathParam("relatedTicketId") Long relatedTicketId) {
         ticketService.addRelatedTicket(ticketId, relatedTicketId);

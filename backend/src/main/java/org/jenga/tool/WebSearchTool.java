@@ -3,18 +3,20 @@ package org.jenga.tool;
 import dev.langchain4j.agent.tool.Tool;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+
+import io.quarkus.logging.Log;
+
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
-import org.jenga.service.MCP_Server.GoogleSearchApi;
-import org.jenga.dto.MCP_Server.WebSearchResponseDTO;
+import org.jenga.service.mcpserver.GoogleSearchApi;
+import org.jenga.dto.mcpserver.WebSearchResponseDTO;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class WebSearchTool {
 
-    @Inject
+    @Inject // leaving inject here since constructor injections with RestClient is a pain
     @RestClient
     GoogleSearchApi searchApi;
 
@@ -27,6 +29,11 @@ public class WebSearchTool {
     @Tool("Performs a web search for a given query")
     public List<String> searchWeb(String query) {
         try {
+            if (apiKey == null || apiKey.isBlank() || searchEngineId == null || searchEngineId.isBlank()) {
+                Log.warn("Web search is not configured (missing API key or CSE ID).");
+                return List.of("Web search is not configured (missing API key or CSE ID).");
+            }
+            Log.infof("WebSearchTool.searchWeb called with query: %s", query);
             WebSearchResponseDTO response = searchApi.search(apiKey, searchEngineId, query);
 
             if (response == null || response.getItems() == null || response.getItems().isEmpty()) {
@@ -38,12 +45,11 @@ public class WebSearchTool {
                             "Title: %s\nSnippet: %s\nURL: %s",
                             item.getTitle(),
                             item.getSnippet(),
-                            item.getLink()
-                    ))
-                    .collect(Collectors.toList());
+                            item.getLink()))
+                    .toList();
 
         } catch (Exception e) {
-            System.err.println("Error calling search API: " + e.getMessage());
+            Log.warnf("Error calling search API: %s", e.getMessage());
             return List.of("Error performing search: " + e.getMessage());
         }
     }

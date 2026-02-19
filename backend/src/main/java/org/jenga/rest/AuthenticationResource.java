@@ -9,24 +9,26 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @Path("/api/auth")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+@RequiredArgsConstructor(onConstructor_ = {@Inject})
 public class AuthenticationResource {
 
-    @Inject
-    AuthenticationService authenticationService;
+    private final AuthenticationService authenticationService;
 
     @POST
     @Path("/register")
-    public LoginResponseDTO register(RegisterRequestDTO registerRequest) {
+    public LoginResponseDTO register(@Valid RegisterRequestDTO registerRequest) {
         return authenticationService.register(registerRequest);
     }
 
     @POST
     @Path("/login")
-    public LoginResponseDTO login(LoginRequestDTO loginRequest) {
+    public LoginResponseDTO login(@Valid LoginRequestDTO loginRequest) {
         try {
             return authenticationService.login(loginRequest);
         } catch (Exception e) {

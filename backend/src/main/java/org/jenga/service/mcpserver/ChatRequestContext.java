@@ -1,4 +1,4 @@
-package org.jenga.service.MCP_Server;
+package org.jenga.service.mcpserver;
 
 import jakarta.enterprise.context.RequestScoped;
 import lombok.Data;
@@ -7,6 +7,6 @@ import lombok.Data;
 @Data
 public class ChatRequestContext {
     private String currentUser;
-    private Long currentProjectID;
+    private String currentProjectID;
     private Long currentTicketID;
 }
