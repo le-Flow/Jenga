@@ -107,6 +107,11 @@ export const ProjectProvider = (props: ProviderProps) => {
         updateTicket
     };
 
+    createEffect(() => {
+        const _ = selectedProject();
+        setSelectedTicket(undefined);
+    });
+
     return (
         <ProjectContext.Provider value={value}>
             {props.children}
