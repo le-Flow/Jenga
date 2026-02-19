@@ -10,8 +10,10 @@ import { Home } from './pages/Home';
 import { About } from './pages/About';
 import { Profile } from './pages/Profile';
 import { Privacy } from './pages/Privacy';
+import { OpenAPI } from './api';
 
 const root = document.getElementById('root');
+OpenAPI.BASE = window.location.origin;
 
 if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
   throw new Error(
