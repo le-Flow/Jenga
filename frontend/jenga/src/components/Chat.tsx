@@ -1,10 +1,11 @@
-import { Alert, Button, Card, CardActions, CardContent, CardHeader, Dialog, DialogActions, DialogContent, Input, List, ListItem, ListItemText, Stack, TextField } from "@suid/material"
+import { Alert, Button, Card, CardActions, CardContent, CardHeader, Dialog, DialogActions, DialogContent, Divider, Input, List, ListItem, ListItemText, Stack, TextField } from "@suid/material"
 import { createEffect, createResource, createSignal, For, Show, useContext } from "solid-js"
 import { ProjectContext } from "../provider/ProjectProvider"
 import { AiResourceService } from "../api"
 import { LayoutContext } from "../provider/LayoutProvider"
 import { UserContext } from "../provider/UserProvider"
 import { AuthContext } from "../provider/AuthProvider"
+import { AiContext } from "../provider/AiProvider"
 
 export const ChatButton = () => {
 
@@ -21,40 +22,25 @@ export const ChatButton = () => {
     )
 }
 
-export const Chat = () => {
-    const uCtx = useContext(UserContext)
-    const aCtx = useContext(AuthContext)
-    const pCtx = useContext(ProjectContext)
+const dummyMessages = [
+    { content: "Hello, how can I help you?" },
+    { content: "I have a problem with my project." },
+    { content: "Sure, what seems to be the issue?" },
+]
 
-    const [sessionId, setSessionId] = createSignal<string>()
+export const Chat = () => {
+    const aCtx = useContext(AuthContext)
+    const aiContext = useContext(AiContext)
 
     const [message, setMessage] = createSignal("")
-    const [n, setN] = createSignal(0)
-
-    const [response] = createResource(n, async q => await AiResourceService.postApiAiChat({
-        //sessionId: sessionId() ?? undefined,
-        currentUser: uCtx?.user()?.username ?? "unknown",
-        currentProjectID: pCtx?.selectedProject()?.identifier ?? "",
-        currentTicketID: pCtx?.selectedTicket()?.id ?? 0,
-        message: message()
-    }
-    ))
-
-    createEffect(() => {
-        if (response()) {
-            setSessionId(response()?.conversationId)
-            setMessage("")
-        }
-    })
-
-    const [messages] = createResource(n, async (q) => await AiResourceService.getApiAiSessionsMessages(sessionId() ?? ""));
 
     const [showError, setShowError] = createSignal(false);
 
     const onClick = () => {
         if (aCtx?.isLoggedIn?.()) {
             setShowError(false);
-            setN(prev => prev + 1);
+            aiContext?.sendMessage(message());
+
         } else {
             setShowError(true);
         }
@@ -67,12 +53,15 @@ export const Chat = () => {
                 <List>
 
                     <For each={
-                        messages()
+                        aiContext?.messages() ?? []
                     }>
-                        {(msg) => (
-                            <ListItem>
-                                <ListItemText primary={`${msg.content}`} />
-                            </ListItem>
+                        {(msg, i) => (
+                            <>
+                                <ListItem >
+                                    <ListItemText primary={i() % 2 === 0 ? `User: ${msg}` : `AI: ${msg}`} sx={{ "backgroundColor": i() % 2 === 0 ? "gray" : "white" }} />
+                                </ListItem>
+                                <Divider />
+                            </>
                         )}
                     </For>
                 </List>
