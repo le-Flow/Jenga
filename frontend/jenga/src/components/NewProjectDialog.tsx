@@ -1,5 +1,5 @@
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@suid/material"
-import { Setter, useContext, createSignal, createEffect } from "solid-js"
+import { Alert, Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@suid/material"
+import { Setter, useContext, createSignal, createEffect, Show } from "solid-js"
 import { ProjectRequestDTO, ProjectResponseDTO, ProjectResourceService } from "../api"
 import { ProjectContext } from "../provider/ProjectProvider"
 import { ProjectInfo } from "./ProjectInfo"
@@ -17,9 +17,13 @@ export const NewProjectDialog = (props: NewProjectDialogProps) => {
     const EMPTY_PROJECT: ProjectResponseDTO = { identifier: "", name: "", description: "" }
     const formId = "new-project-form"
     const [project, setProject] = createSignal<ProjectResponseDTO>({ ...EMPTY_PROJECT })
+    const [createError, setCreateError] = createSignal("")
 
     createEffect(() => {
-        if (props.open) setProject(() => ({ ...EMPTY_PROJECT }))
+        if (props.open) {
+            setProject(() => ({ ...EMPTY_PROJECT }))
+            setCreateError("")
+        }
     })
 
     const onCreate = async (draft?: ProjectResponseDTO) => {
@@ -29,15 +33,25 @@ export const NewProjectDialog = (props: NewProjectDialogProps) => {
             name: source.name ?? "",
             description: source.description ?? ""
         }
-        const newProject = await ProjectResourceService.postApiProjects(request)
-        pCtx?.setProjects(prev => [...(prev ?? []), { ...newProject }])
-        props.setOpen(false)
+        setCreateError("")
+
+        try {
+            const newProject = await ProjectResourceService.postApiProjects(request)
+            pCtx?.setProjects(prev => [...(prev ?? []), { ...newProject }])
+            props.setOpen(false)
+        } catch (error) {
+            console.error("Failed to create project", error)
+            setCreateError("Failed to create project")
+        }
     }
 
     return (
         <Dialog open={props.open} fullWidth>
             <DialogTitle>New Project</DialogTitle>
             <DialogContent>
+                <Show when={createError()}>
+                    {(message) => <Alert severity="error">{message()}</Alert>}
+                </Show>
                 <ProjectInfo
                     mode={InfoMode.Create}
                     formId={formId}

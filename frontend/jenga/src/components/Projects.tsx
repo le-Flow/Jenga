@@ -1,4 +1,4 @@
-import { Button, Card, CardActions, CardContent, CardHeader, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, List, ListItem, ListItemButton, ListItemSecondaryAction, ListItemText, Stack } from "@suid/material"
+import { Alert, Button, Card, CardActions, CardContent, CardHeader, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, List, ListItem, ListItemButton, ListItemSecondaryAction, ListItemText, Stack } from "@suid/material"
 import { ProjectContext } from "../provider/ProjectProvider"
 import { Show, createMemo, createSignal, For, useContext, Setter, Accessor } from "solid-js"
 import { Delete } from "@suid/icons-material"
@@ -15,15 +15,26 @@ interface ConfirmDialogProps {
 
 const ConfirmDialog = (props: ConfirmDialogProps) => {
     const pCtx = useContext(ProjectContext)
+    const [deleteError, setDeleteError] = createSignal("")
 
     const onCancel = () => {
+        setDeleteError("")
         props.setOpen(false)
     }
 
-    const onConfirm = () => {
+    const onConfirm = async () => {
+        setDeleteError("")
         const id = pCtx?.selectedProject()?.identifier
-        if (id) pCtx?.deleteProject(id);
-        props.setOpen(false)
+        if (!id) return
+        if (!pCtx?.deleteProject) return
+
+        try {
+            await pCtx.deleteProject(id)
+            props.setOpen(false)
+        } catch (error) {
+            console.error("Failed to delete project", error)
+            setDeleteError("Failed to delete project")
+        }
     }
 
     return (
@@ -43,6 +54,9 @@ const ConfirmDialog = (props: ConfirmDialogProps) => {
                 <Button onClick={onCancel}>Cancel</Button>
                 <Button onClick={onConfirm} color="warning">Confirm</Button>
             </DialogActions>
+            <Show when={deleteError()}>
+                {(message) => <Alert severity="error">{message()}</Alert>}
+            </Show>
         </Dialog>
     )
 }
@@ -55,6 +69,7 @@ export const Projects = () => {
 
     const [open, setOpen] = createSignal(false)
     const [openConfirm, setOpenConfirm] = createSignal(false)
+    const [saveError, setSaveError] = createSignal("")
 
     const projectCtx = useContext(ProjectContext)
     const formId = "selected-project-form"
@@ -117,8 +132,12 @@ export const Projects = () => {
                                     mode={InfoMode.Edit}
                                     formId={formId}
                                     project={project()}
-                                    onProjectChange={(next) => pCtx?.setSelectedProject(() => next)}
+                                    onProjectChange={(next) => {
+                                        setSaveError("")
+                                        pCtx?.setSelectedProject(() => next)
+                                    }}
                                     onSubmit={async (next) => {
+                                        setSaveError("")
                                         if (!next.identifier) return
                                         try {
                                             await ProjectResourceService.putApiProjects(next.identifier, next)
@@ -130,12 +149,16 @@ export const Projects = () => {
                                             pCtx?.setSelectedProject(() => ({ ...next }))
                                         } catch (error) {
                                             console.error("Failed to update project", error)
+                                            setSaveError("Failed to update project")
                                         }
                                     }}
                                 />
                                 <Button type="submit" form={formId}>
                                     save
                                 </Button>
+                                <Show when={saveError()}>
+                                    {(message) => <Alert severity="error">{message()}</Alert>}
+                                </Show>
                             </CardContent>
                         </Card>
                     )}

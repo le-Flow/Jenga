@@ -42,7 +42,7 @@ const StatusCell = (props: KanbanCellProps) => {
         <TableCell
             sx={{ "border": "1px solid black" }}
             onDragOver={(event) => event.preventDefault()}
-            onDrop={(event) => {
+            onDrop={async (event) => {
                 event.preventDefault()
                 const raw = event.dataTransfer?.getData("text/plain")
                 const ticketId = raw ? Number(raw) : NaN
@@ -59,7 +59,13 @@ const StatusCell = (props: KanbanCellProps) => {
                 if (!projectId) return
 
                 const updated: TicketResponseDTO = { ...ticket, status: props.status, assignee: props.username }
-                void pCtx?.updateTicket(projectId, updated).catch(() => undefined)
+                if (!pCtx?.updateTicket) return
+
+                try {
+                    await pCtx.updateTicket(projectId, updated)
+                } catch (error) {
+                    console.error("Failed to update ticket from kanban drop", error)
+                }
             }}
         >
             <List>

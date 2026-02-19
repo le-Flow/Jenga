@@ -1,5 +1,5 @@
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@suid/material"
-import { Setter, useContext, createSignal, createEffect } from "solid-js"
+import { Alert, Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@suid/material"
+import { Setter, useContext, createSignal, createEffect, Show } from "solid-js"
 import { TicketPriority, TicketSize, TicketStatus, TicketRequestDTO, TicketResponseDTO, TicketResourceService } from "../api"
 import { ProjectContext } from "../provider/ProjectProvider"
 import { TicketInfo } from "./TicketInfo"
@@ -24,6 +24,7 @@ export const NewTicketDialog = (props: NewTicketDialogProps) => {
 
     const formId = "new-ticket-form"
     const [ticket, setTicket] = createSignal<TicketResponseDTO>({ ...EMPTY_TICKET })
+    const [createError, setCreateError] = createSignal("")
 
     createEffect(() => {
         if (props.open) {
@@ -31,13 +32,20 @@ export const NewTicketDialog = (props: NewTicketDialogProps) => {
                 ...EMPTY_TICKET,
                 projectName: pCtx?.selectedProject().name,
             }))
+            setCreateError("")
         }
     })
 
     const onCreate = async (draft?: TicketResponseDTO) => {
         const source = draft ?? ticket()
+        const project = pCtx?.selectedProject()
+        if (!project?.identifier) {
+            setCreateError("No project selected")
+            return
+        }
+
         const request: TicketRequestDTO = {
-            projectName: pCtx?.selectedProject().name,
+            projectName: project.name,
             title: source.title ?? "",
             description: source.description ?? "",
             priority: source.priority ?? TicketPriority.MEDIUM,
@@ -46,15 +54,25 @@ export const NewTicketDialog = (props: NewTicketDialogProps) => {
             assignee: source.assignee ?? "",
         }
 
-        const newTicket = await TicketResourceService.postApiTickets(pCtx?.selectedProject().identifier ?? "", request)
-        pCtx?.setTickets(prev => [...prev ?? [], newTicket])
-        props.setOpen(false)
+        setCreateError("")
+
+        try {
+            const newTicket = await TicketResourceService.postApiTickets(project.identifier, request)
+            pCtx?.setTickets(prev => [...prev ?? [], newTicket])
+            props.setOpen(false)
+        } catch (error) {
+            console.error("Failed to create ticket", error)
+            setCreateError("Failed to create ticket")
+        }
     }
 
     return (
         <Dialog open={props.open} fullWidth>
             <DialogTitle title="New Ticket">New Ticket</DialogTitle>
             <DialogContent>
+                <Show when={createError()}>
+                    {(message) => <Alert severity="error">{message()}</Alert>}
+                </Show>
                 <TicketInfo
                     mode={InfoMode.Create}
                     formId={formId}
