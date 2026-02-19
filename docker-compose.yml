@@ -6,6 +6,8 @@ services:
     build:
       context: ./frontend/jenga
       dockerfile: Dockerfile.current
+    environment:
+      API_UPSTREAM: http://backend:8080
     depends_on:
       backend:
         condition: service_healthy
