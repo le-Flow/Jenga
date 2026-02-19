@@ -17,8 +17,8 @@
     "solid-devtools": "^0.34.3",
     "typescript": "^5.7.2",
     "vite": "^6.3.6",
-    "vite-plugin-solid": "^2.11.8",
-    "@openapitools/openapi-generator-cli": "^2.17.0"
+    "vite-plugin-pwa": "^1.2.0",
+    "vite-plugin-solid": "^2.11.8"
   },
   "dependencies": {
     "@solidjs/router": "^0.15.3",
