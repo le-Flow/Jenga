@@ -10,6 +10,7 @@ import { Menu } from '@suid/icons-material';
 import { Footer } from './components/Footer';
 import { useLocation } from '@solidjs/router';
 import { LayoutProvider } from './provider/LayoutProvider';
+import { ChatButton, ChatDialog } from './components/Chat';
 
 const theme = createTheme()
 
@@ -55,6 +56,10 @@ const App = (props: AppProps) => {
                   </Show>
                   <Box flex={1}>
                     {props.children}
+                    <Box position="absolute" bottom={0} right={0} margin={2}>
+                      <ChatButton></ChatButton>
+                      <ChatDialog></ChatDialog>
+                    </Box>
                   </Box>
                 </Stack>
                 <Footer></Footer>

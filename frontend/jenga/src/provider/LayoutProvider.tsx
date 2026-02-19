@@ -1,9 +1,11 @@
-import { createContext, JSXElement } from "solid-js";
+import { Accessor, createContext, createSignal, JSXElement, Setter } from "solid-js";
 
 type LayoutContextType = {
+    openChat: Accessor<boolean>;
+    setOpenChat: Setter<boolean>;
 }
 
-const LayoutContext = createContext<LayoutContextType>();
+export const LayoutContext = createContext<LayoutContextType>();
 
 interface LayoutProviderProps {
     children: JSXElement;
@@ -11,8 +13,11 @@ interface LayoutProviderProps {
 
 export const LayoutProvider = (props: LayoutProviderProps) => {
 
-    const value: LayoutContextType = {
+    const [openChat, setOpenChat] = createSignal(false);
 
+    const value: LayoutContextType = {
+        openChat,
+        setOpenChat
     };
 
     return (
