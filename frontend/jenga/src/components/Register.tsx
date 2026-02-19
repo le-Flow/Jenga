@@ -1,5 +1,5 @@
-import { Button, Stack, TextField } from "@suid/material";
-import { createSignal, useContext } from "solid-js";
+import { Alert, AlertTitle, Button, Stack, TextField } from "@suid/material";
+import { Show, createSignal, useContext } from "solid-js";
 import { RegisterRequestDTO } from "../api";
 import { AuthContext } from "../provider/AuthProvider";
 
@@ -31,7 +31,12 @@ export const Register = () => {
                 <TextField label="username" value={username()} onChange={(e) => setUsername(e.currentTarget.value)} required></TextField>
                 <TextField label="e-mail" value={email()} onChange={(e) => setEmail(e.currentTarget.value)} type="email" required></TextField>
                 <TextField label="password" value={password()} onChange={(e) => setPassword(e.currentTarget.value)} type="password" required></TextField>
-                <Button type="submit">
+                <Show when={aCtx?.registerResult.error}>
+                    <Alert severity="error">
+                        <AlertTitle>Registration failed</AlertTitle>
+                    </Alert>
+                </Show>
+                <Button type="submit" disabled={aCtx?.registerResult.loading}>
                     Register
                 </Button>
             </Stack>
