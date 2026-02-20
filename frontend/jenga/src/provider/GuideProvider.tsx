@@ -1,4 +1,4 @@
-import { createContext, JSXElement, onCleanup, useContext } from "solid-js";
+import { createContext, JSXElement, onCleanup, onMount, useContext } from "solid-js";
 import { useNavigate } from "@solidjs/router";
 import { LayoutContext } from "./LayoutProvider";
 
@@ -19,7 +19,6 @@ export const GuideContext = createContext<GuideContextType>();
 export const GuideProvider = (props: GuideProviderProps) => {
     const navigate = useNavigate();
     const lCtx = useContext(LayoutContext);
-    let isStarting = false;
     const tour = new Shepherd.Tour({
         defaultStepOptions: {
             classes: "shepherd-theme-arrows",
@@ -39,15 +38,6 @@ export const GuideProvider = (props: GuideProviderProps) => {
             ],
         },
         useModalOverlay: true,
-    });
-    tour.on("start", () => {
-        isStarting = false;
-    });
-    tour.on("cancel", () => {
-        isStarting = false;
-    });
-    tour.on("complete", () => {
-        isStarting = false;
     });
 
     const waitForElement = async (selector: string, timeoutMs = 2000) => {
@@ -177,30 +167,20 @@ export const GuideProvider = (props: GuideProviderProps) => {
         },
     ];
 
-    const attachGuideSteps = () => {
-        tour.steps.forEach((step) => tour.removeStep(step.id));
+    onMount(() => {
         tour.addSteps(steps);
-    };
+    });
+
 
     const startGuide = () => {
-        if (isStarting || tour.isActive()) return;
-
-        isStarting = true;
-        if (tour.steps.length > 0) {
+        if (tour.isActive()) {
             tour.cancel();
         }
 
-        attachGuideSteps();
         if (tour.steps.length === 0) {
-            isStarting = false;
             return;
         }
-        try {
-            tour.start();
-        } catch (error) {
-            isStarting = false;
-            throw error;
-        }
+        tour.start();
     };
 
     const stopGuide = () => {
