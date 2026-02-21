@@ -1,7 +1,7 @@
 import { Alert, Box, Button, Card, CardActions, CardContent, CardHeader, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, List, ListItem, ListItemButton, ListItemSecondaryAction, ListItemText, Stack, Typography } from "@suid/material"
 import { ProjectContext } from "../provider/ProjectProvider"
 import { Show, createMemo, createSignal, For, useContext, Setter } from "solid-js"
-import { Delete } from "@suid/icons-material"
+import { CheckCircle, Delete } from "@suid/icons-material"
 import { NewProjectDialog } from "./NewProjectDialog"
 import { ProjectResourceService } from "../api"
 import { ProjectInfo } from "./ProjectInfo"
@@ -71,6 +71,7 @@ export const Projects = () => {
     const [open, setOpen] = createSignal(false)
     const [openConfirm, setOpenConfirm] = createSignal(false)
     const [saveError, setSaveError] = createSignal("")
+    const [saveSuccess, setSaveSuccess] = createSignal(false)
 
     const projectCtx = useContext(ProjectContext)
     const formId = "selected-project-form"
@@ -84,7 +85,7 @@ export const Projects = () => {
     return (
         <>
             <Box class="projects-layout">
-                <Card>
+                <Card class="projects-card">
                     <CardHeader title="Projects" />
                     <CardContent class="projects-list-content">
                         <List>
@@ -139,10 +140,12 @@ export const Projects = () => {
                                         project={project()}
                                         onProjectChange={(next) => {
                                             setSaveError("")
+                                            setSaveSuccess(false)
                                             pCtx?.setSelectedProject(() => next)
                                         }}
                                         onSubmit={async (next) => {
                                             setSaveError("")
+                                            setSaveSuccess(false)
                                             if (!next.identifier) return
                                             try {
                                                 await ProjectResourceService.putApiProjects(next.identifier, next)
@@ -152,6 +155,7 @@ export const Projects = () => {
                                                     )
                                                 )
                                                 pCtx?.setSelectedProject(() => ({ ...next }))
+                                                setSaveSuccess(true)
                                             } catch (error) {
                                                 console.error("Failed to update project", error)
                                                 setSaveError("Failed to update project")
@@ -163,6 +167,11 @@ export const Projects = () => {
                                     </Button>
                                     <Show when={saveError()}>
                                         {(message) => <Alert severity="error">{message()}</Alert>}
+                                    </Show>
+                                    <Show when={saveSuccess()}>
+                                        <Alert severity="success" icon={<CheckCircle />}>
+                                            Project saved
+                                        </Alert>
                                     </Show>
                                 </>
                             )}

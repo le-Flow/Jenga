@@ -1,4 +1,5 @@
 import { Alert, Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@suid/material"
+import { CheckCircle } from "@suid/icons-material"
 import { Setter, useContext, createSignal, createEffect, Show } from "solid-js"
 import { TicketPriority, TicketSize, TicketStatus, TicketRequestDTO, TicketResponseDTO, TicketResourceService } from "../api"
 import { ProjectContext } from "../provider/ProjectProvider"
@@ -26,6 +27,7 @@ export const NewTicketDialog = (props: NewTicketDialogProps) => {
     const formId = "new-ticket-form"
     const [ticket, setTicket] = createSignal<TicketResponseDTO>({ ...EMPTY_TICKET })
     const [createError, setCreateError] = createSignal("")
+    const [createSuccess, setCreateSuccess] = createSignal(false)
 
     createEffect(() => {
         if (props.open) {
@@ -34,6 +36,7 @@ export const NewTicketDialog = (props: NewTicketDialogProps) => {
                 projectName: pCtx?.selectedProject().name,
             }))
             setCreateError("")
+            setCreateSuccess(false)
         }
     })
 
@@ -57,11 +60,13 @@ export const NewTicketDialog = (props: NewTicketDialogProps) => {
         }
 
         setCreateError("")
+        setCreateSuccess(false)
 
         try {
             const newTicket = await TicketResourceService.postApiTickets(project.identifier, request)
             pCtx?.setTickets(prev => [...prev ?? [], newTicket])
-            props.setOpen(false)
+            setCreateSuccess(true)
+            setTimeout(() => props.setOpen(false), 700)
         } catch (error) {
             console.error("Failed to create ticket", error)
             setCreateError("Failed to create ticket")
@@ -74,6 +79,11 @@ export const NewTicketDialog = (props: NewTicketDialogProps) => {
             <DialogContent>
                 <Show when={createError()}>
                     {(message) => <Alert severity="error">{message()}</Alert>}
+                </Show>
+                <Show when={createSuccess()}>
+                    <Alert severity="success" icon={<CheckCircle />}>
+                        Ticket created
+                    </Alert>
                 </Show>
                 <TicketInfo
                     mode={InfoMode.Create}

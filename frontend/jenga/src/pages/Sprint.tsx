@@ -1,4 +1,5 @@
 import { Alert, Box, Button, Card, CardContent, CardHeader, Stack, Typography } from "@suid/material"
+import { CheckCircle } from "@suid/icons-material"
 import { Backlog } from "../components/Backlog"
 import { Kanban } from "../components/Kanban"
 import { Show, createSignal, useContext } from "solid-js"
@@ -13,6 +14,7 @@ export const Sprint = () => {
     const pCtx = useContext(ProjectContext)
     const formId = "selected-ticket-form"
     const [saveError, setSaveError] = createSignal("")
+    const [saveSuccess, setSaveSuccess] = createSignal(false)
 
     return (
         <Card>
@@ -41,9 +43,14 @@ export const Sprint = () => {
                                             mode={InfoMode.Edit}
                                             formId={formId}
                                             ticket={ticket()}
-                                            onTicketChange={(next) => pCtx?.setSelectedTicket(() => next)}
+                                            onTicketChange={(next) => {
+                                                setSaveSuccess(false)
+                                                setSaveError("")
+                                                pCtx?.setSelectedTicket(() => next)
+                                            }}
                                             onSubmit={async (next) => {
                                                 setSaveError("")
+                                                setSaveSuccess(false)
                                                 const projectId = pCtx?.selectedProject()?.identifier
                                                 if (!projectId) {
                                                     setSaveError("No project selected")
@@ -54,6 +61,7 @@ export const Sprint = () => {
 
                                                 try {
                                                     await pCtx.updateTicket(projectId, next)
+                                                    setSaveSuccess(true)
                                                 } catch (error) {
                                                     console.error("Failed to save ticket", error)
                                                     setSaveError("Failed to save ticket")
@@ -65,6 +73,11 @@ export const Sprint = () => {
                                         </Button>
                                         <Show when={saveError()}>
                                             {(message) => <Alert severity="error">{message()}</Alert>}
+                                        </Show>
+                                        <Show when={saveSuccess()}>
+                                            <Alert severity="success" icon={<CheckCircle />}>
+                                                Ticket saved
+                                            </Alert>
                                         </Show>
                                     </Stack>
                                 )}
