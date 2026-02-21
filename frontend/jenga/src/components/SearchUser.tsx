@@ -1,5 +1,5 @@
 import { Box, List, ListItem, ListItemButton, ListItemText, Popper, TextField } from "@suid/material"
-import { createEffect, createMemo, createResource, createSignal, For, Show } from "solid-js"
+import { createEffect, createMemo, createResource, createSignal, For } from "solid-js"
 import { UserResourceService } from "../api"
 
 interface SearchUserProps {
@@ -13,20 +13,38 @@ export const SearchUser = (props: SearchUserProps) => {
     let ref: HTMLDivElement | undefined
 
     const [input, setInput] = createSignal(props.selected)
-    const [options] = createResource(input, async q => await UserResourceService.getApiUsersSearch(q))
+    const [searchError, setSearchError] = createSignal("")
+    const query = createMemo(() => input().trim() || undefined)
+    const [options] = createResource(query, async (q) => {
+        if (!q) {
+            setSearchError("")
+            return []
+        }
+
+        try {
+            const users = await UserResourceService.getApiUsersSearch(q)
+            setSearchError("")
+            return users
+        } catch (error) {
+            console.error("Failed to load users", error)
+            setSearchError("Failed to load users")
+            return []
+        }
+    })
     const [focused, setFocused] = createSignal(false)
-    const hasSearchError = createMemo(() => Boolean(options.error))
+    const suggestions = createMemo(() => options() ?? [])
+    const open = createMemo(
+        () => focused() && !props.disabled && !options.loading && !searchError() && suggestions().length > 0
+    )
 
     createEffect(() => {
         setInput(props.selected)
     })
 
-    const open = createMemo(() => {
-        if (!focused()) return false
-        if (props.disabled) return false
-        if (hasSearchError() || !options()) return false
-        return options()!.length > 0
-    })
+    const selectUser = (username: string) => {
+        setInput(username)
+        props.setSelected(username)
+    }
 
     return (
         <>
@@ -35,43 +53,34 @@ export const SearchUser = (props: SearchUserProps) => {
                     label={props.label}
                     value={input()}
                     onChange={(event) => {
-                        const value = event.currentTarget.value
-                        setInput(value)
-                        props.setSelected(value)
+                        selectUser(event.currentTarget.value)
                     }}
                     onFocus={() => setFocused(true)}
                     onBlur={() => setFocused(false)}
                     disabled={props.disabled}
-                    error={hasSearchError()}
-                    helperText={hasSearchError() ? "Failed to load users" : undefined}
+                    error={Boolean(searchError())}
+                    helperText={searchError() || undefined}
                     fullWidth
                 />
             </div>
-            <Popper anchorEl={ref} open={open()} placement="bottom-start" style={{ "z-index": 1 }}>
+            <Popper anchorEl={ref} open={open()} placement="bottom-start" style={{ "z-index": 1600 }}>
                 <Box backgroundColor="white">
-                        <Show when={!hasSearchError() && options()}>
-                            {
-                                <List dense>
-                                    <For each={options()}>
-                                        {
-                                            u =>
-                                                <ListItem>
-                                                    <ListItemButton
-                                                        onMouseDown={(event) => {
-                                                            event.preventDefault()
-                                                            const username = u?.username ?? ""
-                                                            setInput(username)
-                                                            props.setSelected(username)
-                                                        }}
-                                                    >
-                                                        <ListItemText primary={u.username} secondary={u.email}></ListItemText>
-                                                    </ListItemButton>
-                                                </ListItem>
-                                        }
-                                    </For>
-                                </List>
-                            }
-                        </Show>
+                    <List dense>
+                        <For each={suggestions()}>
+                            {(u) => (
+                                <ListItem>
+                                    <ListItemButton
+                                        onMouseDown={(event) => {
+                                            event.preventDefault()
+                                            selectUser(u?.username ?? "")
+                                        }}
+                                    >
+                                        <ListItemText primary={u.username} secondary={u.email}></ListItemText>
+                                    </ListItemButton>
+                                </ListItem>
+                            )}
+                        </For>
+                    </List>
                 </Box>
             </Popper>
         </>
