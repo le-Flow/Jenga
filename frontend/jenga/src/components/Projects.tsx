@@ -1,12 +1,13 @@
-import { Alert, Button, Card, CardActions, CardContent, CardHeader, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, List, ListItem, ListItemButton, ListItemSecondaryAction, ListItemText, Stack } from "@suid/material"
+import { Alert, Box, Button, Card, CardActions, CardContent, CardHeader, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, List, ListItem, ListItemButton, ListItemSecondaryAction, ListItemText, Stack, Typography } from "@suid/material"
 import { ProjectContext } from "../provider/ProjectProvider"
-import { Show, createMemo, createSignal, For, useContext, Setter, Accessor } from "solid-js"
+import { Show, createMemo, createSignal, For, useContext, Setter } from "solid-js"
 import { Delete } from "@suid/icons-material"
 import { NewProjectDialog } from "./NewProjectDialog"
 import { ProjectResourceService } from "../api"
 import { ProjectInfo } from "./ProjectInfo"
 import { AuthContext } from "../provider/AuthProvider"
 import { InfoMode } from "../utils/utils"
+import "./Projects.css"
 
 interface ConfirmDialogProps {
     setOpen: Setter<boolean>
@@ -82,11 +83,11 @@ export const Projects = () => {
 
     return (
         <>
-            <Stack direction={"column"}>
-                <Card sx={{ "height": "100%" }}>
+            <Box class="projects-layout">
+                <Card>
                     <CardHeader title="Projects" />
-                    <CardContent sx={{ "height": "80%" }}>
-                        <List sx={{ "flex": "1", "height": "100", "maxHeight": "100%", "overflow": "auto" }}>
+                    <CardContent class="projects-list-content">
+                        <List>
                             <For
                                 each={projects()}
                                 fallback={<div>No projects found</div>
@@ -123,47 +124,52 @@ export const Projects = () => {
                         </Button>
                     </CardActions>
                 </Card >
-                <Show when={pCtx?.selectedProject()}>
-                    {(project) => (
-                        <Card>
-                            <CardHeader title="ProjectInfo" />
-                            <CardContent>
-                                <ProjectInfo
-                                    mode={InfoMode.Edit}
-                                    formId={formId}
-                                    project={project()}
-                                    onProjectChange={(next) => {
-                                        setSaveError("")
-                                        pCtx?.setSelectedProject(() => next)
-                                    }}
-                                    onSubmit={async (next) => {
-                                        setSaveError("")
-                                        if (!next.identifier) return
-                                        try {
-                                            await ProjectResourceService.putApiProjects(next.identifier, next)
-                                            pCtx?.setProjects((prev) =>
-                                                prev?.map((existing) =>
-                                                    existing.identifier === next.identifier ? { ...existing, ...next } : existing
+                <Card variant="outlined" class="project-sidebar">
+                    <CardHeader title="Project Info" />
+                    <CardContent>
+                        <Show
+                            when={pCtx?.selectedProject()}
+                            fallback={<Typography>Please select a project</Typography>}
+                        >
+                            {(project) => (
+                                <>
+                                    <ProjectInfo
+                                        mode={InfoMode.Edit}
+                                        formId={formId}
+                                        project={project()}
+                                        onProjectChange={(next) => {
+                                            setSaveError("")
+                                            pCtx?.setSelectedProject(() => next)
+                                        }}
+                                        onSubmit={async (next) => {
+                                            setSaveError("")
+                                            if (!next.identifier) return
+                                            try {
+                                                await ProjectResourceService.putApiProjects(next.identifier, next)
+                                                pCtx?.setProjects((prev) =>
+                                                    prev?.map((existing) =>
+                                                        existing.identifier === next.identifier ? { ...existing, ...next } : existing
+                                                    )
                                                 )
-                                            )
-                                            pCtx?.setSelectedProject(() => ({ ...next }))
-                                        } catch (error) {
-                                            console.error("Failed to update project", error)
-                                            setSaveError("Failed to update project")
-                                        }
-                                    }}
-                                />
-                                <Button type="submit" form={formId}>
-                                    save
-                                </Button>
-                                <Show when={saveError()}>
-                                    {(message) => <Alert severity="error">{message()}</Alert>}
-                                </Show>
-                            </CardContent>
-                        </Card>
-                    )}
-                </Show>
-            </Stack>
+                                                pCtx?.setSelectedProject(() => ({ ...next }))
+                                            } catch (error) {
+                                                console.error("Failed to update project", error)
+                                                setSaveError("Failed to update project")
+                                            }
+                                        }}
+                                    />
+                                    <Button type="submit" form={formId}>
+                                        save
+                                    </Button>
+                                    <Show when={saveError()}>
+                                        {(message) => <Alert severity="error">{message()}</Alert>}
+                                    </Show>
+                                </>
+                            )}
+                        </Show>
+                    </CardContent>
+                </Card>
+            </Box>
             <NewProjectDialog open={open()} setOpen={setOpen}></NewProjectDialog>
             <ConfirmDialog open={openConfirm()} setOpen={setOpenConfirm}></ConfirmDialog>
         </>

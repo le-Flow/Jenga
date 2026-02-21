@@ -18,6 +18,10 @@ type ProjectContextType = {
     setSelectedTicket: Setter<TicketResponseDTO | undefined>;
     deleteProject: (identifier: string) => Promise<void>;
     updateTicket: (projectId: string, ticket: TicketResponseDTO) => Promise<void>;
+    createLabel: (labelName: string) => Promise<string>;
+    deleteLabel: (labelName: string) => Promise<void>;
+
+    availableLabels?: Resource<string[]>;
 };
 
 export const ProjectContext = createContext<ProjectContextType>();
@@ -32,6 +36,17 @@ export const ProjectProvider = (props: ProviderProps) => {
 
     const [selectedProject, setSelectedProject] = createSignal<ProjectResponseDTO>();
     const [selectedTicket, setSelectedTicket] = createSignal<TicketResponseDTO>();
+    const selectedProjectId = () => selectedProject()?.identifier;
+
+    const getLabelColor = (name: string) => {
+        let hash = 0;
+        for (let i = 0; i < name.length; i += 1) {
+            hash = name.charCodeAt(i) + ((hash << 5) - hash);
+        }
+
+        const rgb = (hash & 0x00FFFFFF).toString(16).toUpperCase().padStart(6, "0");
+        return `#${rgb}`;
+    };
 
     const [projects, { mutate: setProjects, refetch: refetchProjects }] = createResource(
         () => (aCtx?.isLoggedIn?.() ? true : undefined),
@@ -44,6 +59,16 @@ export const ProjectProvider = (props: ProviderProps) => {
             return aCtx?.isLoggedIn() && project ? project.identifier : undefined;
         },
         async (projectId) => await TicketResourceService.getApiTicketsAll(projectId)
+    );
+
+    const [availableLabels, { mutate: setAvailableLabels }] = createResource(
+        () => (aCtx?.isLoggedIn?.() ? selectedProjectId() : undefined),
+        async (projectId) => {
+            const labels = await ProjectResourceService.getApiProjectsLabels(projectId);
+            return labels
+                .map((label) => (label.name ?? "").trim())
+                .filter((label): label is string => Boolean(label));
+        }
     );
 
     createEffect(() => {
@@ -102,6 +127,49 @@ export const ProjectProvider = (props: ProviderProps) => {
         }
     };
 
+    const createLabel = async (labelName: string) => {
+        const projectId = selectedProjectId();
+        const nextLabel = labelName.trim();
+        if (!projectId || !nextLabel) {
+            throw new Error("Missing project or label name");
+        }
+
+        if ((availableLabels() ?? []).includes(nextLabel)) {
+            return nextLabel;
+        }
+
+        try {
+            const created = await ProjectResourceService.postApiProjectsLabels(projectId, {
+                name: nextLabel,
+                color: getLabelColor(nextLabel),
+            });
+            const createdLabel = (created.name ?? nextLabel).trim();
+            setAvailableLabels((prev) =>
+                (prev ?? []).includes(createdLabel) ? prev : [...(prev ?? []), createdLabel]
+            );
+            return createdLabel;
+        } catch (error) {
+            console.error("Failed to create label", error);
+            throw error;
+        }
+    };
+
+    const deleteLabel = async (labelName: string) => {
+        const projectId = selectedProjectId();
+        const nextLabel = labelName.trim();
+        if (!projectId || !nextLabel) {
+            return;
+        }
+
+        try {
+            await ProjectResourceService.deleteApiProjectsLabels(nextLabel, projectId);
+            setAvailableLabels((prev) => prev?.filter((label) => label !== nextLabel));
+        } catch (error) {
+            console.error("Failed to delete label", error);
+            throw error;
+        }
+    };
+
     const value = {
         projects,
         setProjects,
@@ -114,7 +182,10 @@ export const ProjectProvider = (props: ProviderProps) => {
         selectedTicket,
         setSelectedTicket,
         deleteProject,
-        updateTicket
+        updateTicket,
+        createLabel,
+        deleteLabel,
+        availableLabels
     };
 
     return (

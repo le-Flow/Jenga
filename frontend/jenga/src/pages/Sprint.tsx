@@ -1,10 +1,11 @@
-import { Alert, Button, Card, CardContent, CardHeader, Stack } from "@suid/material"
+import { Alert, Box, Button, Card, CardContent, CardHeader, Stack, Typography } from "@suid/material"
 import { Backlog } from "../components/Backlog"
 import { Kanban } from "../components/Kanban"
 import { Show, createSignal, useContext } from "solid-js"
 import { ProjectContext } from "../provider/ProjectProvider"
 import { TicketInfo } from "../components/TicketInfo"
 import { InfoMode } from "../utils/utils"
+import "./Sprint.css"
 
 
 export const Sprint = () => {
@@ -14,49 +15,64 @@ export const Sprint = () => {
     const [saveError, setSaveError] = createSignal("")
 
     return (
-        <Card sx={{}}>
+        <Card>
             <CardHeader title="Sprint"></CardHeader>
             <CardContent>
-                <Stack spacing={2}>
-                    <Kanban></Kanban>
-                    <Backlog></Backlog>
-                </Stack>
+                <Box class="sprint-layout">
+                    <Stack spacing={2}>
+                        <Kanban></Kanban>
+                        <Backlog></Backlog>
+                    </Stack>
+
+                    <Card variant="outlined" class="ticket-sidebar">
+                        <CardHeader title="Ticket Details" />
+                        <CardContent>
+                            <Show
+                                when={pCtx?.selectedTicket()}
+                                fallback={
+                                    <Typography>
+                                        Please select a ticket
+                                    </Typography>
+                                }
+                            >
+                                {(ticket) => (
+                                    <Stack spacing={1.5}>
+                                        <TicketInfo
+                                            mode={InfoMode.Edit}
+                                            formId={formId}
+                                            ticket={ticket()}
+                                            onTicketChange={(next) => pCtx?.setSelectedTicket(() => next)}
+                                            onSubmit={async (next) => {
+                                                setSaveError("")
+                                                const projectId = pCtx?.selectedProject()?.identifier
+                                                if (!projectId) {
+                                                    setSaveError("No project selected")
+                                                    return
+                                                }
+
+                                                if (!pCtx?.updateTicket) return
+
+                                                try {
+                                                    await pCtx.updateTicket(projectId, next)
+                                                } catch (error) {
+                                                    console.error("Failed to save ticket", error)
+                                                    setSaveError("Failed to save ticket")
+                                                }
+                                            }}
+                                        />
+                                        <Button type="submit" form={formId}>
+                                            save
+                                        </Button>
+                                        <Show when={saveError()}>
+                                            {(message) => <Alert severity="error">{message()}</Alert>}
+                                        </Show>
+                                    </Stack>
+                                )}
+                            </Show>
+                        </CardContent>
+                    </Card>
+                </Box>
             </CardContent>
-            <Show when={pCtx?.selectedTicket()}>
-                {(ticket) => (
-                    <>
-                        <TicketInfo
-                            mode={InfoMode.Edit}
-                            formId={formId}
-                            ticket={ticket()}
-                            onTicketChange={(next) => pCtx?.setSelectedTicket(() => next)}
-                            onSubmit={async (next) => {
-                                setSaveError("")
-                                const projectId = pCtx?.selectedProject()?.identifier
-                                if (!projectId) {
-                                    setSaveError("No project selected")
-                                    return
-                                }
-
-                                if (!pCtx?.updateTicket) return
-
-                                try {
-                                    await pCtx.updateTicket(projectId, next)
-                                } catch (error) {
-                                    console.error("Failed to save ticket", error)
-                                    setSaveError("Failed to save ticket")
-                                }
-                            }}
-                        />
-                        <Button type="submit" form={formId}>
-                            save
-                        </Button>
-                        <Show when={saveError()}>
-                            {(message) => <Alert severity="error">{message()}</Alert>}
-                        </Show>
-                    </>
-                )}
-            </Show>
         </Card>
     )
 }

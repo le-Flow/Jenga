@@ -20,6 +20,7 @@ export const NewTicketDialog = (props: NewTicketDialogProps) => {
         size: TicketSize.MEDIUM,
         status: TicketStatus.OPEN,
         assignee: "",
+        labels: [],
     }
 
     const formId = "new-ticket-form"
@@ -52,6 +53,7 @@ export const NewTicketDialog = (props: NewTicketDialogProps) => {
             size: source.size ?? TicketSize.MEDIUM,
             status: source.status ?? TicketStatus.OPEN,
             assignee: source.assignee ?? "",
+            labels: source.labels ?? [],
         }
 
         setCreateError("")

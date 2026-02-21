@@ -1,0 +1,16 @@
+.projects-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 22.5rem;
+    gap: 1rem;
+    align-items: start;
+}
+
+.projects-list-content {
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.project-sidebar {
+    position: sticky;
+    top: 1rem;
+}

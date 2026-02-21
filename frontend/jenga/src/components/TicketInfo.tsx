@@ -1,7 +1,9 @@
 import { FormControl, InputLabel, MenuItem, Select, Stack, TextField } from "@suid/material"
-import { For } from "solid-js"
+import { For, Setter } from "solid-js"
 import { TicketResponseDTO, TicketPriority, TicketSize, TicketStatus } from "../api"
 import { InfoMode } from "../utils/utils"
+import { SearchUser } from "./SearchUser"
+import { LabelSelector } from "./Labels"
 interface TicketInfoProps {
     mode: InfoMode
     ticket: TicketResponseDTO
@@ -20,6 +22,13 @@ export const TicketInfo = (props: TicketInfoProps) => {
         props.onTicketChange(updatedTicket)
     }
 
+    const setLabels: Setter<string[]> = (next) => {
+        const current = props.ticket.labels ?? []
+        const labels = typeof next === "function" ? next(current) : next
+        updateTicket("labels", labels)
+        return labels
+    }
+
     return (
         <form
             id={formId}
@@ -28,7 +37,7 @@ export const TicketInfo = (props: TicketInfoProps) => {
                 props.onSubmit?.({ ...props.ticket })
             }}
         >
-            <Stack spacing={1}>
+            <Stack spacing={1.5}>
                 <TextField
                     name="title"
                     label="title"
@@ -46,11 +55,15 @@ export const TicketInfo = (props: TicketInfoProps) => {
                     multiline
                     disabled={isReadOnly}
                 />
-                <TextField
-                    name="assignee"
+                <SearchUser
+                    selected={props.ticket.assignee ?? ""}
+                    setSelected={(username) => updateTicket("assignee", username)}
+                    disabled={isReadOnly}
                     label="assignee"
-                    value={props.ticket.assignee ?? ""}
-                    onChange={(_, value) => updateTicket("assignee", value)}
+                />
+                <LabelSelector
+                    selected={() => props.ticket.labels ?? []}
+                    setSelected={setLabels}
                     disabled={isReadOnly}
                 />
                 <FormControl fullWidth>
