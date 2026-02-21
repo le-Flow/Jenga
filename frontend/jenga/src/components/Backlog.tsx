@@ -25,7 +25,10 @@ const BacklogItem = (props: BacklogItemProps) => {
                 pCtx?.setSelectedTicket(() => props.ticket)
             }}
         >
-            <ListItemButton onClick={() => pCtx?.setSelectedTicket(props.ticket)}>
+            <ListItemButton
+                onClick={() => pCtx?.setSelectedTicket(props.ticket)}
+                selected={pCtx?.selectedTicket()?.id === props.ticket.id}
+            >
                 <ListItemAvatar>
                     <Avatar></Avatar>
                 </ListItemAvatar>

@@ -24,7 +24,10 @@ const KanbanItem = (props: KanbanItemProps) => {
                 pCtx?.setSelectedTicket(() => props.ticket)
             }}
         >
-            <ListItemButton onClick={() => pCtx?.setSelectedTicket(props.ticket)}>
+            <ListItemButton
+                onClick={() => pCtx?.setSelectedTicket(props.ticket)}
+                selected={pCtx?.selectedTicket()?.id === props.ticket.id}
+            >
                 {props.ticket.title}
             </ListItemButton>
         </ListItem>
