@@ -14,6 +14,9 @@ const BacklogItem = (props: BacklogItemProps) => {
 
     return (
         <ListItem
+            sx={{
+                "transform": "translateZ(0)",
+            }}
             draggable
             onDragStart={(event) => {
                 const id = props.ticket.id

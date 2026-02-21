@@ -12,7 +12,10 @@ const KanbanItem = (props: KanbanItemProps) => {
 
     return (
         <ListItem
-            sx={{ "border": "1px solid black" }}
+            sx={{
+                "border": "1px solid black",
+                "transform": "translateZ(0)",
+            }}
             draggable
             onDragStart={(event) => {
                 const id = props.ticket.id
