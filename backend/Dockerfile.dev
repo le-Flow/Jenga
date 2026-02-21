@@ -1,0 +1,48 @@
+# ===== STAGE 1: Build =====
+FROM maven:3.9-eclipse-temurin-21 AS build
+WORKDIR /app
+#ENV LANGUAGE='en_US:en'
+
+#caching dependency downloads --> faster rebuild later on
+COPY mvnw pom.xml ./
+COPY .mvn/wrapper/ .mvn/wrapper/
+ENV MAVEN_CONFIG=""
+ENV MAVEN_OPTS="-Dmaven.repo.local=/app/.m2"
+# Download dependencies (cached in Docker layer)
+#prefetching libs without building app
+#ENV HOME=/root
+RUN mvn dependency:go-offline
+#RUN ./mvnw clean package 
+COPY . .
+
+# Build the project (normal or native)
+RUN ./mvnw -Dmaven.repo.local=/root/.m2 package -DskipTests -Dquarkus.package.type=uber-jar
+
+
+
+# ===== STAGE 2: Runtime =====
+FROM eclipse-temurin:21-jre AS runtime
+WORKDIR /app
+
+# Copy the built runner jar from previous stage
+COPY --from=build /app/target/*-runner.jar app.jar
+
+
+#Expose Port 8080 for defautl communication, 5005 for debug
+EXPOSE 8080 5005
+
+#no switch to nonroot user --> mvn may need rootaccess
+#USER 185
+#third command binds Quarkus to all network interfaces --> access from outside the container
+
+# Run Quarkus as a JAR — not in dev mode
+
+# Prevent shutdown by disabling STDIO-based MCP server
+# and bind Quarkus to all network interfaces
+#ENTRYPOINT ["java", "-jar", "app.jar"]
+#CMD ["-Dquarkus.http.host=0.0.0.0", "-Dquarkus.mcp.server.stdio.enabled=false"]
+#CMD ["./mvnw", "quarkus:dev", "-Dquarkus.http.host=0.0.0.0"]
+#ENTRYPOINT ["java", "-jar", "app.jar"]
+#CMD ["-Dquarkus.http.host=0.0.0.0", "-Dquarkus.mcp.server.stdio.enabled=false"]
+ENTRYPOINT ["java", "-Dquarkus.http.host=0.0.0.0", "-Dquarkus.mcp.server.stdio.enabled=false", "-jar", "app.jar"]
+                                                                                                                                                            

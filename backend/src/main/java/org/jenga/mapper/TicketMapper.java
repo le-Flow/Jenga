@@ -1,7 +1,7 @@
 package org.jenga.mapper;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.jenga.model.Ticket;
 import org.jenga.model.Label;
@@ -40,42 +40,38 @@ public interface TicketMapper {
     // Map List<Label> labels to List<String> labels
     default List<String> mapLabelsToLabelNames(List<Label> labels) {
         if (labels == null) {
-            return null;
+            return Collections.emptyList();
         }
         return labels.stream()
-                     .map(Label::getName)
-                     .collect(Collectors.toList());
+                     .map(Label::getName).toList();
     }
 
     // Map List<String> labels to List<Label> labels
     default List<Label> mapLabelNamesToLabels(List<String> labelNames) {
         if (labelNames == null) {
-            return null;
+            return Collections.emptyList();
         }
-
         return labelNames.stream()
                          .map(name -> {
                              Label label = new Label();
                              label.setName(name);
                              return label;
-                         })
-                         .collect(Collectors.toList());
+                         }).toList();
     }
-    
+
     // Map AcceptanceCriteria model to AcceptanceCriteria DTO
     default List<AcceptanceCriteriaResponseDTO> mapAcceptanceCriteriaToResponse(List<AcceptanceCriteria> criteria) {
         if (criteria == null) {
-            return null;
+            return Collections.emptyList();
         }
         return criteria.stream()
-                       .map(this::mapAcceptanceCriteriaToResponse)
-                       .collect(Collectors.toList());
+                       .map(this::mapAcceptanceCriteriaToResponse).toList();
     }
 
     // Single mapping of AcceptanceCriteria model to AcceptanceCriteria DTO
     default AcceptanceCriteriaResponseDTO mapAcceptanceCriteriaToResponse(AcceptanceCriteria criteria) {
         if (criteria == null) {
-            return null;
+            return new AcceptanceCriteriaResponseDTO();
         }
         AcceptanceCriteriaResponseDTO response = new AcceptanceCriteriaResponseDTO();
         response.setId(criteria.getId());
@@ -85,35 +81,32 @@ public interface TicketMapper {
     }
 
     // Map the related tickets list to just their IDs
-    @Named("mapRelatedTicketsToIds")  // Explicitly needed, as MapStruct cannot find it otherwise
+    @Named("mapRelatedTicketsToIds")
     default List<Long> mapRelatedTicketsToIds(List<Ticket> relatedTickets) {
         if (relatedTickets == null) {
-            return null;
+            return Collections.emptyList();
         }
         return relatedTickets.stream()
-                             .map(Ticket::getId)
-                             .collect(Collectors.toList());
+                             .map(Ticket::getId).toList();
     }
 
     // Map blockingTickets list to a List<Long> of IDs
     @Named("mapBlockingTicketsToIds")
     default List<Long> mapBlockingTicketsToIds(List<Ticket> blockingTickets) {
         if (blockingTickets == null) {
-            return null;
+            return Collections.emptyList();
         }
         return blockingTickets.stream()
-                              .map(Ticket::getId)
-                              .collect(Collectors.toList());
+                              .map(Ticket::getId).toList();
     }
 
     // Map blockedTickets list to a List<Long> of IDs
     @Named("mapBlockedTicketsToIds")
     default List<Long> mapBlockedTicketsToIds(List<Ticket> blockedTickets) {
         if (blockedTickets == null) {
-            return null;
+            return Collections.emptyList();
         }
         return blockedTickets.stream()
-                             .map(Ticket::getId)
-                             .collect(Collectors.toList());
+                             .map(Ticket::getId).toList();
     }
 }

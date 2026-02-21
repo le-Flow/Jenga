@@ -1,4 +1,4 @@
-package org.jenga.dto.MCP_Server;
+package org.jenga.dto.mcpserver;
 
 import lombok.Data;
 
@@ -8,6 +8,6 @@ public class ChatRequestDTO {
     private String conversationId;
 
     private String currentUser;
-    private Long currentProjectID;
+    private String currentProjectID;
     private Long currentTicketID;
 }

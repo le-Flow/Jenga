@@ -5,6 +5,9 @@ import dev.langchain4j.agent.tool.Tool;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import io.quarkus.logging.Log;
+
 import org.jenga.dto.TicketResponseDTO;
 import org.jenga.dto.TicketSearchDTO;
 import org.jenga.model.TicketPriority;
@@ -15,51 +18,40 @@ import org.jenga.service.TicketService;
 import java.util.List;
 
 @ApplicationScoped
+@RequiredArgsConstructor(onConstructor_ = { @Inject })
 public class SearchTicketTool {
 
-    @Inject
-    TicketService ticketService;
+    private final TicketService ticketService;
 
     @Tool("""
-        Searches for tickets based on criteria. 
-        Use this when the user asks to find multiple tickets, filter by status/priority, 
-        or search for specific keywords in the title/description.
-        """)
+            Searches for tickets based on criteria.
+            Use this when the user asks to find multiple tickets, filter by status/priority,
+            or search for specific keywords in the title/description.
+            """)
     @Transactional
     public List<TicketResponseDTO> searchTickets(
-            @P("The search query text for title or description (e.g., 'database error', 'login page')")
-            String query,
-            
-            @P("Filter by a specific ticket title")
-            String title,
-            
-            @P("Search for text within the ticket description")
-            String description,
-            
-            @P("Filter by list of priorities (e.g., HIGH, CRITICAL)")
-            List<TicketPriority> priorities,
-            
-            @P("Filter by list of statuses (e.g., OPEN, IN_PROGRESS)")
-            List<TicketStatus> statuses,
-            
-            @P("Filter by list of sizes (e.g., SMALL, LARGE)")
-            List<TicketSize> sizes,
-            
-            @P("Filter by a list of assignee usernames")
-            List<String> assignees,
-            
-            @P("Filter by a list of reporter usernames")
-            List<String> reporters,
-            
-            @P("Filter by a list of labels (e.g., 'bug', 'feature')")
-            List<String> labels,
-            
-            @P("Filter by a specific project ID")
-            String projectId,
-            
-            @P("Limit the number of results (default to 5 if not specified)")
-            Integer limit
-    ) {
+            @P("The search query text for title or description (e.g., 'database error', 'login page')") String query,
+
+            @P("Filter by a specific ticket title") String title,
+
+            @P("Search for text within the ticket description") String description,
+
+            @P("Filter by list of priorities (e.g., HIGH, CRITICAL)") List<TicketPriority> priorities,
+
+            @P("Filter by list of statuses (e.g., OPEN, IN_PROGRESS)") List<TicketStatus> statuses,
+
+            @P("Filter by list of sizes (e.g., SMALL, LARGE)") List<TicketSize> sizes,
+
+            @P("Filter by a list of assignee usernames") List<String> assignees,
+
+            @P("Filter by a list of reporter usernames") List<String> reporters,
+
+            @P("Filter by a list of labels (e.g., 'bug', 'feature')") List<String> labels,
+
+            @P("Filter by a specific project ID") String projectId,
+
+            @P("Limit the number of results (default to 5 if not specified)") Integer limit) {
+        Log.debugf("SearchTicketTool.searchTickets called with query: '%s'", query);
         TicketSearchDTO request = new TicketSearchDTO();
         TicketSearchDTO.Filter filter = new TicketSearchDTO.Filter();
 
