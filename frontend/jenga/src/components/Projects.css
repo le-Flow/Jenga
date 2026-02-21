@@ -2,11 +2,21 @@
     display: grid;
     grid-template-columns: minmax(0, 1fr) 22.5rem;
     gap: 1rem;
-    align-items: start;
+    align-items: stretch;
+}
+
+.project-sidebar {
+    height: 100%;
+}
+
+.projects-card {
+    display: flex;
+    flex-direction: column;
 }
 
 .projects-list-content {
-    max-height: 60vh;
+    flex: 1;
+    min-height: 0;
     overflow-y: auto;
 }
 
