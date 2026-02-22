@@ -11,6 +11,7 @@ import { Footer } from './components/Footer';
 import { useLocation } from '@solidjs/router';
 import { LayoutProvider } from './provider/LayoutProvider';
 import { GuideProvider } from './provider/GuideProvider';
+import { GuideButton } from './components/GuideButton';
 
 const theme = createTheme()
 
@@ -45,6 +46,7 @@ const App = (props: AppProps) => {
                     </IconButton>
                     <img src={logo} style={{ "height": "2vw", "width": "auto" }}></img>
                     <Box marginLeft={"auto"}>
+                      <GuideButton></GuideButton>
                       <Auth></Auth>
                     </Box>
                   </Toolbar>
