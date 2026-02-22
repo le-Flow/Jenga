@@ -129,6 +129,10 @@ export const TicketFilters = (props: TicketFiltersProps) => {
             next.push({ ...emptyFilter })
         }
 
+        if (!next.some(isEmpty)) {
+            next.push({ ...emptyFilter })
+        }
+
         return next
     }
 
