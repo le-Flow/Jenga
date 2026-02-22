@@ -149,7 +149,9 @@
       "assignee": "Assignee",
       "reporter": "Reporter",
       "status": "Status",
-      "labels": "Labels"
+      "labels": "Labels",
+      "blocked": "Blockiert",
+      "related": "Verknüpft"
     }
   },
   "labels": {
@@ -158,6 +160,15 @@
   "ticketInfo": {
     "title": "Titel",
     "description": "Beschreibung",
+    "acceptanceCriteria": "Akzeptanzkriterien",
+    "addAcceptanceCriteria": "Akzeptanzkriterium hinzufügen",
+    "removeAcceptanceCriteria": "Akzeptanzkriterium entfernen",
+    "acceptanceCriteriaDescription": "Kriterium",
+    "acceptanceCriteriaPlaceholder": "Erwartetes Ergebnis beschreiben",
+    "relatedTickets": "Verknüpfte Ticket-IDs",
+    "blockingTickets": "Blockierende Ticket-IDs",
+    "blockedTickets": "Blockiert durch Ticket-IDs",
+    "idsPlaceholder": "z. B. 12, 23, 45",
     "assignee": "Assignee",
     "priority": "Priorität",
     "size": "Größe",

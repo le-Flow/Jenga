@@ -4,7 +4,16 @@ import { TicketResponseDTO } from "../api"
 import { Delete } from "@suid/icons-material"
 import { I18nContext } from "../provider/I18nProvider"
 
-export type TicketFilterField = "all" | "title" | "description" | "assignee" | "reporter" | "status" | "labels"
+export type TicketFilterField =
+    | "all"
+    | "title"
+    | "description"
+    | "assignee"
+    | "reporter"
+    | "status"
+    | "labels"
+    | "blocked"
+    | "related"
 
 export type TicketFilter = {
     field: TicketFilterField
@@ -30,6 +39,9 @@ const includesFilter = (value: string | undefined, query: string) =>
 const includesLabelFilter = (labels: string[] | undefined, query: string) =>
     labels?.some((label) => label.toLowerCase().includes(query)) ?? false
 
+const includesIdFilter = (ids: number[] | undefined, query: string) =>
+    ids?.some((id) => String(id).includes(query)) ?? false
+
 export const matchesTicketFilters = (ticket: TicketResponseDTO, filters: TicketFilter[]) => {
     const activeFilters = filters.filter((filter) => filter.value.trim())
     if (activeFilters.length === 0) return true
@@ -50,6 +62,11 @@ export const matchesTicketFilters = (ticket: TicketResponseDTO, filters: TicketF
                 return includesFilter(ticket.status, query)
             case "labels":
                 return includesLabelFilter(ticket.labels, query)
+            case "blocked":
+                return includesIdFilter(ticket.blockingTicketIds, query)
+                    || includesIdFilter(ticket.blockedTicketIds, query)
+            case "related":
+                return includesIdFilter(ticket.relatedTicketsIds, query)
             case "all":
             default:
                 return (
@@ -59,6 +76,9 @@ export const matchesTicketFilters = (ticket: TicketResponseDTO, filters: TicketF
                     || includesFilter(ticket.reporter, query)
                     || includesFilter(ticket.status, query)
                     || includesLabelFilter(ticket.labels, query)
+                    || includesIdFilter(ticket.blockingTicketIds, query)
+                    || includesIdFilter(ticket.blockedTicketIds, query)
+                    || includesIdFilter(ticket.relatedTicketsIds, query)
                 )
         }
     })
@@ -85,6 +105,8 @@ const TicketFilterRow = (props: TicketFilterRowProps) => {
                         <MenuItem value="reporter">{i18n?.t("ticketFilters.field.reporter")}</MenuItem>
                         <MenuItem value="status">{i18n?.t("ticketFilters.field.status")}</MenuItem>
                         <MenuItem value="labels">{i18n?.t("ticketFilters.field.labels")}</MenuItem>
+                        <MenuItem value="blocked">{i18n?.t("ticketFilters.field.blocked")}</MenuItem>
+                        <MenuItem value="related">{i18n?.t("ticketFilters.field.related")}</MenuItem>
                     </Select>
                 </FormControl>
                 <TextField

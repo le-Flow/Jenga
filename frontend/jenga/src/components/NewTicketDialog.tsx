@@ -24,6 +24,7 @@ export const NewTicketDialog = (props: NewTicketDialogProps) => {
         status: TicketStatus.OPEN,
         assignee: "",
         labels: [],
+        acceptanceCriteria: [],
     }
 
     const formId = "new-ticket-form"
@@ -59,6 +60,15 @@ export const NewTicketDialog = (props: NewTicketDialogProps) => {
             status: source.status ?? TicketStatus.OPEN,
             assignee: source.assignee ?? "",
             labels: source.labels ?? [],
+            acceptanceCriteria: (source.acceptanceCriteria ?? [])
+                .map((criteria) => ({
+                    description: (criteria.description ?? "").trim(),
+                    completed: Boolean(criteria.completed),
+                }))
+                .filter((criteria) => criteria.description.length > 0),
+            relatedTicketsIds: source.relatedTicketsIds ?? [],
+            blockingTicketIds: source.blockingTicketIds ?? [],
+            blockedTicketIds: source.blockedTicketIds ?? [],
         }
 
         setCreateError("")

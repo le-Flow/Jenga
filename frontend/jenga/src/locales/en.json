@@ -149,7 +149,9 @@
       "assignee": "Assignee",
       "reporter": "Reporter",
       "status": "Status",
-      "labels": "Labels"
+      "labels": "Labels",
+      "blocked": "Blocked",
+      "related": "Related"
     }
   },
   "labels": {
@@ -158,6 +160,15 @@
   "ticketInfo": {
     "title": "Title",
     "description": "Description",
+    "acceptanceCriteria": "Acceptance Criteria",
+    "addAcceptanceCriteria": "Add acceptance criterion",
+    "removeAcceptanceCriteria": "Remove acceptance criterion",
+    "acceptanceCriteriaDescription": "Criterion",
+    "acceptanceCriteriaPlaceholder": "Describe the expected result",
+    "relatedTickets": "Related ticket IDs",
+    "blockingTickets": "Blocking ticket IDs",
+    "blockedTickets": "Blocked by ticket IDs",
+    "idsPlaceholder": "e.g. 12, 23, 45",
     "assignee": "Assignee",
     "priority": "Priority",
     "size": "Size",

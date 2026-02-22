@@ -1,5 +1,5 @@
 import { Accessor, JSXElement, Resource, Setter, createContext, createEffect, createResource, createSignal, useContext } from "solid-js";
-import { ProjectResponseDTO, ProjectResourceService, TicketResponseDTO, TicketResourceService } from "../api";
+import { ProjectResponseDTO, ProjectResourceService, TicketRequestDTO, TicketResponseDTO, TicketResourceService } from "../api";
 import { AuthContext } from "./AuthProvider";
 
 type ProjectContextType = {
@@ -46,6 +46,51 @@ export const ProjectProvider = (props: ProviderProps) => {
 
         const rgb = (hash & 0x00FFFFFF).toString(16).toUpperCase().padStart(6, "0");
         return `#${rgb}`;
+    };
+
+    const normalizeAcceptanceCriteria = (criteria: TicketResponseDTO["acceptanceCriteria"] | undefined) =>
+        (criteria ?? [])
+            .map((entry) => ({
+                id: entry.id,
+                description: (entry.description ?? "").trim(),
+                completed: Boolean(entry.completed),
+            }))
+            .filter((entry) => entry.description.length > 0);
+
+    const toTicketRequest = (ticket: TicketResponseDTO): TicketRequestDTO => ({
+        title: ticket.title ?? "",
+        description: ticket.description ?? "",
+        priority: ticket.priority,
+        size: ticket.size,
+        status: ticket.status,
+        projectName: ticket.projectName,
+        assignee: ticket.assignee,
+        reporter: ticket.reporter,
+        labels: ticket.labels ?? [],
+        acceptanceCriteria: normalizeAcceptanceCriteria(ticket.acceptanceCriteria).map((entry) => ({
+            description: entry.description,
+            completed: entry.completed,
+        })),
+        relatedTicketsIds: ticket.relatedTicketsIds ?? [],
+        blockingTicketIds: ticket.blockingTicketIds ?? [],
+        blockedTicketIds: ticket.blockedTicketIds ?? [],
+    });
+
+    const syncAcceptanceCriteria = async (ticketId: number, nextTicket: TicketResponseDTO) => {
+        const nextCriteria = normalizeAcceptanceCriteria(nextTicket.acceptanceCriteria);
+
+        const existing = await TicketResourceService.getApiTicketsAcceptanceCriteria(ticketId);
+        for (const item of existing) {
+            if (item.id == null) continue;
+            await TicketResourceService.deleteApiTicketsAcceptanceCriteria(item.id, ticketId);
+        }
+
+        for (const entry of nextCriteria) {
+            await TicketResourceService.postApiTicketsAcceptanceCriteria(ticketId, {
+                description: entry.description,
+                completed: entry.completed,
+            });
+        }
     };
 
     const [projects, { mutate: setProjects, refetch: refetchProjects }] = createResource(
@@ -112,13 +157,16 @@ export const ProjectProvider = (props: ProviderProps) => {
         setSelectedTicket((prev) => (prev?.id === ticket.id ? { ...prev, ...ticket } : prev));
 
         try {
-            const newTicket = await TicketResourceService.putApiTickets(ticket.id, ticket)
+            const request = toTicketRequest(ticket);
+            await TicketResourceService.putApiTickets(ticket.id, request);
+            await syncAcceptanceCriteria(ticket.id, ticket);
+            const refreshedTicket = await TicketResourceService.getApiTickets1(ticket.id);
 
             setTickets((prev) =>
-                prev?.map((existing) => (existing.id === ticket.id ? { ...existing, ...newTicket } : existing)) ?? prev
+                prev?.map((existing) => (existing.id === ticket.id ? { ...existing, ...refreshedTicket } : existing)) ?? prev
             );
 
-            setSelectedTicket((prev) => (prev?.id === ticket.id ? { ...prev, ...newTicket } : prev));
+            setSelectedTicket((prev) => (prev?.id === ticket.id ? { ...prev, ...refreshedTicket } : prev));
         } catch (error) {
             console.error("Failed to update ticket", error);
             setTickets(() => previousTickets);
