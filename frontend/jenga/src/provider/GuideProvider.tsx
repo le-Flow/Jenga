@@ -179,16 +179,6 @@ export const GuideProvider = (props: GuideProviderProps) => {
             tour.cancel();
         }
 
-        [...tour.steps].forEach((step) => {
-            if (step.id) {
-                tour.removeStep(step.id);
-            }
-        });
-        tour.addSteps(getSteps());
-
-        if (tour.steps.length === 0) {
-            return;
-        }
         tour.start();
     };
 
