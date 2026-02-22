@@ -12,6 +12,7 @@ import { useLocation } from '@solidjs/router';
 import { LayoutContext, LayoutProvider } from './provider/LayoutProvider';
 import { GuideProvider } from './provider/GuideProvider';
 import { GuideButton } from './components/GuideButton';
+import { I18nProvider } from './provider/I18nProvider';
 
 const theme = createTheme()
 
@@ -30,39 +31,41 @@ const AppShell = (props: AppProps) => {
   });
 
   return (
-    <AuthProvider>
-      <UserProvider>
-        <ProjectProvider>
-          <GuideProvider>
-            <AppBar position="static">
-              <Toolbar>
-                <IconButton id="guide-nav-toggle" onClick={() => { lCtx?.toggleSidebar(); }}>
-                  <Menu></Menu>
-                </IconButton>
-                <img src={logo} style={{ "height": "2vw", "width": "auto" }}></img>
-                <Box marginLeft={"auto"}>
-                  <Stack direction="row" spacing={2}>
-                    <GuideButton></GuideButton>
-                    <Auth></Auth>
-                  </Stack>
+    <I18nProvider>
+      <AuthProvider>
+        <UserProvider>
+          <ProjectProvider>
+            <GuideProvider>
+              <AppBar position="static">
+                <Toolbar>
+                  <IconButton id="guide-nav-toggle" onClick={() => { lCtx?.toggleSidebar(); }}>
+                    <Menu></Menu>
+                  </IconButton>
+                  <img src={logo} style={{ "height": "2vw", "width": "auto" }}></img>
+                  <Box marginLeft={"auto"}>
+                    <Stack direction="row" spacing={2}>
+                      <GuideButton></GuideButton>
+                      <Auth></Auth>
+                    </Stack>
+                  </Box>
+                </Toolbar>
+              </AppBar>
+              <Stack direction="row">
+                <Show when={lCtx?.sidebarOpen()}>
+                  <Card id="guide-sidebar" sx={{ "height": "100vh", "width": "10vw" }}>
+                    <Sidebar />
+                  </Card>
+                </Show>
+                <Box flex={1}>
+                  {props.children}
                 </Box>
-              </Toolbar>
-            </AppBar>
-            <Stack direction="row">
-              <Show when={lCtx?.sidebarOpen()}>
-                <Card id="guide-sidebar" sx={{ "height": "100vh", "width": "10vw" }}>
-                  <Sidebar />
-                </Card>
-              </Show>
-              <Box flex={1}>
-                {props.children}
-              </Box>
-            </Stack>
-            <Footer></Footer>
-          </GuideProvider>
-        </ProjectProvider>
-      </UserProvider>
-    </AuthProvider>
+              </Stack>
+              <Footer></Footer>
+            </GuideProvider>
+          </ProjectProvider>
+        </UserProvider>
+      </AuthProvider>
+    </I18nProvider>
   );
 };
 
