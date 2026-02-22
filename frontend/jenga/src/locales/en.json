@@ -169,16 +169,19 @@
     "HIGH": "High"
   },
   "ticketSize": {
+    "TINY": "Tiny",
     "SMALL": "Small",
     "MEDIUM": "Medium",
-    "LARGE": "Large"
+    "LARGE": "Large",
+    "HUGE": "Huge"
   },
   "ticketStatus": {
     "OPEN": "Open",
     "IN_PROGRESS": "In Progress",
     "IN_REVIEW": "In Review",
     "RESOLVED": "Resolved",
-    "CLOSED": "Closed"
+    "CLOSED": "Closed",
+    "ON_HOLD": "On Hold"
   },
   "errors": {
     "noProjectSelected": "No project selected",
