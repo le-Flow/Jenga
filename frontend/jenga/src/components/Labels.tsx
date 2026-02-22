@@ -1,6 +1,7 @@
 import { Box, Chip, List, ListItem, ListItemButton, ListItemText, Popper, TextField } from "@suid/material"
 import { Accessor, createMemo, createSignal, For, Setter, useContext } from "solid-js"
 import { ProjectContext } from "../provider/ProjectProvider"
+import { I18nContext } from "../provider/I18nProvider"
 
 
 interface LabelSelectorProps {
@@ -11,6 +12,7 @@ interface LabelSelectorProps {
 
 export const LabelSelector = (props: LabelSelectorProps) => {
     const pCtx = useContext(ProjectContext)
+    const i18n = useContext(I18nContext)
     let ref: HTMLDivElement | undefined
 
     const [input, setInput] = createSignal("")
@@ -18,7 +20,7 @@ export const LabelSelector = (props: LabelSelectorProps) => {
     const [createError, setCreateError] = createSignal("")
     const loadError = createMemo(() => {
         if (!focused()) return ""
-        return pCtx?.availableLabels?.error ? "Failed to load labels" : ""
+        return pCtx?.availableLabels?.error ? (i18n?.t("errors.failedLoadLabels") ?? "") : ""
     })
     const hasLabelsError = createMemo(() => Boolean(loadError()))
     const safeAvailableLabels = createMemo(() => {
@@ -40,7 +42,7 @@ export const LabelSelector = (props: LabelSelectorProps) => {
 
     const addLabel = async (value: string) => {
         if (hasLabelsError()) {
-            setCreateError("Failed to load labels")
+            setCreateError(i18n?.t("errors.failedLoadLabels") ?? "")
             return
         }
 
@@ -56,7 +58,7 @@ export const LabelSelector = (props: LabelSelectorProps) => {
                 labelToUse = await pCtx.createLabel(label)
             } catch (error) {
                 console.error("Failed to persist label", error)
-                setCreateError("Failed to create label")
+                setCreateError(i18n?.t("errors.failedCreateLabel") ?? "")
                 return
             }
         }
@@ -73,7 +75,7 @@ export const LabelSelector = (props: LabelSelectorProps) => {
         <>
             <div ref={(el) => ref = el}>
                 <TextField
-                    label="labels"
+                    label={i18n?.t("labels.label")}
                     value={input()}
                     onChange={(event) => {
                         setInput(event.currentTarget.value)

@@ -1,7 +1,8 @@
 import { FormControl, IconButton, InputLabel, List, ListItem, ListItemButton, MenuItem, Select, Stack, TextField, Typography } from "@suid/material"
-import { Index, Show, createEffect, createSignal } from "solid-js"
+import { Index, Show, createEffect, createSignal, useContext } from "solid-js"
 import { TicketResponseDTO } from "../api"
 import { Delete } from "@suid/icons-material"
+import { I18nContext } from "../provider/I18nProvider"
 
 export type TicketFilterField = "all" | "title" | "description" | "assignee" | "reporter" | "status" | "labels"
 
@@ -64,35 +65,37 @@ export const matchesTicketFilters = (ticket: TicketResponseDTO, filters: TicketF
 }
 
 const TicketFilterRow = (props: TicketFilterRowProps) => {
+    const i18n = useContext(I18nContext)
+
     return (
         <ListItem sx={{ px: 0 }}>
             <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} sx={{ width: "100%" }}>
                 <FormControl sx={{ "minWidth": "12rem" }}>
-                    <InputLabel id={`ticket-filter-by-label-${props.index}`}>Filter by</InputLabel>
+                    <InputLabel id={`ticket-filter-by-label-${props.index}`}>{i18n?.t("ticketFilters.filterBy")}</InputLabel>
                     <Select
                         labelId={`ticket-filter-by-label-${props.index}`}
                         value={props.filter.field}
-                        label="Filter by"
+                        label={i18n?.t("ticketFilters.filterBy")}
                         onChange={(event) => props.onFieldChange(props.index, event.target.value as TicketFilterField)}
                     >
-                        <MenuItem value="all">All fields</MenuItem>
-                        <MenuItem value="title">Title</MenuItem>
-                        <MenuItem value="description">Description</MenuItem>
-                        <MenuItem value="assignee">Assignee</MenuItem>
-                        <MenuItem value="reporter">Reporter</MenuItem>
-                        <MenuItem value="status">Status</MenuItem>
-                        <MenuItem value="labels">Labels</MenuItem>
+                        <MenuItem value="all">{i18n?.t("ticketFilters.field.all")}</MenuItem>
+                        <MenuItem value="title">{i18n?.t("ticketFilters.field.title")}</MenuItem>
+                        <MenuItem value="description">{i18n?.t("ticketFilters.field.description")}</MenuItem>
+                        <MenuItem value="assignee">{i18n?.t("ticketFilters.field.assignee")}</MenuItem>
+                        <MenuItem value="reporter">{i18n?.t("ticketFilters.field.reporter")}</MenuItem>
+                        <MenuItem value="status">{i18n?.t("ticketFilters.field.status")}</MenuItem>
+                        <MenuItem value="labels">{i18n?.t("ticketFilters.field.labels")}</MenuItem>
                     </Select>
                 </FormControl>
                 <TextField
                     fullWidth
-                    label="Ticket filter"
-                    placeholder="Type to filter tickets..."
+                    label={i18n?.t("ticketFilters.ticketFilter")}
+                    placeholder={i18n?.t("ticketFilters.placeholder")}
                     value={props.filter.value}
                     onChange={(_, value) => props.onValueChange(props.index, value)}
                 />
                 <IconButton
-                    aria-label="Remove filter row"
+                    aria-label={i18n?.t("ticketFilters.removeFilterRow")}
                     onClick={() => props.onRemove(props.index)}
                     disabled={!props.canRemove}
                     sx={{
@@ -107,6 +110,7 @@ const TicketFilterRow = (props: TicketFilterRowProps) => {
 }
 
 export const TicketFilters = (props: TicketFiltersProps) => {
+    const i18n = useContext(I18nContext)
     const [filters, setFilters] = createSignal<TicketFilter[]>([{ field: "all", value: "" }])
     const [expanded, setExpanded] = createSignal(true)
 
@@ -146,6 +150,7 @@ export const TicketFilters = (props: TicketFiltersProps) => {
 
     return (
         <Stack
+            id="guide-ticket-filter"
             spacing={1.5}
             sx={{
                 "border": "1px solid",
@@ -190,7 +195,7 @@ export const TicketFilters = (props: TicketFiltersProps) => {
                             }}
                         >
                             <Typography>
-                                {expanded() ? "show less" : "extend"}
+                                {expanded() ? i18n?.t("ticketFilters.showLess") : i18n?.t("ticketFilters.extend")}
                             </Typography>
                         </ListItemButton>
                     </ListItem>

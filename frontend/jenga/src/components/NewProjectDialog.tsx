@@ -5,6 +5,7 @@ import { ProjectRequestDTO, ProjectResponseDTO, ProjectResourceService } from ".
 import { ProjectContext } from "../provider/ProjectProvider"
 import { ProjectInfo } from "./ProjectInfo"
 import { InfoMode } from "../utils/utils"
+import { I18nContext } from "../provider/I18nProvider"
 
 interface NewProjectDialogProps {
     open: boolean
@@ -14,6 +15,7 @@ interface NewProjectDialogProps {
 export const NewProjectDialog = (props: NewProjectDialogProps) => {
 
     const pCtx = useContext(ProjectContext)
+    const i18n = useContext(I18nContext)
 
     const EMPTY_PROJECT: ProjectResponseDTO = { identifier: "", name: "", description: "" }
     const formId = "new-project-form"
@@ -46,20 +48,20 @@ export const NewProjectDialog = (props: NewProjectDialogProps) => {
             setTimeout(() => props.setOpen(false), 700)
         } catch (error) {
             console.error("Failed to create project", error)
-            setCreateError("Failed to create project")
+            setCreateError(i18n?.t("errors.failedCreateProject") ?? "")
         }
     }
 
     return (
         <Dialog open={props.open} fullWidth>
-            <DialogTitle>New Project</DialogTitle>
+            <DialogTitle>{i18n?.t("newProject.title")}</DialogTitle>
             <DialogContent>
                 <Show when={createError()}>
                     {(message) => <Alert severity="error">{message()}</Alert>}
                 </Show>
                 <Show when={createSuccess()}>
                     <Alert severity="success" icon={<CheckCircle />}>
-                        Project created
+                        {i18n?.t("newProject.created")}
                     </Alert>
                 </Show>
                 <ProjectInfo
@@ -72,10 +74,10 @@ export const NewProjectDialog = (props: NewProjectDialogProps) => {
             </DialogContent>
             <DialogActions>
                 <Button type="button" onClick={() => { props.setOpen(false) }}>
-                    cancel
+                    {i18n?.t("common.cancel")}
                 </Button>
                 <Button type="submit" form={formId}>
-                    create
+                    {i18n?.t("common.create")}
                 </Button>
             </DialogActions>
         </Dialog>

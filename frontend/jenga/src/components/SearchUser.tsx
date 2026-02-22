@@ -1,6 +1,7 @@
 import { Box, List, ListItem, ListItemButton, ListItemText, Popper, TextField } from "@suid/material"
-import { createEffect, createMemo, createResource, createSignal, For } from "solid-js"
+import { createEffect, createMemo, createResource, createSignal, For, useContext } from "solid-js"
 import { UserResourceService } from "../api"
+import { I18nContext } from "../provider/I18nProvider"
 
 interface SearchUserProps {
     setSelected: (username: string) => void
@@ -10,6 +11,7 @@ interface SearchUserProps {
 }
 
 export const SearchUser = (props: SearchUserProps) => {
+    const i18n = useContext(I18nContext)
     let ref: HTMLDivElement | undefined
 
     const [input, setInput] = createSignal(props.selected)
@@ -27,7 +29,7 @@ export const SearchUser = (props: SearchUserProps) => {
             return users
         } catch (error) {
             console.error("Failed to load users", error)
-            setSearchError("Failed to load users")
+            setSearchError(i18n?.t("errors.failedLoadUsers") ?? "")
             return []
         }
     })
