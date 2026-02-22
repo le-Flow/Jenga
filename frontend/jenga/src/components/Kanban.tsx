@@ -2,6 +2,7 @@ import { TableRow, TableCell, Card, CardHeader, CardContent, TableContainer, Pap
 import { useContext, createMemo, For } from "solid-js"
 import { TicketResponseDTO, TicketStatus } from "../api"
 import { ProjectContext } from "../provider/ProjectProvider"
+import { I18nContext } from "../provider/I18nProvider"
 
 interface KanbanItemProps {
     ticket: TicketResponseDTO
@@ -111,6 +112,7 @@ interface KanbanProps {
 export const Kanban = (props: KanbanProps) => {
 
     const pCtx = useContext(ProjectContext)
+    const i18n = useContext(I18nContext)
 
     const tickets = createMemo(() =>
         Map.groupBy(props.tickets ?? pCtx?.tickets() ?? [], t => t.assignee ?? "")
@@ -118,18 +120,18 @@ export const Kanban = (props: KanbanProps) => {
 
     return (
         <Card id="guide-kanban">
-            <CardHeader title="Kanban"></CardHeader>
+            <CardHeader title={i18n?.t("kanban.title")}></CardHeader>
             <CardContent>
                 <TableContainer component={Paper}>
                     <Table>
                         <TableHead>
                             <TableRow>
-                                <TableCell>Dev</TableCell>
-                                <TableCell>Todo</TableCell>
-                                <TableCell>In Progress</TableCell>
-                                <TableCell>In Review</TableCell>
-                                <TableCell>Resolved</TableCell>
-                                <TableCell>Done</TableCell>
+                                <TableCell>{i18n?.t("kanban.dev")}</TableCell>
+                                <TableCell>{i18n?.t("ticketStatus.OPEN")}</TableCell>
+                                <TableCell>{i18n?.t("ticketStatus.IN_PROGRESS")}</TableCell>
+                                <TableCell>{i18n?.t("ticketStatus.IN_REVIEW")}</TableCell>
+                                <TableCell>{i18n?.t("ticketStatus.RESOLVED")}</TableCell>
+                                <TableCell>{i18n?.t("ticketStatus.CLOSED")}</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>

@@ -7,6 +7,7 @@ import { ProjectResourceService } from "../api"
 import { ProjectInfo } from "./ProjectInfo"
 import { AuthContext } from "../provider/AuthProvider"
 import { InfoMode } from "../utils/utils"
+import { I18nContext } from "../provider/I18nProvider"
 import "./Projects.css"
 
 interface ConfirmDialogProps {
@@ -16,6 +17,7 @@ interface ConfirmDialogProps {
 
 const ConfirmDialog = (props: ConfirmDialogProps) => {
     const pCtx = useContext(ProjectContext)
+    const i18n = useContext(I18nContext)
     const [deleteError, setDeleteError] = createSignal("")
 
     const onCancel = () => {
@@ -34,7 +36,7 @@ const ConfirmDialog = (props: ConfirmDialogProps) => {
             props.setOpen(false)
         } catch (error) {
             console.error("Failed to delete project", error)
-            setDeleteError("Failed to delete project")
+            setDeleteError(i18n?.t("errors.failedDeleteProject") ?? "")
         }
     }
 
@@ -42,18 +44,17 @@ const ConfirmDialog = (props: ConfirmDialogProps) => {
         <Dialog
             open={props.open}
         >
-            <DialogTitle>Confirm Deletion</DialogTitle>
+            <DialogTitle>{i18n?.t("projects.confirmDeletionTitle")}</DialogTitle>
             <DialogContent>
                 <DialogContentText>
                     <Stack>
-                        Are you sure?
-                        This can't be undone!
+                        {i18n?.t("projects.confirmDeletionText")}
                     </Stack>
                 </DialogContentText>
             </DialogContent>
             <DialogActions>
-                <Button onClick={onCancel}>Cancel</Button>
-                <Button onClick={onConfirm} color="warning">Confirm</Button>
+                <Button onClick={onCancel}>{i18n?.t("common.cancel")}</Button>
+                <Button onClick={onConfirm} color="warning">{i18n?.t("common.confirm")}</Button>
             </DialogActions>
             <Show when={deleteError()}>
                 {(message) => <Alert severity="error">{message()}</Alert>}
@@ -67,6 +68,7 @@ export const Projects = () => {
 
     const pCtx = useContext(ProjectContext)
     const aCtx = useContext(AuthContext)
+    const i18n = useContext(I18nContext)
 
     const [open, setOpen] = createSignal(false)
     const [openConfirm, setOpenConfirm] = createSignal(false)
@@ -86,12 +88,12 @@ export const Projects = () => {
         <>
             <Box class="projects-layout">
                 <Card class="projects-card">
-                    <CardHeader title="Projects" />
+                    <CardHeader title={i18n?.t("projects.title")} />
                     <CardContent class="projects-list-content">
                         <List>
                             <For
                                 each={projects()}
-                                fallback={<div>No projects found</div>
+                                fallback={<div>{i18n?.t("projects.noProjectsFound")}</div>
                                 }
                             >
                                 {
@@ -124,16 +126,16 @@ export const Projects = () => {
                     </CardContent>
                     <CardActions>
                         <Button onClick={() => { setOpen(true) }} disabled={!aCtx?.isLoggedIn()}>
-                            NEW
+                            {i18n?.t("common.new")}
                         </Button>
                     </CardActions>
                 </Card >
                 <Card variant="outlined" class="project-sidebar">
-                    <CardHeader title="Project Info" />
+                    <CardHeader title={i18n?.t("projects.projectInfo")} />
                     <CardContent>
                         <Show
                             when={pCtx?.selectedProject()}
-                            fallback={<Typography>Please select a project</Typography>}
+                            fallback={<Typography>{i18n?.t("projects.selectProject")}</Typography>}
                         >
                             {(project) => (
                                 <>
@@ -161,19 +163,19 @@ export const Projects = () => {
                                                 setSaveSuccess(true)
                                             } catch (error) {
                                                 console.error("Failed to update project", error)
-                                                setSaveError("Failed to update project")
+                                                setSaveError(i18n?.t("errors.failedUpdateProject") ?? "")
                                             }
                                         }}
                                     />
                                     <Button type="submit" form={formId}>
-                                        save
+                                        {i18n?.t("common.save")}
                                     </Button>
                                     <Show when={saveError()}>
                                         {(message) => <Alert severity="error">{message()}</Alert>}
                                     </Show>
                                     <Show when={saveSuccess()}>
                                         <Alert severity="success" icon={<CheckCircle />}>
-                                            Project saved
+                                            {i18n?.t("projects.projectSaved")}
                                         </Alert>
                                     </Show>
                                 </>

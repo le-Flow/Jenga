@@ -7,11 +7,13 @@ import { ProjectContext } from "../provider/ProjectProvider"
 import { TicketInfo } from "../components/TicketInfo"
 import { TicketFilter, TicketFilters, matchesTicketFilters } from "../components/TicketFilters"
 import { InfoMode } from "../utils/utils"
+import { I18nContext } from "../provider/I18nProvider"
 import "./Sprint.css"
 
 export const Sprint = () => {
 
     const pCtx = useContext(ProjectContext)
+    const i18n = useContext(I18nContext)
     const formId = "selected-ticket-form"
     const [saveError, setSaveError] = createSignal("")
     const [saveSuccess, setSaveSuccess] = createSignal(false)
@@ -23,7 +25,7 @@ export const Sprint = () => {
 
     return (
         <Card>
-            <CardHeader title="Sprint"></CardHeader>
+            <CardHeader title={i18n?.t("pages.sprint.title")}></CardHeader>
             <CardContent>
                 <Box class="sprint-layout">
                     <Stack spacing={2}>
@@ -35,13 +37,13 @@ export const Sprint = () => {
                     </Stack>
 
                     <Card id="guide-ticket-details" variant="outlined" class="ticket-sidebar">
-                        <CardHeader title="Ticket Details" />
+                        <CardHeader title={i18n?.t("pages.sprint.ticketDetails")} />
                         <CardContent>
                             <Show
                                 when={pCtx?.selectedTicket()}
                                 fallback={
                                     <Typography>
-                                        Please select a ticket
+                                        {i18n?.t("pages.sprint.selectTicket")}
                                     </Typography>
                                 }
                             >
@@ -61,7 +63,7 @@ export const Sprint = () => {
                                                 setSaveSuccess(false)
                                                 const projectId = pCtx?.selectedProject()?.identifier
                                                 if (!projectId) {
-                                                    setSaveError("No project selected")
+                                                    setSaveError(i18n?.t("errors.noProjectSelected") ?? "")
                                                     return
                                                 }
 
@@ -72,19 +74,19 @@ export const Sprint = () => {
                                                     setSaveSuccess(true)
                                                 } catch (error) {
                                                     console.error("Failed to save ticket", error)
-                                                    setSaveError("Failed to save ticket")
+                                                    setSaveError(i18n?.t("errors.failedSaveTicket") ?? "")
                                                 }
                                             }}
                                         />
                                         <Button type="submit" form={formId}>
-                                            save
+                                            {i18n?.t("common.save")}
                                         </Button>
                                         <Show when={saveError()}>
                                             {(message) => <Alert severity="error">{message()}</Alert>}
                                         </Show>
                                         <Show when={saveSuccess()}>
                                             <Alert severity="success" icon={<CheckCircle />}>
-                                                Ticket saved
+                                                {i18n?.t("pages.sprint.ticketSaved")}
                                             </Alert>
                                         </Show>
                                     </Stack>

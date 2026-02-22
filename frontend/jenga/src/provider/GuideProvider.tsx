@@ -1,6 +1,7 @@
 import { createContext, JSXElement, onCleanup, onMount, useContext } from "solid-js";
 import { useNavigate } from "@solidjs/router";
 import { LayoutContext } from "./LayoutProvider";
+import { I18nContext } from "./I18nProvider";
 
 import "shepherd.js/dist/css/shepherd.css";
 import Shepherd from "shepherd.js";
@@ -19,6 +20,7 @@ export const GuideContext = createContext<GuideContextType>();
 export const GuideProvider = (props: GuideProviderProps) => {
     const navigate = useNavigate();
     const lCtx = useContext(LayoutContext);
+    const i18n = useContext(I18nContext);
     const tour = new Shepherd.Tour({
         defaultStepOptions: {
             classes: "shepherd-theme-arrows",
@@ -28,11 +30,11 @@ export const GuideProvider = (props: GuideProviderProps) => {
             },
             buttons: [
                 {
-                    text: "Back",
+                    text: i18n?.t("guide.back"),
                     action: () => tour.back(),
                 },
                 {
-                    text: "Next",
+                    text: i18n?.t("guide.next"),
                     action: () => tour.next(),
                 },
             ],
@@ -60,16 +62,16 @@ export const GuideProvider = (props: GuideProviderProps) => {
         lCtx?.setSidebarOpen(true);
     };
 
-    const steps: Shepherd.Step.StepOptions[] = [
+    const getSteps = (): Shepherd.Step.StepOptions[] => [
         {
             id: "welcome",
-            title: "Welcome to Jenga",
-            text: "This quick tour follows the typical flow: choose a project, import or create tickets, plan work in Sprint, then update ticket details.",
+            title: i18n?.t("guide.steps.welcome.title"),
+            text: i18n?.t("guide.steps.welcome.text"),
         },
         {
             id: "navigation",
-            title: "Main Navigation",
-            text: "Use this menu button to open or close the sidebar. The guide will switch between Home and Sprint automatically.",
+            title: i18n?.t("guide.steps.navigation.title"),
+            text: i18n?.t("guide.steps.navigation.text"),
             attachTo: {
                 element: "#guide-nav-toggle",
                 on: "bottom",
@@ -78,8 +80,8 @@ export const GuideProvider = (props: GuideProviderProps) => {
         },
         {
             id: "sidebar",
-            title: "App Sections",
-            text: "Navigate to Home for project setup and to Sprint for daily ticket planning and status updates.",
+            title: i18n?.t("guide.steps.sidebar.title"),
+            text: i18n?.t("guide.steps.sidebar.text"),
             attachTo: {
                 element: "#guide-sidebar",
                 on: "right",
@@ -91,8 +93,8 @@ export const GuideProvider = (props: GuideProviderProps) => {
         },
         {
             id: "projects",
-            title: "Projects",
-            text: "Start here: create or select a project. In Jenga, tickets and labels are always scoped to the selected project.",
+            title: i18n?.t("guide.steps.projects.title"),
+            text: i18n?.t("guide.steps.projects.text"),
             attachTo: {
                 element: "#guide-projects",
                 on: "bottom",
@@ -101,8 +103,8 @@ export const GuideProvider = (props: GuideProviderProps) => {
         },
         {
             id: "file-import",
-            title: "File Import",
-            text: "You can seed a project by importing GitHub issues as JSON via drag and drop or the file picker.",
+            title: i18n?.t("guide.steps.fileImport.title"),
+            text: i18n?.t("guide.steps.fileImport.text"),
             attachTo: {
                 element: "#guide-file-import",
                 on: "top",
@@ -111,8 +113,8 @@ export const GuideProvider = (props: GuideProviderProps) => {
         },
         {
             id: "ticket-filter",
-            title: "Ticket Filter",
-            text: "Before planning, narrow the ticket set by title, assignee, status, labels, or all fields.",
+            title: i18n?.t("guide.steps.ticketFilter.title"),
+            text: i18n?.t("guide.steps.ticketFilter.text"),
             attachTo: {
                 element: "#guide-ticket-filter",
                 on: "bottom",
@@ -121,8 +123,8 @@ export const GuideProvider = (props: GuideProviderProps) => {
         },
         {
             id: "kanban",
-            title: "Kanban",
-            text: "Use drag and drop to move tickets across status columns and assignees directly on the board.",
+            title: i18n?.t("guide.steps.kanban.title"),
+            text: i18n?.t("guide.steps.kanban.text"),
             attachTo: {
                 element: "#guide-kanban",
                 on: "top",
@@ -131,8 +133,8 @@ export const GuideProvider = (props: GuideProviderProps) => {
         },
         {
             id: "backlog",
-            title: "Backlog",
-            text: "The backlog lists all filtered tickets and lets you create new tickets with the plus button.",
+            title: i18n?.t("guide.steps.backlog.title"),
+            text: i18n?.t("guide.steps.backlog.text"),
             attachTo: {
                 element: "#guide-backlog",
                 on: "top",
@@ -141,8 +143,8 @@ export const GuideProvider = (props: GuideProviderProps) => {
         },
         {
             id: "ticket-details",
-            title: "Ticket Details",
-            text: "Select any ticket from Kanban or Backlog, edit fields here, then save to persist project changes.",
+            title: i18n?.t("guide.steps.ticketDetails.title"),
+            text: i18n?.t("guide.steps.ticketDetails.text"),
             attachTo: {
                 element: "#guide-ticket-details",
                 on: "left",
@@ -151,16 +153,16 @@ export const GuideProvider = (props: GuideProviderProps) => {
         },
         {
             id: "done",
-            title: "You're Ready",
-            text: "You now know the core Jenga workflow. Pick a project and start planning your sprint.",
+            title: i18n?.t("guide.steps.done.title"),
+            text: i18n?.t("guide.steps.done.text"),
             beforeShowPromise: () => goToPathAndWaitFor("/Sprint", "#guide-ticket-details"),
             buttons: [
                 {
-                    text: "Back",
+                    text: i18n?.t("guide.back"),
                     action: () => tour.back(),
                 },
                 {
-                    text: "Finish",
+                    text: i18n?.t("guide.finish"),
                     action: () => tour.complete(),
                 },
             ],
@@ -168,7 +170,7 @@ export const GuideProvider = (props: GuideProviderProps) => {
     ];
 
     onMount(() => {
-        tour.addSteps(steps);
+        tour.addSteps(getSteps());
     });
 
 
@@ -176,6 +178,13 @@ export const GuideProvider = (props: GuideProviderProps) => {
         if (tour.isActive()) {
             tour.cancel();
         }
+
+        [...tour.steps].forEach((step) => {
+            if (step.id) {
+                tour.removeStep(step.id);
+            }
+        });
+        tour.addSteps(getSteps());
 
         if (tour.steps.length === 0) {
             return;

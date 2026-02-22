@@ -18,7 +18,7 @@ export const LangButton = () => {
             variant="outlined"
             color="inherit"
         >
-            {i18n?.language()?.startsWith("de") ? "DE" : "EN"}
+            {i18n?.language()?.startsWith("de") ? i18n?.t("lang.de") : i18n?.t("lang.en")}
         </Button>
     );
 };

@@ -5,6 +5,7 @@ import { TicketPriority, TicketSize, TicketStatus, TicketRequestDTO, TicketRespo
 import { ProjectContext } from "../provider/ProjectProvider"
 import { TicketInfo } from "./TicketInfo"
 import { InfoMode } from "../utils/utils"
+import { I18nContext } from "../provider/I18nProvider"
 
 interface NewTicketDialogProps {
     open: boolean
@@ -13,6 +14,7 @@ interface NewTicketDialogProps {
 
 export const NewTicketDialog = (props: NewTicketDialogProps) => {
     const pCtx = useContext(ProjectContext)
+    const i18n = useContext(I18nContext)
 
     const EMPTY_TICKET: TicketResponseDTO = {
         title: "",
@@ -44,7 +46,7 @@ export const NewTicketDialog = (props: NewTicketDialogProps) => {
         const source = draft ?? ticket()
         const project = pCtx?.selectedProject()
         if (!project?.identifier) {
-            setCreateError("No project selected")
+            setCreateError(i18n?.t("errors.noProjectSelected") ?? "")
             return
         }
 
@@ -69,20 +71,20 @@ export const NewTicketDialog = (props: NewTicketDialogProps) => {
             setTimeout(() => props.setOpen(false), 700)
         } catch (error) {
             console.error("Failed to create ticket", error)
-            setCreateError("Failed to create ticket")
+            setCreateError(i18n?.t("errors.failedCreateTicket") ?? "")
         }
     }
 
     return (
         <Dialog open={props.open} fullWidth>
-            <DialogTitle title="New Ticket">New Ticket</DialogTitle>
+            <DialogTitle title={i18n?.t("newTicket.title")}>{i18n?.t("newTicket.title")}</DialogTitle>
             <DialogContent>
                 <Show when={createError()}>
                     {(message) => <Alert severity="error">{message()}</Alert>}
                 </Show>
                 <Show when={createSuccess()}>
                     <Alert severity="success" icon={<CheckCircle />}>
-                        Ticket created
+                        {i18n?.t("newTicket.created")}
                     </Alert>
                 </Show>
                 <TicketInfo
@@ -94,8 +96,8 @@ export const NewTicketDialog = (props: NewTicketDialogProps) => {
                 />
             </DialogContent>
             <DialogActions>
-                <Button type="button" onClick={() => { props.setOpen(false) }}>cancel</Button>
-                <Button type="submit" form={formId}>create</Button>
+                <Button type="button" onClick={() => { props.setOpen(false) }}>{i18n?.t("common.cancel")}</Button>
+                <Button type="submit" form={formId}>{i18n?.t("common.create")}</Button>
             </DialogActions>
         </Dialog>
     )
