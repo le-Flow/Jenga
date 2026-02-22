@@ -51,7 +51,7 @@ const StatusCell = (props: KanbanCellProps) => {
 
     return (
         <TableCell
-            sx={{ "border": "1px solid black" }}
+            sx={{ "border": "1px solid black", "vertical-align": "top" }}
             onDragOver={(event) => event.preventDefault()}
             onDrop={async (event) => {
                 event.preventDefault()
@@ -79,7 +79,14 @@ const StatusCell = (props: KanbanCellProps) => {
                 }
             }}
         >
-            <List>
+            <List
+                sx={{
+                    "maxHeight": "30vh",
+                    "overflowY": "auto",
+                    "paddingTop": 0,
+                    "paddingBottom": 0,
+                }}
+            >
                 <For each={props.tickets?.filter(t => t.status === props.status)}>
                     {(ticket) => (
                         <KanbanItem ticket={ticket} />
