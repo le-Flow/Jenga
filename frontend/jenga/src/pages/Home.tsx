@@ -8,8 +8,12 @@ export const Home = () => {
             <CardHeader title="Home"></CardHeader>
             <CardContent>
                 <Stack spacing={2}>
-                    <Projects></Projects>
-                    <Filedrop></Filedrop>
+                    <div id="guide-projects">
+                        <Projects></Projects>
+                    </div>
+                    <div id="guide-file-import">
+                        <Filedrop></Filedrop>
+                    </div>
                 </Stack>
             </CardContent>
         </Card>

@@ -53,7 +53,7 @@ export const Backlog = (props: BacklogProps) => {
 
     return (
         <>
-            <Card>
+            <Card id="guide-backlog">
                 <CardHeader title="Backlog"></CardHeader>
                 <CardContent>
                     <List>

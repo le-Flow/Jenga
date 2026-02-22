@@ -117,7 +117,7 @@ export const Kanban = (props: KanbanProps) => {
     )
 
     return (
-        <Card>
+        <Card id="guide-kanban">
             <CardHeader title="Kanban"></CardHeader>
             <CardContent>
                 <TableContainer component={Paper}>

@@ -34,7 +34,7 @@ export const Sprint = () => {
                         <Backlog tickets={filteredTickets()}></Backlog>
                     </Stack>
 
-                    <Card variant="outlined" class="ticket-sidebar">
+                    <Card id="guide-ticket-details" variant="outlined" class="ticket-sidebar">
                         <CardHeader title="Ticket Details" />
                         <CardContent>
                             <Show

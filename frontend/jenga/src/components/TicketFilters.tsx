@@ -146,6 +146,7 @@ export const TicketFilters = (props: TicketFiltersProps) => {
 
     return (
         <Stack
+            id="guide-ticket-filter"
             spacing={1.5}
             sx={{
                 "border": "1px solid",
