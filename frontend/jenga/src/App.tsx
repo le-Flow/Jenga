@@ -13,6 +13,7 @@ import { LayoutContext, LayoutProvider } from './provider/LayoutProvider';
 import { GuideProvider } from './provider/GuideProvider';
 import { GuideButton } from './components/GuideButton';
 import { I18nProvider } from './provider/I18nProvider';
+import { LangButton } from './components/LangButton';
 
 const theme = createTheme()
 
@@ -44,6 +45,7 @@ const AppShell = (props: AppProps) => {
                   <img src={logo} style={{ "height": "2vw", "width": "auto" }}></img>
                   <Box marginLeft={"auto"}>
                     <Stack direction="row" spacing={2}>
+                      <LangButton></LangButton>
                       <GuideButton></GuideButton>
                       <Auth></Auth>
                     </Stack>

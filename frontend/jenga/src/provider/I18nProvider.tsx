@@ -11,7 +11,7 @@ type I18nContextType = {
     changeLanguage: (lng: string) => Promise<void>;
 }
 
-const I18nContext = createContext<I18nContextType>()
+export const I18nContext = createContext<I18nContextType>()
 
 interface I18nProviderProps {
     children: JSXElement
@@ -75,4 +75,4 @@ export const I18nProvider = (props: I18nProviderProps) => {
         </I18nContext.Provider>
     )
 
-}
+};
