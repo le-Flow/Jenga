@@ -1,4 +1,4 @@
-import { TableRow, TableCell, Card, CardHeader, CardContent, TableContainer, Paper, Table, TableHead, TableBody, ListItem, List, ListItemButton } from "@suid/material"
+import { Card, CardContent, CardHeader, List, ListItem, ListItemButton, ListItemText, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@suid/material"
 import { useContext, createMemo, For } from "solid-js"
 import { TicketResponseDTO, TicketStatus } from "../api"
 import { ProjectContext } from "../provider/ProjectProvider"
@@ -10,6 +10,7 @@ interface KanbanItemProps {
 
 const KanbanItem = (props: KanbanItemProps) => {
     const pCtx = useContext(ProjectContext)
+    const labels = () => (props.ticket.labels ?? []).join(", ")
 
     return (
         <ListItem
@@ -29,7 +30,10 @@ const KanbanItem = (props: KanbanItemProps) => {
                 onClick={() => pCtx?.setSelectedTicket(props.ticket)}
                 selected={pCtx?.selectedTicket()?.id === props.ticket.id}
             >
-                {props.ticket.title}
+                <ListItemText
+                    primary={props.ticket.title}
+                    secondary={labels() ? `tags: ${labels()}` : undefined}
+                />
             </ListItemButton>
         </ListItem>
     )
