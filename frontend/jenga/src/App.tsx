@@ -10,6 +10,7 @@ import { Menu } from '@suid/icons-material';
 import { Footer } from './components/Footer';
 import { useLocation } from '@solidjs/router';
 import { LayoutProvider } from './provider/LayoutProvider';
+import { GuideProvider } from './provider/GuideProvider';
 
 const theme = createTheme()
 
@@ -36,6 +37,7 @@ const App = (props: AppProps) => {
           <AuthProvider>
             <UserProvider>
               <ProjectProvider>
+                <GuideProvider>
                 <AppBar position="static">
                   <Toolbar>
                     <IconButton onClick={() => { setOpen(prev => !prev) }}>
@@ -58,6 +60,7 @@ const App = (props: AppProps) => {
                   </Box>
                 </Stack>
                 <Footer></Footer>
+                </GuideProvider>
               </ProjectProvider>
             </UserProvider>
           </AuthProvider>
