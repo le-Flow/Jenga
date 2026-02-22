@@ -104,12 +104,16 @@ const Row = (props: RowProps) => {
 }
 
 
-export const Kanban = () => {
+interface KanbanProps {
+    tickets?: TicketResponseDTO[]
+}
+
+export const Kanban = (props: KanbanProps) => {
 
     const pCtx = useContext(ProjectContext)
 
     const tickets = createMemo(() =>
-        Map.groupBy(pCtx?.tickets() ?? [], t => t.assignee ?? "")
+        Map.groupBy(props.tickets ?? pCtx?.tickets() ?? [], t => t.assignee ?? "")
     )
 
     return (

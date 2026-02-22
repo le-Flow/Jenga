@@ -49,6 +49,7 @@ export const Backlog = (props: BacklogProps) => {
     const pCtx = useContext(ProjectContext)
 
     const [open, setOpen] = createSignal(false)
+    const tickets = () => props.tickets ?? pCtx?.tickets() ?? []
 
     return (
         <>
@@ -56,7 +57,7 @@ export const Backlog = (props: BacklogProps) => {
                 <CardHeader title="Backlog"></CardHeader>
                 <CardContent>
                     <List>
-                        <For each={pCtx?.tickets() ?? []}>
+                        <For each={tickets()}>
                             {
                                 (t) => <BacklogItem ticket={t}></BacklogItem>
                             }
