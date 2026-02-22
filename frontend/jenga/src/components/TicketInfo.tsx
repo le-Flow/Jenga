@@ -75,10 +75,31 @@ export const TicketInfo = (props: TicketInfoProps) => {
             id={formId}
             onSubmit={(event) => {
                 event.preventDefault()
-                props.onSubmit?.({ ...props.ticket })
+                const nextRelated = parseTicketIds(ticketIdInputs().relatedTicketsIds)
+                const nextBlocking = parseTicketIds(ticketIdInputs().blockingTicketIds)
+                const nextBlocked = parseTicketIds(ticketIdInputs().blockedTicketIds)
+
+                setTicketIdInputs({
+                    relatedTicketsIds: formatTicketIds(nextRelated),
+                    blockingTicketIds: formatTicketIds(nextBlocking),
+                    blockedTicketIds: formatTicketIds(nextBlocked),
+                })
+
+                props.onSubmit?.({
+                    ...props.ticket,
+                    relatedTicketsIds: nextRelated,
+                    blockingTicketIds: nextBlocking,
+                    blockedTicketIds: nextBlocked,
+                })
             }}
         >
             <Stack spacing={1.5}>
+                <TextField
+                    name="id"
+                    label={i18n?.t("ticketInfo.id")}
+                    value={props.ticket.id != null ? String(props.ticket.id) : "-"}
+                    disabled
+                />
                 <TextField
                     name="title"
                     label={i18n?.t("ticketInfo.title")}

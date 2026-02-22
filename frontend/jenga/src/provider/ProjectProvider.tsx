@@ -57,6 +57,9 @@ export const ProjectProvider = (props: ProviderProps) => {
             }))
             .filter((entry) => entry.description.length > 0);
 
+    const normalizeTicketIds = (ids: number[] | undefined, ticketId: number) =>
+        [...new Set((ids ?? []).filter((id) => id > 0 && id !== ticketId))];
+
     const toTicketRequest = (ticket: TicketResponseDTO): TicketRequestDTO => ({
         title: ticket.title ?? "",
         description: ticket.description ?? "",
@@ -90,6 +93,52 @@ export const ProjectProvider = (props: ProviderProps) => {
                 description: entry.description,
                 completed: entry.completed,
             });
+        }
+    };
+
+    const syncTicketLinks = async (ticketId: number, nextTicket: TicketResponseDTO) => {
+        const currentTicket = await TicketResourceService.getApiTickets1(ticketId);
+
+        const currentRelated = new Set(normalizeTicketIds(currentTicket.relatedTicketsIds, ticketId));
+        const nextRelated = new Set(normalizeTicketIds(nextTicket.relatedTicketsIds, ticketId));
+
+        for (const relatedId of currentRelated) {
+            if (!nextRelated.has(relatedId)) {
+                await TicketResourceService.deleteApiTicketsRelated(relatedId, ticketId);
+            }
+        }
+        for (const relatedId of nextRelated) {
+            if (!currentRelated.has(relatedId)) {
+                await TicketResourceService.putApiTicketsRelated(relatedId, ticketId);
+            }
+        }
+
+        const currentBlocking = new Set(normalizeTicketIds(currentTicket.blockingTicketIds, ticketId));
+        const nextBlocking = new Set(normalizeTicketIds(nextTicket.blockingTicketIds, ticketId));
+
+        for (const blockingId of currentBlocking) {
+            if (!nextBlocking.has(blockingId)) {
+                await TicketResourceService.deleteApiTicketsBlock(blockingId, ticketId);
+            }
+        }
+        for (const blockingId of nextBlocking) {
+            if (!currentBlocking.has(blockingId)) {
+                await TicketResourceService.putApiTicketsBlock(blockingId, ticketId);
+            }
+        }
+
+        const currentBlocked = new Set(normalizeTicketIds(currentTicket.blockedTicketIds, ticketId));
+        const nextBlocked = new Set(normalizeTicketIds(nextTicket.blockedTicketIds, ticketId));
+
+        for (const blockedId of currentBlocked) {
+            if (!nextBlocked.has(blockedId)) {
+                await TicketResourceService.deleteApiTicketsBlock(ticketId, blockedId);
+            }
+        }
+        for (const blockedId of nextBlocked) {
+            if (!currentBlocked.has(blockedId)) {
+                await TicketResourceService.putApiTicketsBlock(ticketId, blockedId);
+            }
         }
     };
 
@@ -160,6 +209,7 @@ export const ProjectProvider = (props: ProviderProps) => {
             const request = toTicketRequest(ticket);
             await TicketResourceService.putApiTickets(ticket.id, request);
             await syncAcceptanceCriteria(ticket.id, ticket);
+            await syncTicketLinks(ticket.id, ticket);
             const refreshedTicket = await TicketResourceService.getApiTickets1(ticket.id);
 
             setTickets((prev) =>

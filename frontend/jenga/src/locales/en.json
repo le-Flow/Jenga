@@ -158,6 +158,7 @@
     "label": "Labels"
   },
   "ticketInfo": {
+    "id": "Ticket ID",
     "title": "Title",
     "description": "Description",
     "acceptanceCriteria": "Acceptance Criteria",
