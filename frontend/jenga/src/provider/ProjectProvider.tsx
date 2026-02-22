@@ -5,14 +5,15 @@ import { AuthContext } from "./AuthProvider";
 type ProjectContextType = {
     projects: Resource<ProjectResponseDTO[] | undefined>;
     setProjects: Setter<ProjectResponseDTO[] | undefined>;
-    refetchProjects: () => void;
+    refetchProjects: () => Promise<ProjectResponseDTO[] | undefined>;
 
     selectedProject: Accessor<ProjectResponseDTO | undefined>;
     setSelectedProject: Setter<ProjectResponseDTO | undefined>;
 
     tickets: Resource<TicketResponseDTO[] | undefined>;
     setTickets: Setter<TicketResponseDTO[] | undefined>;
-    refetchTickets: () => void;
+    refetchTickets: () => Promise<TicketResponseDTO[] | undefined>;
+    refetchAll: () => Promise<void>;
 
     selectedTicket: Accessor<TicketResponseDTO | undefined>;
     setSelectedTicket: Setter<TicketResponseDTO | undefined>;
@@ -155,7 +156,7 @@ export const ProjectProvider = (props: ProviderProps) => {
         async (projectId) => await TicketResourceService.getApiTicketsAll(projectId)
     );
 
-    const [availableLabels, { mutate: setAvailableLabels }] = createResource(
+    const [availableLabels, { mutate: setAvailableLabels, refetch: refetchAvailableLabels }] = createResource(
         () => (aCtx?.isLoggedIn?.() ? selectedProjectId() : undefined),
         async (projectId) => {
             const labels = await ProjectResourceService.getApiProjectsLabels(projectId);
@@ -164,6 +165,28 @@ export const ProjectProvider = (props: ProviderProps) => {
                 .filter((label): label is string => Boolean(label));
         }
     );
+
+    const refetchAll = async () => {
+        await refetchProjects();
+
+        const projectId = selectedProjectId();
+        if (!projectId) {
+            return;
+        }
+
+        const [nextTickets] = await Promise.all([
+            refetchTickets(),
+            refetchAvailableLabels()
+        ]);
+
+        const selectedId = selectedTicket()?.id;
+        if (selectedId == null || !nextTickets) {
+            return;
+        }
+
+        const refreshedSelectedTicket = nextTickets.find((ticket) => ticket.id === selectedId);
+        setSelectedTicket(() => refreshedSelectedTicket);
+    };
 
     createEffect(() => {
         if (!aCtx?.isLoggedIn?.()) {
@@ -277,6 +300,7 @@ export const ProjectProvider = (props: ProviderProps) => {
         tickets,
         setTickets,
         refetchTickets,
+        refetchAll,
         selectedTicket,
         setSelectedTicket,
         deleteProject,

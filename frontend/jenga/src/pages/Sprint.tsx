@@ -8,6 +8,7 @@ import { TicketInfo } from "../components/TicketInfo"
 import { TicketFilter, TicketFilters, matchesTicketFilters } from "../components/TicketFilters"
 import { InfoMode } from "../utils/utils"
 import { I18nContext } from "../provider/I18nProvider"
+import { RefetchButton } from "../components/RefetchButton"
 import "./Sprint.css"
 
 export const Sprint = () => {
@@ -25,7 +26,10 @@ export const Sprint = () => {
 
     return (
         <Card>
-            <CardHeader title={i18n?.t("pages.sprint.title")}></CardHeader>
+            <CardHeader
+                title={i18n?.t("pages.sprint.title")}
+                action={<RefetchButton />}
+            ></CardHeader>
             <CardContent>
                 <Box class="sprint-layout">
                     <Stack spacing={2}>
