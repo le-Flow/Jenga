@@ -19,7 +19,7 @@ export const Register = () => {
             password: password()
         }
 
-        aCtx?.register?.(request)
+        void aCtx?.register?.(request)
     }
 
     return (
@@ -33,12 +33,12 @@ export const Register = () => {
                 <TextField label={i18n?.t("auth.username")} value={username()} onChange={(e) => setUsername(e.currentTarget.value)} required></TextField>
                 <TextField label={i18n?.t("auth.email")} value={email()} onChange={(e) => setEmail(e.currentTarget.value)} type="email" required></TextField>
                 <TextField label={i18n?.t("auth.password")} value={password()} onChange={(e) => setPassword(e.currentTarget.value)} type="password" required></TextField>
-                <Show when={aCtx?.registerResult.error}>
+                <Show when={aCtx?.registerError()}>
                     <Alert severity="error">
                         <AlertTitle>{i18n?.t("auth.registrationFailed")}</AlertTitle>
                     </Alert>
                 </Show>
-                <Button type="submit" disabled={aCtx?.registerResult.loading}>
+                <Button type="submit" disabled={aCtx?.registerLoading()}>
                     {i18n?.t("auth.register")}
                 </Button>
             </Stack>

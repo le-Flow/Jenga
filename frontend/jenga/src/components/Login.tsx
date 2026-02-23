@@ -18,7 +18,7 @@ export const LogIn = () => {
             password: password()
         }
 
-        aCtx?.login?.(request)
+        void aCtx?.login?.(request)
     }
 
     return (
@@ -31,12 +31,12 @@ export const LogIn = () => {
             <Stack spacing={1}>
                 <TextField label={i18n?.t("auth.username")} value={username()} onChange={(e) => setUsername(e.currentTarget.value)} required></TextField>
                 <TextField label={i18n?.t("auth.password")} value={password()} onChange={(e) => setPassword(e.currentTarget.value)} type="password" required></TextField>
-                <Show when={aCtx?.jwt.error}>
+                <Show when={aCtx?.loginError()}>
                     <Alert severity="error">
                         <AlertTitle>{i18n?.t("auth.wrongCredentials")}</AlertTitle>
                     </Alert>
                 </Show>
-                <Button type="submit">
+                <Button type="submit" disabled={aCtx?.loginLoading()}>
                     {i18n?.t("auth.login")}
                 </Button>
             </Stack>
