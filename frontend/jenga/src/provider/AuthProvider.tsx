@@ -1,13 +1,15 @@
-import { Accessor, JSXElement, Resource, createContext, createEffect, createMemo, createResource, createSignal } from "solid-js";
+import { Accessor, JSXElement, createContext, createMemo, createSignal } from "solid-js";
 import { AuthenticationResourceService, LoginRequestDTO, LoginResponseDTO, OpenAPI, RegisterRequestDTO } from "../api";
 
-
 type AuthContextType = {
-  login?: (request: LoginRequestDTO) => void;
+  login?: (request: LoginRequestDTO) => Promise<void>;
   isLoggedIn: Accessor<boolean>;
-  register?: (request: RegisterRequestDTO) => void;
-  jwt: Resource<LoginResponseDTO | undefined>;
-  registerResult: Resource<LoginResponseDTO | undefined>;
+  register?: (request: RegisterRequestDTO) => Promise<void>;
+  jwt: Accessor<LoginResponseDTO | undefined>;
+  loginError: Accessor<unknown>;
+  registerError: Accessor<unknown>;
+  loginLoading: Accessor<boolean>;
+  registerLoading: Accessor<boolean>;
   logout?: () => void;
 };
 
@@ -18,63 +20,71 @@ interface ProviderProps {
 }
 
 export const AuthProvider = (props: ProviderProps) => {
-  const [registerRequestDTO, setRegisterRequestDTO] = createSignal<RegisterRequestDTO>();
-  const [loginRequestDTO, setLoginRequestDTO] = createSignal<LoginRequestDTO>();
+  const [jwt, setJwt] = createSignal<LoginResponseDTO>();
+  const [loginError, setLoginError] = createSignal<unknown>();
+  const [registerError, setRegisterError] = createSignal<unknown>();
+  const [loginLoading, setLoginLoading] = createSignal(false);
+  const [registerLoading, setRegisterLoading] = createSignal(false);
 
-  const register = (request: RegisterRequestDTO) => {
-    setRegisterRequestDTO(request);
+  const setSession = (nextJwt: LoginResponseDTO | undefined) => {
+    OpenAPI.TOKEN = nextJwt?.token;
+    OpenAPI.USERNAME = nextJwt?.username;
+    setJwt(() => nextJwt);
   };
 
-  const login = (request: LoginRequestDTO) => {
-    setLoginRequestDTO(request);
+  const register = async (request: RegisterRequestDTO) => {
+    setRegisterLoading(true);
+    setRegisterError(undefined);
+
+    try {
+      const registeredUser = await AuthenticationResourceService.postApiAuthRegister(request);
+      setSession(registeredUser);
+      setLoginError(undefined);
+    } catch (error) {
+      setRegisterError(error);
+    } finally {
+      setRegisterLoading(false);
+    }
   };
 
-  const [registerResult] = createResource(registerRequestDTO, async (payload) => {
-    if (!payload) {
-      return undefined;
-    }
+  const login = async (request: LoginRequestDTO) => {
+    setLoginLoading(true);
+    setLoginError(undefined);
 
-    return await AuthenticationResourceService.postApiAuthRegister(payload);
-  });
-  const [loginResult, { mutate: setLoginResult }] = createResource(loginRequestDTO, async (payload) => {
-    if (!payload) {
-      return undefined;
+    try {
+      const loggedInUser = await AuthenticationResourceService.postApiAuthLogin(request);
+      setSession(loggedInUser);
+      setRegisterError(undefined);
+    } catch (error) {
+      setSession(undefined);
+      setLoginError(error);
+    } finally {
+      setLoginLoading(false);
     }
-
-    return await AuthenticationResourceService.postApiAuthLogin(payload);
-  });
-
-  createEffect(() => {
-    const registeredUser = registerResult();
-    if (registeredUser) {
-      setLoginResult(() => registeredUser);
-    }
-  });
+  };
 
   const loggedIn = createMemo(() => {
-    if (loginResult.error) {
-      OpenAPI.TOKEN = undefined;
-      OpenAPI.USERNAME = undefined;
-      return false;
-    }
-
-    const jwt = loginResult();
-    OpenAPI.TOKEN = jwt?.token;
-    OpenAPI.USERNAME = jwt?.username;
-    return Boolean(jwt?.token);
+    const currentJwt = jwt();
+    return Boolean(currentJwt?.token);
   });
 
   const logout = () => {
-    setLoginRequestDTO(undefined);
-    setLoginResult(() => undefined);
+    setSession(undefined);
+    setLoginError(undefined);
+    setRegisterError(undefined);
+    setLoginLoading(false);
+    setRegisterLoading(false);
   };
 
   const value: AuthContextType = {
     login,
     isLoggedIn: loggedIn,
     register,
-    jwt: loginResult,
-    registerResult,
+    jwt,
+    loginError,
+    registerError,
+    loginLoading,
+    registerLoading,
     logout,
   };
 
