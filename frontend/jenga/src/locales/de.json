@@ -85,7 +85,13 @@
       "title": "Home"
     },
     "about": {
-      "title": "Über"
+      "title": "Über",
+      "description": "Jenga ist ein freies Open-Source-Tool fuer Projektmanagement und Issue-Tracking, das Workflows vereinfachen soll. Es enthaelt einen integrierten KI-Assistenten fuer Support und Automatisierung.",
+      "earlyDevelopment": "Fruehe Entwicklungsphase: Funktionen koennen sich schnell aendern und Stabilitaet ist nicht garantiert.",
+      "links": {
+        "sourceCode": "Source Code (GitHub)",
+        "documentation": "Projekt-Dokumentation"
+      }
     },
     "profile": {
       "title": "Profil",
