@@ -10,6 +10,8 @@ import { Menu } from '@suid/icons-material';
 import { Footer } from './components/Footer';
 import { useLocation } from '@solidjs/router';
 import { LayoutContext, LayoutProvider } from './provider/LayoutProvider';
+import { ChatButton, ChatDialog } from './components/Chat';
+import { AiProvider } from './provider/AiProvider';
 import { GuideProvider } from './provider/GuideProvider';
 import { GuideButton } from './components/GuideButton';
 import { I18nProvider } from './provider/I18nProvider';
@@ -32,42 +34,51 @@ const AppShell = (props: AppProps) => {
   });
 
   return (
-    <I18nProvider>
-      <AuthProvider>
-        <UserProvider>
-          <ProjectProvider>
-            <GuideProvider>
-              <AppBar position="static">
-                <Toolbar>
-                  <IconButton id="guide-nav-toggle" onClick={() => { lCtx?.toggleSidebar(); }}>
-                    <Menu></Menu>
-                  </IconButton>
-                  <img src={logo} style={{ "height": "2vw", "width": "auto" }}></img>
-                  <Box marginLeft={"auto"}>
-                    <Stack direction="row" spacing={2}>
-                      <LangButton></LangButton>
-                      <GuideButton></GuideButton>
-                      <Auth></Auth>
-                    </Stack>
-                  </Box>
-                </Toolbar>
-              </AppBar>
-              <Stack direction="row">
-                <Show when={lCtx?.sidebarOpen()}>
-                  <Card id="guide-sidebar" sx={{ "height": "100vh", "width": "10vw" }}>
-                    <Sidebar />
-                  </Card>
-                </Show>
-                <Box flex={1}>
-                  {props.children}
-                </Box>
-              </Stack>
-              <Footer></Footer>
-            </GuideProvider>
-          </ProjectProvider>
-        </UserProvider>
-      </AuthProvider>
-    </I18nProvider>
+    <>
+
+      <I18nProvider>
+        <AuthProvider>
+          <UserProvider>
+            <ProjectProvider>
+              <GuideProvider>
+                <AiProvider>
+                  <AppBar position="static">
+                    <Toolbar>
+                      <IconButton id="guide-nav-toggle" onClick={() => { lCtx?.toggleSidebar(); }}>
+                        <Menu></Menu>
+                      </IconButton>
+                      <img src={logo} style={{ "height": "2vw", "width": "auto" }}></img>
+                      <Box marginLeft={"auto"}>
+                        <Stack direction="row" spacing={2}>
+                          <LangButton></LangButton>
+                          <GuideButton></GuideButton>
+                          <Auth></Auth>
+                        </Stack>
+                      </Box>
+                    </Toolbar>
+                  </AppBar>
+                  <Stack direction="row">
+                    <Show when={lCtx?.sidebarOpen()}>
+                      <Card id="guide-sidebar" sx={{ "height": "100vh", "width": "10vw" }}>
+                        <Sidebar />
+                      </Card>
+                    </Show>
+                    <Box flex={1}>
+                      {props.children}
+                      <Box position="absolute" bottom={0} right={0} margin={2}>
+                        <ChatButton></ChatButton>
+                        <ChatDialog></ChatDialog>
+                      </Box>
+                    </Box>
+                  </Stack>
+                  <Footer></Footer>
+                </AiProvider>
+              </GuideProvider>
+            </ProjectProvider>
+          </UserProvider>
+        </AuthProvider>
+      </I18nProvider >
+    </>
   );
 };
 

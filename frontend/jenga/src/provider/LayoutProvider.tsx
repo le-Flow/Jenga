@@ -4,6 +4,8 @@ type LayoutContextType = {
     sidebarOpen: Accessor<boolean>;
     setSidebarOpen: Setter<boolean>;
     toggleSidebar: () => void;
+    openChat: Accessor<boolean>;
+    setOpenChat: Setter<boolean>;
 }
 
 export const LayoutContext = createContext<LayoutContextType>();
@@ -15,10 +17,13 @@ interface LayoutProviderProps {
 export const LayoutProvider = (props: LayoutProviderProps) => {
     const [sidebarOpen, setSidebarOpen] = createSignal(false);
 
+    const [openChat, setOpenChat] = createSignal(false);
+
     const value: LayoutContextType = {
         sidebarOpen,
         setSidebarOpen,
-        toggleSidebar: () => setSidebarOpen((prev) => !prev),
+        toggleSidebar: () => setSidebarOpen((prev) => !prev), openChat,
+        setOpenChat
     };
 
     return (
