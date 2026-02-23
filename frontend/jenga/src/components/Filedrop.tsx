@@ -11,6 +11,8 @@ export const Filedrop = () => {
     const [uploadError, setUploadError] = createSignal<string>("");
 
     const handleFilesUpload = async (files: File[]) => {
+        setUploadError("")
+
         const projectId = pCtx?.selectedProject()?.identifier
         if (!projectId) {
             console.error("No project selected for import");
