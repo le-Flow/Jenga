@@ -6,6 +6,7 @@
   "scripts": {
     "start": "vite",
     "dev": "vite",
+    "test": "vitest",
     "build": "vite build",
     "serve": "vite preview",
     "gen:api": "npx openapi-typescript-codegen --input ./openapi.yaml --output ./src/api --client fetch",
