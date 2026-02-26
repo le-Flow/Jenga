@@ -86,7 +86,7 @@ export const Projects = () => {
 
     return (
         <>
-            <Box class="projects-layout">
+            <Box class="projects-layout" data-testid="projects-layout">
                 <Card class="projects-card">
                     <CardHeader title={i18n?.t("projects.title")} />
                     <CardContent class="projects-list-content">
@@ -101,6 +101,9 @@ export const Projects = () => {
                                         return (
                                             <ListItem>
                                                 <ListItemButton
+                                                    role="button"
+                                                    aria-label={`select-project-${p.identifier}`}
+                                                    data-testid={`select-project-${p.identifier}`}
                                                     onClick={() => { pCtx?.setSelectedProject(p) }}
                                                     selected={p.identifier === pCtx?.selectedProject()?.identifier}
                                                 >
@@ -110,10 +113,15 @@ export const Projects = () => {
                                                     />
                                                 </ListItemButton>
                                                 <ListItemSecondaryAction>
-                                                    <ListItemButton onClick={() => {
-                                                        pCtx?.setSelectedProject(p);
-                                                        setOpenConfirm(true);
-                                                    }}>
+                                                    <ListItemButton
+                                                        role="button"
+                                                        aria-label={`delete-project-${p.identifier}`}
+                                                        data-testid={`delete-project-${p.identifier}`}
+                                                        onClick={() => {
+                                                            pCtx?.setSelectedProject(p);
+                                                            setOpenConfirm(true);
+                                                        }}
+                                                    >
                                                         <Delete></Delete>
                                                     </ListItemButton>
                                                 </ListItemSecondaryAction>
@@ -125,7 +133,11 @@ export const Projects = () => {
                         </List>
                     </CardContent>
                     <CardActions>
-                        <Button onClick={() => { setOpen(true) }} disabled={!aCtx?.isLoggedIn()}>
+                        <Button
+                            aria-label="create-project"
+                            onClick={() => { setOpen(true) }}
+                            disabled={!aCtx?.isLoggedIn()}
+                        >
                             {i18n?.t("common.new")}
                         </Button>
                     </CardActions>

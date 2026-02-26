@@ -28,6 +28,9 @@ const BacklogItem = (props: BacklogItemProps) => {
             }}
         >
             <ListItemButton
+                role="button"
+                aria-label={`select-ticket-${props.ticket.id ?? "unknown"}`}
+                data-testid={`select-ticket-${props.ticket.id ?? "unknown"}`}
                 onClick={() => pCtx?.setSelectedTicket(props.ticket)}
                 selected={pCtx?.selectedTicket()?.id === props.ticket.id}
             >
@@ -68,7 +71,12 @@ export const Backlog = (props: BacklogProps) => {
                     </List>
                 </CardContent>
                 <CardActions>
-                    <IconButton onClick={() => setOpen(true)} disabled={!pCtx?.selectedProject()}>
+                    <IconButton
+                        aria-label="add-ticket"
+                        data-testid="add-ticket-button"
+                        onClick={() => setOpen(true)}
+                        disabled={!pCtx?.selectedProject()}
+                    >
                         <Add></Add>
                     </IconButton>
                 </CardActions>
