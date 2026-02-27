@@ -49,6 +49,7 @@ export const AiProvider = (props: ProviderProps) => {
         }
 
         return await AiResourceService.postApiAiChat({
+            conversationId: sessionId(),
             currentUser: uCtx?.user()?.username ?? "unknown",
             currentProjectID: pCtx?.selectedProject()?.identifier ?? "",
             currentTicketID: pCtx?.selectedTicket()?.id ?? 0,

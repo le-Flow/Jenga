@@ -185,7 +185,8 @@
   "ticketPriority": {
     "LOW": "Low",
     "MEDIUM": "Medium",
-    "HIGH": "High"
+    "HIGH": "High",
+    "CRITICAL": "Critical"
   },
   "ticketSize": {
     "TINY": "Tiny",

@@ -27,6 +27,7 @@ const LoggedIn = () => {
     return (
         <Stack direction="row">
             <IconButton
+                aria-label="open-profile"
                 onMouseEnter={() => setShowProfile(true)}
                 onMouseLeave={() => setShowProfile(false)}
                 ref={(el) => setAnchorEl(el)}
@@ -51,7 +52,7 @@ const LoggedIn = () => {
                     </CardContent>
                 </Card>
             </Popper>
-            <IconButton onClick={logout}>
+            <IconButton aria-label="logout" onClick={logout}>
                 <Logout></Logout>
             </IconButton>
         </Stack>
@@ -66,7 +67,7 @@ const LoggedOut = () => {
     return (
         <>
 
-            <IconButton onClick={() => setOpen(true)} color="inherit">
+            <IconButton aria-label="open-auth-dialog" onClick={() => setOpen(true)} color="inherit">
                 <Login></Login>
             </IconButton>
             <Dialog open={open()} fullWidth onClose={() => setOpen(false)}>
@@ -79,8 +80,8 @@ const LoggedOut = () => {
                             fullWidth
                             onChange={(_, value) => value !== null && setMode(value)}
                         >
-                            <ToggleButton value={AuthE.SignIn}>{i18n?.t("auth.signIn")}</ToggleButton>
-                            <ToggleButton value={AuthE.SignUp}>{i18n?.t("auth.signUp")}</ToggleButton>
+                            <ToggleButton aria-label="switch-signin" value={AuthE.SignIn}>{i18n?.t("auth.signIn")}</ToggleButton>
+                            <ToggleButton aria-label="switch-signup" value={AuthE.SignUp}>{i18n?.t("auth.signUp")}</ToggleButton>
                         </ToggleButtonGroup>
 
                         <Switch>

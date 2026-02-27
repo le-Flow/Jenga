@@ -38,6 +38,7 @@ export const Filedrop = () => {
     return (
         <>
             <Box
+                data-testid="filedrop-zone"
                 sx={{ "height": "20vh", "width": "100%", "border": "1px black dashed", "display": "flex" }}
                 justifyContent="center"
                 alignItems="center"
@@ -49,8 +50,16 @@ export const Filedrop = () => {
                     await handleFilesUpload(droppedFiles)
                 }}
             >
-                <Button component="label" sx={{ "height": "5vh" }} variant="outlined">
+                <Button
+                    component="label"
+                    role="button"
+                    data-testid="filedrop-button"
+                    aria-label="choose-file"
+                    sx={{ "height": "5vh" }}
+                    variant="outlined"
+                >
                     <input
+                        data-testid="filedrop-input"
                         type="file"
                         multiple
                         hidden
