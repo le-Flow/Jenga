@@ -6,6 +6,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
+import lombok.RequiredArgsConstructor;
+import io.quarkus.logging.Log;
 
 import org.jenga.dto.TicketRequestDTO;
 import org.jenga.dto.TicketResponseDTO;
@@ -13,45 +15,34 @@ import org.jenga.model.TicketPriority;
 import org.jenga.model.TicketSize;
 import org.jenga.model.TicketStatus;
 import org.jenga.service.TicketService;
-import org.jenga.service.MCP_Server.ChatRequestContext;
+import org.jenga.service.mcpserver.ChatRequestContext;
 import java.util.List;
 
 @ApplicationScoped
+@RequiredArgsConstructor(onConstructor_ = { @Inject })
 public class EditTicketTool {
-
-    @Inject
-    TicketService ticketService;
-
-    @Inject
-    ChatRequestContext requestContext;
+    private final TicketService ticketService;
+    private final ChatRequestContext requestContext;
 
     @Tool("Updates an existing ticket. Only fields that are provided (not null) will be changed.")
     public String editTicket(
-            @P("The internal database ID (e.g., 101, 102) of the ticket to edit. If null, the user's current ticket context is used.")
-            Long ticketId,
-            
-            @P("The new title for the ticket. If null, the title will not be changed.")
-            String title,
-            
-            @P("The new detailed description for the ticket. If null, the description will not be changed.")
-            String description,
-            
-            @P("The username of the new assignee. Use 'unassigned' to unassign. If null, the assignee will not be changed.")
-            String assignee,
-            
-            @P("The new priority. If null, the priority will not be changed.")
-            TicketPriority priority,
-            
-            @P("The new size. If null, the size will not be changed.")
-            TicketSize size,
-            
-            @P("The new status. If null, the status will not be changed.")
-            TicketStatus status,
-            
-            @P("A new list of label names. This will REPLACE the old list. If null, labels will not be changed.")
-            List<String> labels
-    ) {
-        
+            @P("The internal database ID (e.g., 101, 102) of the ticket to edit. If null, the user's current ticket context is used.") Long ticketId,
+
+            @P("The new title for the ticket. If null, the title will not be changed.") String title,
+
+            @P("The new detailed description for the ticket. If null, the description will not be changed.") String description,
+
+            @P("The username of the new assignee. Use 'unassigned' to unassign. If null, the assignee will not be changed.") String assignee,
+
+            @P("The new priority. If null, the priority will not be changed.") TicketPriority priority,
+
+            @P("The new size. If null, the size will not be changed.") TicketSize size,
+
+            @P("The new status. If null, the status will not be changed.") TicketStatus status,
+
+            @P("A new list of label names. This will REPLACE the old list. If null, labels will not be changed.") List<String> labels) {
+        Log.infof("EditTicketTool.editTicket called with ticketId: %s", ticketId);
+
         try {
             Long finalTicketId = ticketId;
             if (finalTicketId == null) {
@@ -94,11 +85,11 @@ public class EditTicketTool {
                 updateDTO.setStatus(status);
             }
             if (labels != null) {
-                updateDTO.setLabels(labels); 
+                updateDTO.setLabels(labels);
             }
-            
+
             if (assignee != null) {
-                if (assignee.equalsIgnoreCase("unassigned") || assignee.isBlank()) {
+                if ("unassigned".equalsIgnoreCase(assignee) || assignee.isBlank()) {
                     updateDTO.setAssignee(null);
                 } else {
                     updateDTO.setAssignee(assignee);
@@ -106,12 +97,14 @@ public class EditTicketTool {
             }
 
             TicketResponseDTO updatedTicket = ticketService.update(existingTicket.getId(), updateDTO);
-            
+
             return "SUCCESS: Ticket " + updatedTicket.getTicketNumber() + " has been updated.";
 
         } catch (NotFoundException | BadRequestException e) {
+            Log.warnf("EditTicketTool: Ticket not found or invalid request: %s", e.getMessage());
             return "ERROR: Could not update ticket. Reason: " + e.getMessage();
         } catch (Exception e) {
+            Log.errorf(e, "EditTicketTool: Unexpected error: %s", e.getMessage());
             return "ERROR: An unexpected error occurred: " + e.getMessage();
         }
     }

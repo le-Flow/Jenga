@@ -11,24 +11,30 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.SecurityContext;
+import lombok.RequiredArgsConstructor;
+
 import javax.security.auth.login.LoginException;
 import jakarta.ws.rs.BadRequestException;
+import io.quarkus.security.AuthenticationFailedException;
 import io.quarkus.elytron.security.common.BcryptUtil;
 import io.smallrye.jwt.build.Jwt;
+import io.quarkus.logging.Log;
 
 @ApplicationScoped
+@RequiredArgsConstructor(onConstructor_ = {@Inject})
 public class AuthenticationService {
 
     private static final int EXPIRATION_TIME_SECONDS = 3600;
 
-    @Inject
-    UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @Context
     SecurityContext securityContext;
 
     @Transactional
     public LoginResponseDTO register(RegisterRequestDTO registerRequest) {
+        Log.infof("Attempt registration with E-Mail %s and username %s", registerRequest.getEmail(), registerRequest.getUsername());
+
         String username = registerRequest.getUsername().toLowerCase();
 
         User existingUser = userRepository.findByUsername(username);
@@ -46,17 +52,25 @@ public class AuthenticationService {
 
         if (!username.matches("[a-zA-Z0-9]+")) {
             throw new BadRequestException("Username must only contain letters and numbers");
+        } 
+
+        String displayName = registerRequest.getDisplayName();
+        if (displayName == null || displayName.isEmpty()) {
+            displayName = username;
         }
 
         String email = registerRequest.getEmail();
         String hashedPassword = BcryptUtil.bcryptHash(registerRequest.getPassword());
-        User user = new User(username, email, hashedPassword, null, null);
+        User user = new User(username, displayName, email, hashedPassword, null, null);
         userRepository.persist(user);
 
         LoginResponseDTO loginResponse = new LoginResponseDTO();
         loginResponse.setUsername(username);
+        loginResponse.setDisplayName(displayName);
         loginResponse.setToken(generateToken(user));
         loginResponse.setExpiresIn(EXPIRATION_TIME_SECONDS);
+
+        Log.infof("User created with username %s", username);
 
         return loginResponse;
     }
@@ -64,16 +78,21 @@ public class AuthenticationService {
     public LoginResponseDTO login(LoginRequestDTO loginRequest) throws LoginException {
         User user = userRepository.findByUsername(loginRequest.getUsername().toLowerCase());
 
+        Log.infof("Login attempt with username %s", loginRequest.getUsername());
+
         if (user == null) {
+            Log.warnf("Failed login attempt with username %s: Invalid username", loginRequest.getUsername());
             throw new BadRequestException("Invalid username or password");
         }
 
         if (!BcryptUtil.matches(loginRequest.getPassword(), user.getPassword())) {
+            Log.warnf("Failed login attempt with username %s: Invalid password", user.getUsername());
             throw new BadRequestException("Invalid username or password");
         }
 
         LoginResponseDTO loginResponse = new LoginResponseDTO();
         loginResponse.setUsername(user.getUsername());
+        loginResponse.setDisplayName(user.getDisplayName());
         loginResponse.setToken(generateToken(user));
         loginResponse.setExpiresIn(EXPIRATION_TIME_SECONDS);
 
@@ -81,8 +100,9 @@ public class AuthenticationService {
     }
 
     public String generateToken(User user) {
-        long expirationTime = (System.currentTimeMillis() + EXPIRATION_TIME_SECONDS * 1000L) / 1000L;
-        expirationTime = (System.currentTimeMillis() / 1000L) + EXPIRATION_TIME_SECONDS;
+        long expirationTime = (System.currentTimeMillis() / 1000L) + EXPIRATION_TIME_SECONDS;
+
+        Log.infof("Generating JWT token for user %s", user.getUsername());
 
         return Jwt.issuer("jenga")
                   .upn(user.getUsername())
@@ -96,7 +116,7 @@ public class AuthenticationService {
         User currentUser = userRepository.findByUsername(username);
 
         if (currentUser == null) {
-            throw new RuntimeException("Failed to get user from security context: " + username);
+            throw new AuthenticationFailedException("Failed to get user from security context: " + username);
         }
 
         return currentUser;

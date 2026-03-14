@@ -23,7 +23,7 @@ public class Ticket {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id")
     private Project project;
 
@@ -39,11 +39,11 @@ public class Ticket {
     private LocalDateTime createDate;
     private LocalDateTime modifyDate;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reporter_id")
     private User reporter;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "assignee_id")
     private User assignee;
 

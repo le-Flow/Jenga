@@ -1,0 +1,39 @@
+# ============================
+# Build stage
+# ============================
+ARG NODE_VERSION=20
+FROM node:${NODE_VERSION}-alpine AS build
+
+WORKDIR /app
+
+# Install system dependencies --> need Java for OpenAPI generator
+#RUN apk add --no-cache curl bash git openjdk17
+
+# Copy package files and install dependencies
+COPY package*.json ./
+RUN npm ci
+
+# Copy the rest of the source code
+COPY . .
+
+# Ensure output folder exists
+RUN mkdir -p src/api
+
+RUN npm run gen:api
+
+RUN npm run build
+
+# ============================
+# Runtime stage
+# ============================
+FROM nginx:1.27-alpine AS runtime
+
+WORKDIR /app
+# Copy built frontend
+COPY --from=build /app/dist /usr/share/nginx/html
+COPY nginx/default.conf.template /etc/nginx/templates/default.conf.template
+
+ENV API_UPSTREAM=http://backend:8080
+
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

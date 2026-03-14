@@ -15,9 +15,11 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.NotFoundException;
+
+import org.jenga.exception.ProjectNotFoundException;
+import org.jenga.exception.LabelNotFoundException;
 import java.util.List;
-import java.util.stream.Collectors;
+import io.quarkus.logging.Log;
 
 @ApplicationScoped
 public class ProjectService {
@@ -29,11 +31,10 @@ public class ProjectService {
 
     @Inject
     public ProjectService(
-        ProjectRepository projectRepository, 
-        LabelRepository labelRepository,
-        ProjectMapper projectMapper,
-        LabelMapper labelMapper
-    ) {
+            ProjectRepository projectRepository,
+            LabelRepository labelRepository,
+            ProjectMapper projectMapper,
+            LabelMapper labelMapper) {
         this.projectRepository = projectRepository;
         this.labelRepository = labelRepository;
         this.projectMapper = projectMapper;
@@ -44,12 +45,14 @@ public class ProjectService {
     public ProjectResponseDTO create(ProjectRequestDTO projectRequestDTO) {
         String identifier = projectRequestDTO.getIdentifier();
 
+        Log.infof("Attempting to create new project: %s", identifier);
+
         if (identifier == null || identifier.trim().isEmpty()) {
             throw new BadRequestException("Project identifier cannot be empty");
         }
 
-        if (identifier.length() > 10) {
-            throw new BadRequestException("Project identifier cannot exceed 10 characters");
+        if (identifier.length() > 30) {
+            throw new BadRequestException("Project identifier cannot exceed 30 characters");
         }
 
         if (!identifier.equals(identifier.trim())) {
@@ -61,7 +64,8 @@ public class ProjectService {
         }
 
         if (!identifier.matches("[a-zA-Z0-9]+")) {
-            throw new BadRequestException("Project identifier must only contain letters and numbers (no special characters)");
+            throw new BadRequestException(
+                    "Project identifier must only contain letters and numbers (no special characters)");
         }
 
         Project existingProject = projectRepository.findById(identifier);
@@ -73,28 +77,35 @@ public class ProjectService {
 
         projectRepository.persist(project);
 
+        Log.infof("Created new project: %s", identifier);
+
         return projectMapper.projectToProjectDTO(project);
     }
 
     public List<ProjectResponseDTO> findAll() {
+        Log.info("Fetching all projects");
+
         return projectRepository.findAll().stream()
-                .map(projectMapper::projectToProjectDTO)
-                .collect(Collectors.toList());
+                .map(projectMapper::projectToProjectDTO).toList();
     }
 
     public ProjectResponseDTO findById(String projectId) {
+        Log.infof("Fetch project with Id %s", projectId);
+
         Project project = projectRepository.findById(projectId);
         if (project == null) {
-            throw new NotFoundException("Project not found with ID: " + projectId);
+            throw new ProjectNotFoundException("Project not found with ID: " + projectId);
         }
         return projectMapper.projectToProjectDTO(project);
     }
 
     @Transactional
     public ProjectResponseDTO update(String projectId, ProjectRequestDTO projectRequestDTO) {
+        Log.infof("Update project with Id", projectId);
+
         Project existing = projectRepository.findById(projectId);
         if (existing == null) {
-            throw new NotFoundException("Project not found with ID: " + projectId);
+            throw new ProjectNotFoundException("Project not found with ID: " + projectId);
         }
 
         existing.setId(projectRequestDTO.getIdentifier());
@@ -107,9 +118,11 @@ public class ProjectService {
 
     @Transactional
     public void delete(String projectId) {
+        Log.infof("Delete project with Id", projectId);
+
         Project project = projectRepository.findById(projectId);
         if (project == null) {
-            throw new NotFoundException("Project not found with ID: " + projectId);
+            throw new ProjectNotFoundException("Project not found with ID: " + projectId);
         }
 
         projectRepository.delete(project);
@@ -117,9 +130,11 @@ public class ProjectService {
 
     @Transactional
     public LabelDTO createLabel(String projectId, LabelDTO labelDTO) {
+        Log.infof("Create label for project %s", projectId);
+
         Project project = projectRepository.findById(projectId);
         if (project == null) {
-            throw new NotFoundException("Project not found with ID: " + projectId);
+            throw new ProjectNotFoundException("Project not found with ID: " + projectId);
         }
 
         boolean labelExists = labelRepository.findByProjectIdAndLabelName(projectId, labelDTO.getName()) != null;
@@ -142,15 +157,18 @@ public class ProjectService {
     }
 
     public List<LabelDTO> getAllLabels(String projectId) {
+        Log.infof("Fetching all labels for project %s", projectId);
+
         List<Label> labels = labelRepository.findByProjectId(projectId);
 
         return labels.stream()
-                     .map(labelMapper::labelToLabelDTO)
-                     .collect(Collectors.toList());
+                .map(labelMapper::labelToLabelDTO).toList();
     }
 
     @Transactional
     public void deleteLabel(String projectId, String labelName) {
+        Log.infof("Delete label %s for project %s", labelName, projectId);
+
         Label label = labelRepository.findByProjectIdAndLabelName(projectId, labelName);
         if (label != null) {
             for (Ticket ticket : label.getTickets()) {
@@ -159,7 +177,7 @@ public class ProjectService {
 
             labelRepository.delete(label);
         } else {
-            throw new NotFoundException("Label not found");
+            throw new LabelNotFoundException("Label not found: " + labelName);
         }
     }
 }

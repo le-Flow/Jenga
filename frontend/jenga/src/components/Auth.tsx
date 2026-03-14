@@ -6,6 +6,7 @@ import { Register } from "./Register";
 import { AuthContext } from "../provider/AuthProvider";
 import { UserInfo } from "./UserInfo";
 import { A } from "@solidjs/router";
+import { I18nContext } from "../provider/I18nProvider";
 
 const enum AuthE {
     SignIn,
@@ -26,6 +27,7 @@ const LoggedIn = () => {
     return (
         <Stack direction="row">
             <IconButton
+                aria-label="open-profile"
                 onMouseEnter={() => setShowProfile(true)}
                 onMouseLeave={() => setShowProfile(false)}
                 ref={(el) => setAnchorEl(el)}
@@ -50,7 +52,7 @@ const LoggedIn = () => {
                     </CardContent>
                 </Card>
             </Popper>
-            <IconButton onClick={logout}>
+            <IconButton aria-label="logout" onClick={logout}>
                 <Logout></Logout>
             </IconButton>
         </Stack>
@@ -58,17 +60,18 @@ const LoggedIn = () => {
 }
 
 const LoggedOut = () => {
+    const i18n = useContext(I18nContext);
     const [open, setOpen] = createSignal(false)
     const [mode, setMode] = createSignal(AuthE.SignIn)
 
     return (
         <>
 
-            <IconButton onClick={() => setOpen(true)} color="inherit">
+            <IconButton aria-label="open-auth-dialog" onClick={() => setOpen(true)} color="inherit">
                 <Login></Login>
             </IconButton>
             <Dialog open={open()} fullWidth onClose={() => setOpen(false)}>
-                <DialogTitle>Authentication</DialogTitle>
+                <DialogTitle>{i18n?.t("auth.authentication")}</DialogTitle>
                 <DialogContent>
                     <Stack spacing={2}>
                         <ToggleButtonGroup
@@ -77,8 +80,8 @@ const LoggedOut = () => {
                             fullWidth
                             onChange={(_, value) => value !== null && setMode(value)}
                         >
-                            <ToggleButton value={AuthE.SignIn}>Sign In</ToggleButton>
-                            <ToggleButton value={AuthE.SignUp}>Sign Up</ToggleButton>
+                            <ToggleButton aria-label="switch-signin" value={AuthE.SignIn}>{i18n?.t("auth.signIn")}</ToggleButton>
+                            <ToggleButton aria-label="switch-signup" value={AuthE.SignUp}>{i18n?.t("auth.signUp")}</ToggleButton>
                         </ToggleButtonGroup>
 
                         <Switch>
